@@ -1,38 +1,43 @@
 %{
-    #include "scanType.h"
-    int lines=0;
+// this *order* of these includes is mandatory
+#include "scanType.h"  // TokenData Type
+#include "calc.tab.h"  // token definitions from the bison
+
+int line;
+int numErrors;    // ERR err count
+
+static int setValue(int linenum, int tokenClass, char *svalue)
+{
+    // create the pass-back data space
+    yylval.tokenData = new TokenData;
+
+    // fill it up
+    yylval.tokenData->linenum = linenum;
+    yylval.tokenData->tokenstr = strdup(svalue);  // duplicating string!!
+  
+    if (tokenClass == NUMBER) {
+        yylval.tokenData->numValue = atof(svalue); 
+    }
+    else if (tokenClass == ID) {
+        yylval.tokenData->idIndex = svalue[0]-'a';
+    }
+    // return the tokenclass
+    return tokenClass;
+}
+
 %}
 
 %option noyywrap
 
-BOOLCONST true|false
-NUMCONST idk
-STRINGCONST idk
-ID idk
-
 %%
-[ \t] ; /* ignore whitespace */
-\n    ++lines;
-{BOOLCONST} {
-    struct TokenData tokenData;
-    tokenData.tokenclass = 0;
-    tokenData.linenum = 0;
-    tokenData.tokenstr = "hello";
-    tokenData.cvalue = '\0';
-    tokenData.nvalue = 0;
-    tokenData.svalue = "hello2";
-
-    printf("FOUND A BOOL HERE");
-}
-
-
+"stop"|"quit"|"exit"   { return setValue(line, QUIT, yytext); }
+"pi"                   { return setValue(line, NUMBER, (char *)"3.141592653589793238"); }
+[0-9]+|[0-9]*\.[0-9]+  { return setValue(line, NUMBER, yytext); }
+[0-9]+\.[0-9]*         { return setValue(line, NUMBER, yytext); }
+[a-z]                  { return setValue(line, ID, yytext); }
+[\=\+\-\*\/\(\)]       { return setValue(line, yytext[0], yytext ); }
+[ \t]                  ;
+\/\/.*                 ;
+\n                     { line++; return setValue(line, yytext[0], yytext ); }
+.                      { printf("ERROR(%d): char \'%c\' is not in the language\n", line, yytext[0]); numErrors++; }
 %%
-int main(int argc, char *argv[]) {
-    if (argc == 1) {
-        yyin = fopen(argv[1], "r");
-    }
-
-    yylex();
-    fclose(yyin);
-}
- 
