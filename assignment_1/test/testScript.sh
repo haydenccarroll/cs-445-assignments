@@ -1,0 +1,1 @@
+./scanner > .tmp.txt ./test/badchar.c-; diff -y ./test/badchar.out .tmp.txt

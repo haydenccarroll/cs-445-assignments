@@ -6,8 +6,13 @@
 // Robert Heckendorn
 // Jan 21, 2021    
 
-#include "scanType.h"  // TokenData Type
+#include <iostream>
+#include <string>
+#include <string.h>
 #include <stdio.h>
+
+#include "scanType.hpp"  // TokenData Type
+#include "strutil.hpp"
 
 double vars[26];    
 
@@ -19,7 +24,7 @@ extern int numErrors;    // ERR err count
 #define YYERROR_VERBOSE
 void yyerror(const char *msg)
 {
-    printf("ERROR(%d): %s\n", line, msg);
+    std::cout << "ERROR(" << line << "): " << msg << std::endl;
     numErrors++;
 }
 
@@ -32,174 +37,47 @@ void yyerror(const char *msg)
     double value;
 }
 
-    /* not entirely sure what union, token, and type do. */
-%token <tokenData> QUIT NUMBER ID
-%type  <value> funDecl
+%token <tokenData> ID NUMCONST CHARCONST STRINGCONST BOOLCONST TOKEN KEYWORD
 
 %%
-program : declList
-        ;
-
-declList : decList decl
-         | decl
-         ;
-
-decl     : varDecl
-         | funcDecl
-
-varDecl  : typeSpec varDeclList ';'
-         ;
-
-scopedVarDecl : static typeSpec varDeclList ';'
-              | typeSpec varDeclList ';'
-
-varDeclList   : varDeclList, varDeclInit
-              | simpleExp
+statementlist : statementlist statement
+              | statement
               ;
 
-varDeclInit   : varDeclId
-              | varDeclId ':' simpleExp
-              ;
-
-varDeclId     : ID
-              | ID '[' NUMCONST ']'
-              ;
-
-typeSpec      : bool
-              | char
-              | int
-              ;
-
-funDecl       : typeSpec ID '(' parms ')' compoundStmt
-              | ID '(' parms ')' compoundStmt
-              ;
-
-parms         : parmList
-              | 'ε'
-              ;
-
-parmList      : parmList ';' parmTypeList
-              | parmTypeList
-              ;
-
-parmTypeList  : typeSpec parmIdList
-              ;
-
-parmIdList    : parmIdList ',' parmId
-              | parmId
-              ;
-
-parmId        : ID
-              | ID '['']'
-              ;
-
-stmt          : expStmt | compoundStmt | selectStmt
-              | iterStmt | returnStmt | breakStmt
-              ;
-
-expStmt       : exp ';'
-              | ';'
-              ;
-
-compoundStmt  : '{' localDecls stmtList '}'
-              ;
-
-localDecls    : localDecls scopedVarDecl
-              | 'ε'
-              ;
-
-stmtList      : stmtList stmt
-              | 'ε'
-              ;
-
-selectStmt    : 'if' simpleExp 'then' stmt
-              | 'if' simpleExp 'then' stmt 'else' stmt
-              ;
-
-iterStmt      : 'while' simpleExp 'do' stmt
-              | 'for' ID '=' iterRange 'do' stmt
-              ;
-
-iterRange     : simpleExp 'to' simpleExp
-              | simpleExp 'to' simpleExp 'by' simpleExp
-              ;
-
-returnStmt    : 'return' ';'
-              | 'return' exp ';'
-              ;
-
-breakStmt     : 'break' ';'
-              ;
-
-exp           : mutable assignop exp
-              | mutable '++' | mutable '--'
-              | simpleExp
-              ;
-
-assignop      : '=' | '+=' | '-=' | '*=' | '/='
-              ;
-
-simpleExp     : simpleExp 'or' andExp
-              | andExp
-
-andExp        : andExp 'and' unaryRelExp
-              | unaryRelExp
-              ;
-
-unaryRelExp   : 'not' unaryRelExp | relExp
-              ;
-
-relExp        : sumExp relop sumExp
-              | sumExp
-              ;
-
-relop         : '<' | '<=' | '>' | '>=' | '==' | '!='
-              ;
-
-sumExp        : sumExp sumop mulExp
-              | mulExp
-              ;
-
-sumop         : '+' | '-'
-              ;
-
-mulExp        : mulExp mulop unaryExp 
-              | unaryExp
-              ;
-
-mulop         : '*' | '/' | '%'
-              ;
-
-unaryExp      : unaryop unaryExp
-              | factor
-              ;
-
-unaryop       : '-' | '*' | '?'
-              ;
-
-factor        : mutable | immutable
-              ;
-
-mutable       : ID | ID '[' exp ']'
-              ;
-
-immutable     : '(' exp ')'
-              | call
-              | constant
-              ;
-
-call          : ID '(' args ')'
-              ;
-
-args          : argList
-              | 'ε'
-              ;
-
-argList       : argList ',' exp
-              | exp
-              ;
-
-constant      : NUMCONST | CHARCONST | STRINGCONST | 'true' | 'false'
+statement     : '\n'
+              | ID                      { std::cout << "Line " << $1->linenum << " Token: ID Value: " << $1->tokenstr << std::endl; }
+              | KEYWORD                 { std::cout << "Line " << $1->linenum << " Token: " << $1->tokenstr << std::endl; }
+              | NUMCONST                { std::cout << "Line " << $1->linenum << " Token: NUMCONST Value: " << $1->numConst << "  Input: " << $1->tokenstr << std::endl; }
+              | CHARCONST               {
+                    if (strutil::str_len($1->tokenstr) > 3) {
+                        std::cout << "WARNING(" << $1->linenum << "): character is " << $1->tokenstr.length() - 2 << " characters long and not a single character: '" << $1->tokenstr << "'.  The first char will be used.\n";
+                    }
+                    std::cout << "Line " << $1->linenum << " Token: CHARCONST Value: '" << $1->charConst << "'  Input: " << $1->tokenstr << std::endl; 
+                  }
+              | STRINGCONST             { std::cout << "Line " << $1->linenum << " Token: STRINGCONST Value: \"" << $1->stringConst << "\"  Len: " << $1->stringConst.length() << "  Input: " << $1->tokenstr << std::endl; }
+              | BOOLCONST               { printf("Line %i Token: BOOLCONST Value: %d  Input: %s\n", $1->linenum, $1->boolConst, $1->tokenstr.c_str()); }
+              | TOKEN                   {
+                    std::cout << "Line " << $1->linenum << " Token: ";
+                    if ($1->tokenstr == "<-") {
+                        std::cout << "ASGN\n";
+                    } else if ($1->tokenstr == "==") {
+                        std::cout << "EQ\n";
+                    } else if ($1->tokenstr == "+=") {
+                        std::cout << "ADDASS\n";
+                    } else if ($1->tokenstr == "++") {
+                        std::cout << "INC\n";
+                    } else if ($1->tokenstr == "--") {
+                        std::cout << "DEC\n";
+                    } else if ($1->tokenstr == ">=") {
+                        std::cout << "GEQ\n";
+                    } else if ($1->tokenstr == "<=") {
+                        std::cout << "LEQ\n";
+                    } else if ($1->tokenstr == "!=") {
+                        std::cout << "NEQ\n";
+                    } else {
+                        std::cout << $1->tokenstr << std::endl;
+                    }
+                  }
 
 %%
 extern int yydebug;
@@ -222,8 +100,6 @@ int main(int argc, char *argv[])
     // do the parsing
     numErrors = 0;
     yyparse();
-
-    printf("Number of errors: %d\n", numErrors);   // ERR
 
     return 0;
 }
