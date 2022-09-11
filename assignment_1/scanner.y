@@ -1,20 +1,11 @@
 %{
-// // // // // // // // // // // // // // // // // // // // // // // 
-// CS445 - Calculator Example Program written in the style of the C-
-// compiler for the class.
-//
-// Robert Heckendorn
-// Jan 21, 2021    
-
-#include <iostream>
-#include <string>
 #include <string.h>
 #include <stdio.h>
+#include <iostream>
+#include <string>
 
-#include "scanType.hpp"  // TokenData Type
-#include "strutil.hpp"
-
-double vars[26];    
+#include "scanType.h"  // TokenData Type
+#include "helpers.h"
 
 extern int yylex();
 extern FILE *yyin;
@@ -49,7 +40,7 @@ statement     : '\n'
               | KEYWORD                 { std::cout << "Line " << $1->linenum << " Token: " << $1->tokenstr << std::endl; }
               | NUMCONST                { std::cout << "Line " << $1->linenum << " Token: NUMCONST Value: " << $1->numConst << "  Input: " << $1->tokenstr << std::endl; }
               | CHARCONST               {
-                    if (strutil::str_len($1->tokenstr) > 3) {
+                    if ($1->tokenstr.length() > 3) {
                         std::cout << "WARNING(" << $1->linenum << "): character is " << $1->tokenstr.length() - 2 << " characters long and not a single character: '" << $1->tokenstr << "'.  The first char will be used.\n";
                     }
                     std::cout << "Line " << $1->linenum << " Token: CHARCONST Value: '" << $1->charConst << "'  Input: " << $1->tokenstr << std::endl; 
@@ -94,10 +85,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    // init variables a through z
-    for (int i=0; i<26; i++) vars[i] = 0.0;
-
-    // do the parsing
     numErrors = 0;
     yyparse();
 

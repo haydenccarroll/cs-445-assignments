@@ -1,17 +1,16 @@
 %{
-// this *order* of these includes is mandatory
 #include <algorithm>
 #include <string>
 #include <cstring>
 
-#include "scanType.hpp"  // TokenData Type
+#include "scanType.h"  // TokenData Type
 #include "scanner.tab.h"  // token definitions from the bison
-#include "strutil.hpp"
+#include "helpers.h"
 
 int line = 1;
 int numErrors;    // ERR err count
 
-static int setValue(int linenum, int tokenClass, char *svalue)
+static int setValue(int linenum, int tokenClass, char* strVal)
 {
     int i = 0;
     // create the pass-back data space
@@ -19,22 +18,23 @@ static int setValue(int linenum, int tokenClass, char *svalue)
 
     // fill it up
     yylval.tokenData->linenum = linenum;
-    yylval.tokenData->tokenstr = std::string(svalue);
+    yylval.tokenData->tokenstr = std::string(strVal);
   
     switch (tokenClass) {
         case ID:
-            break;
-        case NUMCONST:
-            yylval.tokenData->numConst = std::atoi(svalue);
-            break;
-        case CHARCONST:
-            yylval.tokenData->charConst = strutil::get_first_char(strutil::remove_quotes(svalue));
-            break;
-        case BOOLCONST:
-            yylval.tokenData->boolConst = yylval.tokenData->tokenstr == "true";
+            // do nothing for ID
             break;
         case STRINGCONST:
-            yylval.tokenData->stringConst = strutil::make_str(strutil::remove_quotes(svalue));
+            yylval.tokenData->stringConst = helpers::remove_quotes(strVal);
+            break;
+        case NUMCONST:
+            yylval.tokenData->numConst = std::atoi(strVal);
+            break;
+        case CHARCONST:
+            yylval.tokenData->charConst = helpers::remove_quotes(strVal)[0];
+            break;
+        case BOOLCONST:
+            yylval.tokenData->boolConst = (yylval.tokenData->tokenstr == "true");
             break;
         case KEYWORD:
             std::transform(yylval.tokenData->tokenstr.begin(), yylval.tokenData->tokenstr.end(), yylval.tokenData->tokenstr.begin(), toupper);
