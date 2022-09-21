@@ -4,7 +4,7 @@
 #include <cstring>
 
 #include "scanType.h"  // TokenData Type
-#include "scanner.tab.h"  // token definitions from the bison
+#include "c-.tab.h"  // token definitions from the bison
 #include "helpers.h"
 
 int line = 1;
@@ -25,13 +25,15 @@ static int setValue(int linenum, int tokenClass, char* strVal)
             // do nothing for ID
             break;
         case STRINGCONST:
-            yylval.tokenData->stringConst = helpers::remove_quotes(strVal);
+            yylval.tokenData->stringConst = helpers::toString(helpers::removeQuotes(strVal));
             break;
         case NUMCONST:
             yylval.tokenData->numConst = std::atoi(strVal);
             break;
         case CHARCONST:
-            yylval.tokenData->charConst = helpers::remove_quotes(strVal)[0];
+            // want to populate stringConst too because we want to warn if a char is too long
+            yylval.tokenData->stringConst = helpers::toString(helpers::removeQuotes(strVal));
+            yylval.tokenData->charConst = helpers::toChar(helpers::removeQuotes(strVal));
             break;
         case BOOLCONST:
             yylval.tokenData->boolConst = (yylval.tokenData->tokenstr == "true");

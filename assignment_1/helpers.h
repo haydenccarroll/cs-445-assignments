@@ -5,7 +5,10 @@
 
 namespace helpers
 {
-    std::string remove_quotes(std::string);
+    std::string removeQuotes(std::string);
+    std::string toString(std::string str);
+    char toChar(std::string str);
+
 }
 
 #endif

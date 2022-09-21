@@ -31,7 +31,7 @@ void yyerror(const char *msg)
 %token <tokenData> ID NUMCONST CHARCONST STRINGCONST BOOLCONST TOKEN KEYWORD
 
 %%
-statementlist : statementlist statement
+statements : statements statement
               | statement
               ;
 
@@ -40,8 +40,8 @@ statement     : '\n'
               | KEYWORD                 { std::cout << "Line " << $1->linenum << " Token: " << $1->tokenstr << std::endl; }
               | NUMCONST                { std::cout << "Line " << $1->linenum << " Token: NUMCONST Value: " << $1->numConst << "  Input: " << $1->tokenstr << std::endl; }
               | CHARCONST               {
-                    if ($1->tokenstr.length() > 3) {
-                        std::cout << "WARNING(" << $1->linenum << "): character is " << $1->tokenstr.length() - 2 << " characters long and not a single character: '" << $1->tokenstr << "'.  The first char will be used.\n";
+                    if ($1->stringConst.length() > 1) {
+                        std::cout << "WARNING(" << $1->linenum << "): character is " << $1->stringConst.length() << " characters long and not a single character: ''" << $1->stringConst << "''.  The first char will be used.\n";
                     }
                     std::cout << "Line " << $1->linenum << " Token: CHARCONST Value: '" << $1->charConst << "'  Input: " << $1->tokenstr << std::endl; 
                   }

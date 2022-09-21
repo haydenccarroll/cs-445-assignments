@@ -1,13 +1,13 @@
-all: scanner
+all: c-
 
-scanner.tab.c scanner.tab.h:	scanner.y
-	bison -t -v -d scanner.y
+c-.tab.c c-.tab.h:	c-.y
+	bison -t -v -d c-.y
 
-lex.yy.c: scanner.l scanner.tab.h
-	flex scanner.l
+lex.yy.c: c-.l c-.tab.h
+	flex c-.l
 
-scanner: lex.yy.c scanner.tab.c scanner.tab.h scanType.h helpers.h helpers.cpp
-	g++ -o scanner scanner.tab.c lex.yy.c helpers.cpp
+c-: lex.yy.c c-.tab.c c-.tab.h scanType.h helpers.h helpers.cpp
+	g++ -o c- c-.tab.c lex.yy.c helpers.cpp
 
 clean:
-	rm scanner scanner.tab.c lex.yy.c scanner.tab.h scanner.output
+	rm c- c-.tab.c lex.yy.c c-.tab.h c-.output
