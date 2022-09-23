@@ -46,7 +46,7 @@ namespace AST
             {
                 for (int j = 0; j < numIndents; j++)
                 {
-                    std::cout << s_indentString;
+                    std::cout << ".   ";
                 }
 
                 std::cout << "Child: " + std::to_string(i) << "  ";
@@ -63,7 +63,7 @@ namespace AST
         {
             for (int i = 0; i < numIndents; i++)
             {
-                std::cout << s_indentString;
+                std::cout << ".   ";
             }
 
             std::cout << "Sibling: " + std::to_string(siblingCount) << "  ";

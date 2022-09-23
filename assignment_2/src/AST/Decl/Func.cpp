@@ -7,16 +7,6 @@
 
 namespace AST::Decl
 {
-    Func::Func()
-        : Decl::Decl()
-    {
-    }
-
-    Func::Func(unsigned lineNum)
-        : Decl::Decl(lineNum)
-    {
-    }
-
     Func::Func(unsigned lineNum, const std::string &id,
                Node *parms, Node *compoundstmt)
         : Decl::Decl(lineNum)

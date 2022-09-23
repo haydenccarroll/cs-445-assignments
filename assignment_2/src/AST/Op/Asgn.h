@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ASGN_H
+#define ASGN_H
 
 #include "../Node.h"
 
@@ -7,32 +8,25 @@
 
 namespace AST::Op
 {
-    /// Assignment node
     class Asgn : public Node
     {
     public:
-        /// Assignment types
         enum class Type
         {
+            DivAsgn,
+            MulAsgn,
             Asgn,
             AddAsgn,
-            SubAsgn,
-            DivAsgn,
-            MulAsgn
+            SubAsgn
         };
 
         Asgn();
-        /// @param lineNum Line number the node appears on
         Asgn(unsigned lineNum);
-        /// Children nodes are optional in the constructor, but they must be provided eventually!
-        /// Use addChildren to add them later.
-        /// @param lineNum Line number the node appears on
-        /// @param type Assignment type
-        /// @param exp1 The assignee
-        /// @param exp2 The expression assigned to exp1
-        Asgn(unsigned lineNum, Type type, Node *exp1 = nullptr, Node *exp2 = nullptr);
-        /// @param exp1 The assignee
-        /// @param exp2 The expression assigned to exp1
+        // although lval and rval are optional, they must be set. they can be set later by addChildren.
+        // type - type of assignment (enum Type)
+        // lval - lval of assignment
+        // rval - rval of assignment
+        Asgn(unsigned lineNum, Type type, Node *lval = nullptr, Node *rval = nullptr);
         void addChildren(Node *exp1, Node *exp2);
         virtual std::string toString() const override;
 
@@ -41,3 +35,5 @@ namespace AST::Op
         Type m_type;
     };
 }
+
+#endif

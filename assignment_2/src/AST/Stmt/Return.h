@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RETURN_H
+#define RETURN_H
 
 #include "../Node.h"
 #include "Stmt.h"
@@ -7,14 +8,13 @@
 
 namespace AST::Stmt
 {
-    /// Function return statement node
     class Return : public Stmt
     {
     public:
         Return();
-        /// @param lineNum Line number the node appears on
-        Return(unsigned lineNum);
-        /// @param lineNum Line number the node appears on
         Return(unsigned lineNum, Node *exp);
+        Return(unsigned lineNum);
     };
 }
+
+#endif

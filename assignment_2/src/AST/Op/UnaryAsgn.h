@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UNARYASGN_H
+#define UNARYASGN_H
 
 #include "../Node.h"
 
@@ -7,11 +8,9 @@
 
 namespace AST::Op
 {
-    /// Unary assignment operator
     class UnaryAsgn : public Node
     {
     public:
-        /// Assignment type
         enum class Type
         {
             Inc,
@@ -19,11 +18,9 @@ namespace AST::Op
         };
 
         UnaryAsgn();
-        /// @param lineNum Line number the node appears on
         UnaryAsgn(unsigned lineNum);
-        /// @param lineNum Line number the node appears on
-        /// @param type Assignment type
-        /// @param exp The node being assigned
+        // type - Assignment type
+        // exp  - exression to be incremented/decremented.
         UnaryAsgn(unsigned lineNum, Type type, Node *exp);
         virtual std::string toString() const override;
 
@@ -32,3 +29,5 @@ namespace AST::Op
         Type m_type;
     };
 }
+
+#endif

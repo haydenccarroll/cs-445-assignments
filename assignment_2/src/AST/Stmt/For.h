@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOR_H
+#define FOR_H
 
 #include "../Node.h"
 #include "Stmt.h"
@@ -7,17 +8,16 @@
 
 namespace AST::Stmt
 {
-    /// For loop node
     class For : public Stmt
     {
     public:
         For();
-        /// @param lineNum Line number the node appears on
         For(unsigned lineNum);
-        /// @param lineNum Line number the node appears on
-        /// @param id Iterator variable identifier
-        /// @param range Iteration range
-        /// @param stmt Loop body
+        // id - name of iterator var
+        // range - iter range
+        // stmt - stmt of loop to be executed
         For(unsigned lineNum, Node *id, Node *range, Node *stmt);
     };
 }
+
+#endif

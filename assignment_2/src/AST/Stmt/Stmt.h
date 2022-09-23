@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STMT_H
+#define STMT_H
 
 #include "../Node.h"
 
@@ -7,17 +8,14 @@
 
 namespace AST::Stmt
 {
-    /// Base statement node
     class Stmt : public Node
     {
     public:
         Stmt();
-        /// @param lineNum Line number the node appears on
         Stmt(unsigned lineNum);
         virtual std::string toString() const override;
 
     protected:
-        /// Statement type (for printing)
         enum class Type
         {
             Break,
@@ -43,3 +41,5 @@ namespace AST::Stmt
 #include "Id.h"
 #include "Const.h"
 #include "Call.h"
+
+#endif

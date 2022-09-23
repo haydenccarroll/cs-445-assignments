@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PARM_H
+#define PARM_H
 
 #include "../Node.h"
 #include "Decl.h"
@@ -8,20 +9,19 @@
 
 namespace AST::Decl
 {
-    /// Parameter declaration node
     class Parm : public Decl
     {
     public:
         Parm();
-        /// @param lineNum Line number the node appears on
         Parm(unsigned lineNum);
-        /// @param lineNum Line number the node appears on
-        /// @param id Parameter name
-        /// @param isArray Whether or not the parameter is an array
-        Parm(unsigned lineNum, const std::string &id, bool isArray);
+        // id - param name
+        // isArr - is array
+        Parm(unsigned lineNum, const std::string &id, bool isArr);
         virtual std::string toString() const override;
 
     protected:
         bool m_isArray;
     };
 }
+
+#endif

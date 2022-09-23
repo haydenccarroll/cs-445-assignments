@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DECL_H
+#define DECL_H
 
 #include "../Node.h"
 
@@ -6,10 +7,9 @@
 #include <optional>
 #include <string>
 
-/// Namespace for declaration nodes
 namespace AST::Decl
 {
-    /// Declaration type
+    // 3 different types of decls
     enum class Type
     {
         Bool,
@@ -22,15 +22,13 @@ namespace AST::Decl
                                                                {Type::Int, "int"}};
     ;
 
-    /// Base declaration node
+    /// Abstract base decl class inherits from node
     class Decl : public Node
     {
     public:
         Decl();
-        /// @param lineNum Line number the node appears on
         Decl(unsigned lineNum);
-        /// Set the node and its sibling's types to the provided type
-        /// @param type Type to set
+        // Set the node and all its sibling's types to type.
         virtual void setType(Type type);
 
     protected:
@@ -42,3 +40,5 @@ namespace AST::Decl
 #include "Func.h"
 #include "Parm.h"
 #include "Var.h"
+
+#endif

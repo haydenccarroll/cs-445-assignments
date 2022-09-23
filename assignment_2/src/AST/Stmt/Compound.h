@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMPOUND_H
+#define COMPOUND_H
 
 #include "../Node.h"
 #include "Stmt.h"
@@ -11,11 +12,11 @@ namespace AST::Stmt
     {
     public:
         Compound();
-        /// @param lineNum Line number the node appears on
         Compound(unsigned lineNum);
-        /// @param lineNum Line number the node appears on
-        /// @param localdecls Local declarations, use nullptr if none
-        /// @param stmtlist Statement list, use nullptr if none
-        Compound(unsigned lineNum, Node *localdecls, Node *stmtlist);
+        // localDecls - Local declarations, nullptr for none
+        // stmtList -  Statement list, nullptr for none
+        Compound(unsigned lineNum, Node *localDecls, Node *stmtList);
     };
 }
+
+#endif

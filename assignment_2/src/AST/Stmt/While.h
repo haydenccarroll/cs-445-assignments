@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WHILE_H
+#define WHILE_H
 
 #include "../Node.h"
 #include "Stmt.h"
@@ -7,16 +8,15 @@
 
 namespace AST::Stmt
 {
-    /// While loop node
     class While : public Stmt
     {
     public:
         While();
-        /// @param lineNum Line number the node appears on
         While(unsigned lineNum);
-        /// @param lineNum Line number the node appears on
-        /// @param exp Expression to evaluate to Boolean
-        /// @param stmt Loop body
+        // exp - exp of while loop
+        // stmt - inside body statements to be executed in loop
         While(unsigned lineNum, Node *exp, Node *stmt);
     };
 }
+
+#endif

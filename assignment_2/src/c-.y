@@ -638,8 +638,6 @@ int main(int argc, char *argv[])
         for (unsigned i = 0; i < options.files().size(); i++) {
             std::string file = options.files()[i];
             if ((yyin = fopen(file.c_str(), "r"))) {
-                // file open successful
-                // do the parsing
                 numErrors = 0;
                 yyparse();
 
@@ -647,8 +645,7 @@ int main(int argc, char *argv[])
                     root->print();
                     delete root;
                     
-                    /// Smart pointers, so destructors are called when vector is cleared
-                    /// Frees all tokens
+                    /// Gets rid of all unique_ptr tokens
                     token_vec.clear();
 
                     if (i != options.files().size() - 1) {
@@ -657,7 +654,6 @@ int main(int argc, char *argv[])
                 }
             }
             else {
-                // failed to open file
                 printf("ERROR: failed to open \'%s\'\n", argv[1]);
                 exit(1);
             }

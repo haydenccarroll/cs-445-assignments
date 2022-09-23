@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OPTIONS_H
+#define OPTIONS_H
 
 #include "ourgetopt/ourgetopt.h"
 
@@ -21,3 +22,5 @@ private:
     bool m_print = false;
     bool m_debug = false;
 };
+
+#endif

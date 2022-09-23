@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UNARY_H
+#define UNARY_H
 
 #include "../Node.h"
 
@@ -7,12 +8,9 @@
 
 namespace AST::Op
 {
-    /// Generic class for unary operator nodes
-    /// "Generic" as in one-size-fits-all, not using generics or templates.
     class Unary : public Node
     {
     public:
-        /// Unary operators
         enum class Type
         {
             Chsign,
@@ -22,15 +20,11 @@ namespace AST::Op
         };
 
         Unary();
-        /// @param lineNum
         Unary(unsigned lineNum);
-        /// exp is optional in this constructor, but must be provided eventually!
-        /// Set later with addExp.
-        /// @param lineNum
-        /// @param type Unary operator type
-        /// @param exp Optional child expression
+        // note: must set exp now or later.
+        // type - type of unary op
+        // exp - exp op is used on. optional (must be set later)
         Unary(unsigned lineNum, Type type, Node *exp = nullptr);
-        /// @param exp Child node
         void addExp(Node *exp);
         virtual std::string toString() const override;
 
@@ -39,3 +33,5 @@ namespace AST::Op
         Type m_type;
     };
 }
+
+#endif

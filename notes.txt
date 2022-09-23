@@ -9,3 +9,4 @@ why is typespec not part of tokenData
 stuff to change:
 
 the setStatic function for Vars.cpp, should only set itself static potentially.
+get rid of all pragmas

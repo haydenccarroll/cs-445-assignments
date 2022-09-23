@@ -1,30 +1,28 @@
-#pragma once
+#ifndef NODE_H
+#define NODE_H
 
 #include <string>
 #include <vector>
 
 namespace AST
 {
-    /// String to print for indentations
-    static const std::string s_indentString = ".   ";
-
-    /// Base AST Node class
+    /// Abstract Base Node class
     class Node
     {
     public:
-        /// Default constructor
         Node();
-        /// @param lineNum Line number the node appears on
+        // lineNum - Line number node is on
         Node(unsigned lineNum);
         virtual ~Node();
-        /// Recursively prints the tree
+        // prints the tree
         void print() const;
+        // returns the string version of the node for printing purposes
         virtual std::string toString() const;
-        /// Adds a child node
+        // Adds a child node
         void addChild(Node *);
-        /// Adds a sibling node
+        // Adds a sibling node
         void addSibling(Node *);
-        /// Gets reference to the line number member
+        // Gets line number reference
         unsigned &lineNumber();
 
     private:
@@ -33,7 +31,9 @@ namespace AST
         Node *m_sibling = nullptr;
         unsigned m_lineNum;
 
-        /// @returns The line tag at the end of every node's print statement
+        // returns the line number text. This is used in the toString() function. 
         std::string lineTag() const;
     };
 }
+
+#endif

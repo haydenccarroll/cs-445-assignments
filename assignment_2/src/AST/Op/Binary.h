@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BINARY_H
+#define BINARY_H
 
 #include "../Node.h"
 
@@ -7,12 +8,9 @@
 
 namespace AST::Op
 {
-    /// Generic class for binary operator nodes
-    /// "Generic" as in one-size-fits-all, not using generics or templates.
     class Binary : public Node
     {
     public:
-        /// Binary operators
         enum class Type
         {
             Mul,
@@ -32,18 +30,15 @@ namespace AST::Op
         };
 
         Binary();
-        /// @param lineNum Line number the node appears on
         Binary(unsigned lineNum);
-        /// exp1 and exp2 are optional arguments, but they must be set later if not provided in the constructor!
-        /// Set them with addChildren
-        /// @param lineNum Line number the node appears on
-        /// @param type Operator type
-        /// @param exp1 First argument
-        /// @param exp2 Second argument
-        Binary(unsigned lineNum, Type type, Node *exp1 = nullptr, Node *exp2 = nullptr);
-        /// @param exp1 First argument
-        /// @param exp2 Second argument
-        void addChildren(Node *exp1, Node *exp2);
+        // note: must add children either now or later.
+        // type - type of operatr
+        // lval - lval
+        // rval - rval
+        Binary(unsigned lineNum, Type type, Node *lval = nullptr, Node *rval = nullptr);
+        // lval - lval
+        // rval - rval
+        void addChildren(Node *lval, Node *rval);
         virtual std::string toString() const override;
 
     protected:
@@ -51,3 +46,5 @@ namespace AST::Op
         Type m_type;
     };
 }
+
+#endif

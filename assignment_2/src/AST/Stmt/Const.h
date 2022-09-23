@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CONST_H
+#define CONST_H
 
 #include "../Node.h"
 #include "Stmt.h"
@@ -7,11 +8,9 @@
 
 namespace AST::Stmt
 {
-    /// Node for constants
     class Const : public Stmt
     {
     public:
-        /// Constant types
         enum class Type
         {
             Int,
@@ -21,11 +20,8 @@ namespace AST::Stmt
         };
 
         Const();
-        /// @param lineNum Line number the node appears on
         Const(unsigned lineNum);
-        /// @param lineNum Line number the node appears on
-        /// @param Type Type of the constant
-        /// @param data String value of the data
+        // data - data of const in string form.
         Const(unsigned lineNum, Type type, std::string data);
         virtual std::string toString() const override;
 
@@ -35,3 +31,5 @@ namespace AST::Stmt
         Type m_type;
     };
 }
+
+#endif

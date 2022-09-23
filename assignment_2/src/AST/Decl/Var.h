@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VAR_H
+#define VAR_H
 
 #include "../Node.h"
 #include "Decl.h"
@@ -8,19 +9,16 @@
 
 namespace AST::Decl
 {
-    /// Variable declaration node
     class Var : public Decl
     {
     public:
         Var();
-        /// @param lineNum Line number the node appears on
         Var(unsigned lineNum);
-        /// @param lineNum Line number the node appears on
-        /// @param id String identifier
-        /// @param isArray Whether or not the variable is an array
-        Var(unsigned lineNum, const std::string &id, bool isArray);
+        // id  - name of variable
+        // isArr - is var array
+        Var(unsigned lineNum, const std::string &id, bool isArr);
         virtual std::string toString() const override;
-        /// Set the variable and its siblings to static
+        // Set var and all siblings to static.
         void setStatic();
 
     protected:
@@ -28,3 +26,5 @@ namespace AST::Decl
         bool m_isStatic = false;
     };
 }
+
+#endif

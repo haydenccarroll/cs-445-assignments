@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SELECT_H
+#define SELECT_H
 
 #include "../Node.h"
 #include "Stmt.h"
@@ -7,17 +8,16 @@
 
 namespace AST::Stmt
 {
-    /// Select/If statement node
     class Select : public Stmt
     {
     public:
         Select();
-        /// @param lineNum Line number the node appears on
         Select(unsigned lineNum);
-        /// @param lineNum Line number the node appears on
-        /// @param exp Expression evaluated
-        /// @param stmt1 Statement executed if exp is evaluated to true
-        /// @param stmt2 Optional, statement executed if exp is evaluated to false (else part)
+        // exp - expression inside select
+        // stmt1 - executed if exp is true
+        // stmt2 - executed if exp is fales (else part, optional)
         Select(unsigned lineNum, Node *exp, Node *stmt1, Node *stmt2 = nullptr);
     };
 }
+
+#endif
