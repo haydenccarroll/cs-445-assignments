@@ -4,13 +4,13 @@
 #include <string>
 
 struct TokenData {
-    std::string tokenstr;
+    std::string tokenStr;
     std::string stringConst;
     char charConst;
     int numConst;
     int boolConst;
     int tokenclass;
-    int linenum;
+    int lineNum;
 };
 
 #endif

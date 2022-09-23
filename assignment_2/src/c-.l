@@ -15,12 +15,11 @@ std::vector<std::unique_ptr<TokenData>> token_vec;
 
 static int setValue(int lineNum, int tokenClass, char *svalue)
 {
-    token_vec.push_back(std::move(std::make_unique<TokenData>()));
+    token_vec.push_back(std::make_unique<TokenData>());
     yylval.tokenData = token_vec.back().get();
-    yylval.tokenData->linenum = lineNum;
-    yylval.tokenData->tokenstr = std::string(svalue);
+    yylval.tokenData->lineNum = lineNum;
+    yylval.tokenData->tokenStr = std::string(svalue);
 
-    // return the tokenclass
     return tokenClass;
 }
 
@@ -31,13 +30,11 @@ static int setValue(int lineNum, int tokenClass, char *svalue)
 %%
 \/\/.*\n                    { line++; }
 \n                          { line++; }
-\"((\\\")|([^\n\"]))*\"     { return setValue(line, STRINGCONST, yytext); }
-\'((\\\')|([^\n\']))*\'     { return setValue(line, CHARCONST, yytext); }
-"true"|"false"              { return setValue(line, BOOLCONST, yytext); }
-[0-9]+                      { return setValue(line, NUMCONST, yytext); }
+
 "int"                       { return INT; }
 "bool"                      { return BOOL; }
 "char"                      { return CHAR; }
+
 "return"                    { return setValue(line, RETURN, yytext); }
 "break"                     { return setValue(line, BREAK, yytext); }
 "not"                       { return setValue(line, NOT, yytext); }
@@ -51,8 +48,8 @@ static int setValue(int lineNum, int tokenClass, char *svalue)
 "and"                       { return setValue(line, AND, yytext); }
 "to"                        { return setValue(line, TO, yytext); }
 "then"                      { return setValue(line, THEN, yytext); }
-"{"                         { return setValue(line, BGN, yytext); }
-"}"                         { return setValue(line, END, yytext); }
+"{"                         { return setValue(line, LCURL, yytext); }
+"}"                         { return setValue(line, RCURL, yytext); }
 "static"                    { return setValue(line, STATIC, yytext); }
 "?"                         { return setValue(line, RAND, yytext); }
 "*"                         { return setValue(line, ASTERISK, yytext); }
@@ -80,7 +77,13 @@ static int setValue(int lineNum, int tokenClass, char *svalue)
 "--"                        { return setValue(line, DEC, yytext); }
 ":"                         { return setValue(line, COL, yytext); }
 ","                         { return setValue(line, COM, yytext); }
+
+\"((\\\")|([^\n\"]))*\"     { return setValue(line, STRINGCONST, yytext); }
+\'((\\\')|([^\n\']))*\'     { return setValue(line, CHARCONST, yytext); }
+"true"|"false"              { return setValue(line, BOOLCONST, yytext); }
+[0-9]+                      { return setValue(line, NUMCONST, yytext); }
 [a-zA-Z][a-zA-Z0-9]*        { return setValue(line, ID, yytext); }
-[ \t]                       ;
+
+[\t ]                       ;
 .                           { printf("ERROR(%d): Invalid or misplaced input character: \'%c\'. Character Ignored.\n", line, yytext[0]); numErrors++; }
 %%

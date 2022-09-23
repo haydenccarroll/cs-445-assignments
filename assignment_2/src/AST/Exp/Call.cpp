@@ -10,13 +10,13 @@ namespace AST::Exp
     {
     }
 
-    Call::Call(unsigned linenum)
-        : Node::Node(linenum)
+    Call::Call(unsigned lineNum)
+        : Node::Node(lineNum)
     {
     }
 
-    Call::Call(unsigned linenum, const std::string &id, Node *arglist)
-        : Node::Node(linenum),
+    Call::Call(unsigned lineNum, const std::string &id, Node *arglist)
+        : Node::Node(lineNum),
           m_id(id)
     {
         addChild(arglist);

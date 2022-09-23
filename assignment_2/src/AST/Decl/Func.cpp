@@ -12,23 +12,23 @@ namespace AST::Decl
     {
     }
 
-    Func::Func(unsigned linenum)
-        : Decl::Decl(linenum)
+    Func::Func(unsigned lineNum)
+        : Decl::Decl(lineNum)
     {
     }
 
-    Func::Func(unsigned linenum, const std::string &id,
+    Func::Func(unsigned lineNum, const std::string &id,
                Node *parms, Node *compoundstmt)
-        : Decl::Decl(linenum)
+        : Decl::Decl(lineNum)
     {
         m_id = id;
         addChild(parms);
         addChild(compoundstmt);
     }
 
-    Func::Func(unsigned linenum, Type returnType, const std::string &id,
+    Func::Func(unsigned lineNum, Type returnType, const std::string &id,
                Node *parms, Node *compoundstmt)
-        : Decl::Decl(linenum)
+        : Decl::Decl(lineNum)
     {
         m_type = returnType;
         m_id = id;

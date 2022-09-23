@@ -11,8 +11,8 @@ namespace AST::Decl
     {
     }
 
-    Decl::Decl(unsigned linenum)
-        : Node::Node(linenum)
+    Decl::Decl(unsigned lineNum)
+        : Node::Node(lineNum)
     {
     }
 

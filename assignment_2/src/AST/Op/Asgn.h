@@ -22,15 +22,15 @@ namespace AST::Op
         };
 
         Asgn();
-        /// @param linenum Line number the node appears on
-        Asgn(unsigned linenum);
+        /// @param lineNum Line number the node appears on
+        Asgn(unsigned lineNum);
         /// Children nodes are optional in the constructor, but they must be provided eventually!
         /// Use addChildren to add them later.
-        /// @param linenum Line number the node appears on
+        /// @param lineNum Line number the node appears on
         /// @param type Assignment type
         /// @param exp1 The assignee
         /// @param exp2 The expression assigned to exp1
-        Asgn(unsigned linenum, Type type, Node *exp1 = nullptr, Node *exp2 = nullptr);
+        Asgn(unsigned lineNum, Type type, Node *exp1 = nullptr, Node *exp2 = nullptr);
         /// @param exp1 The assignee
         /// @param exp2 The expression assigned to exp1
         void addChildren(Node *exp1, Node *exp2);
@@ -38,7 +38,6 @@ namespace AST::Op
 
     protected:
         static const std::map<Type, std::string> s_typeToString;
-
         Type m_type;
     };
 }

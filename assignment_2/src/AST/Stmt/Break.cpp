@@ -12,8 +12,8 @@ namespace AST::Stmt
         m_type = Type::Break;
     }
 
-    Break::Break(unsigned linenum)
-        : Stmt::Stmt(linenum)
+    Break::Break(unsigned lineNum)
+        : Stmt::Stmt(lineNum)
     {
         m_type = Type::Break;
     }

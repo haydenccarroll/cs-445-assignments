@@ -11,13 +11,13 @@ namespace AST::Exp
     {
     }
 
-    Const::Const(unsigned linenum)
-        : Node::Node(linenum)
+    Const::Const(unsigned lineNum)
+        : Node::Node(lineNum)
     {
     }
 
-    Const::Const(unsigned linenum, Type type, std::string value)
-        : Node::Node(linenum),
+    Const::Const(unsigned lineNum, Type type, std::string value)
+        : Node::Node(lineNum),
           m_type(type)
     {
         switch (m_type)

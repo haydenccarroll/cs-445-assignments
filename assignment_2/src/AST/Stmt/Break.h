@@ -12,7 +12,7 @@ namespace AST::Stmt
     {
     public:
         Break();
-        /// @param linenum Line number the node appears on
-        Break(unsigned linenum);
+        /// @param lineNum Line number the node appears on
+        Break(unsigned lineNum);
     };
 }

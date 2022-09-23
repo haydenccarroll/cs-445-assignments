@@ -13,12 +13,12 @@ namespace AST::Decl
     {
     public:
         Parm();
-        /// @param linenum Line number the node appears on
-        Parm(unsigned linenum);
-        /// @param linenum Line number the node appears on
+        /// @param lineNum Line number the node appears on
+        Parm(unsigned lineNum);
+        /// @param lineNum Line number the node appears on
         /// @param id Parameter name
         /// @param isArray Whether or not the parameter is an array
-        Parm(unsigned linenum, const std::string &id, bool isArray);
+        Parm(unsigned lineNum, const std::string &id, bool isArray);
         virtual std::string toString() const override;
 
     protected:

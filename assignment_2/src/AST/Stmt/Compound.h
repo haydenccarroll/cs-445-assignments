@@ -11,11 +11,11 @@ namespace AST::Stmt
     {
     public:
         Compound();
-        /// @param linenum Line number the node appears on
-        Compound(unsigned linenum);
-        /// @param linenum Line number the node appears on
+        /// @param lineNum Line number the node appears on
+        Compound(unsigned lineNum);
+        /// @param lineNum Line number the node appears on
         /// @param localdecls Local declarations, use nullptr if none
         /// @param stmtlist Statement list, use nullptr if none
-        Compound(unsigned linenum, Node *localdecls, Node *stmtlist);
+        Compound(unsigned lineNum, Node *localdecls, Node *stmtlist);
     };
 }

@@ -12,14 +12,14 @@ namespace AST::Stmt
         m_type = Type::Return;
     }
 
-    Return::Return(unsigned linenum)
-        : Stmt::Stmt(linenum)
+    Return::Return(unsigned lineNum)
+        : Stmt::Stmt(lineNum)
     {
         m_type = Type::Return;
     }
 
-    Return::Return(unsigned linenum, Node *exp)
-        : Stmt::Stmt(linenum)
+    Return::Return(unsigned lineNum, Node *exp)
+        : Stmt::Stmt(lineNum)
     {
         m_type = Type::Return;
         addChild(exp);

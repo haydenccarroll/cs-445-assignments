@@ -11,11 +11,11 @@ namespace AST::Exp
     {
     public:
         Id();
-        /// @param linenum Line number the node appears on
-        Id(unsigned linenum);
-        /// @param linenum Line number the node appears on
+        /// @param lineNum Line number the node appears on
+        Id(unsigned lineNum);
+        /// @param lineNum Line number the node appears on
         /// @param id String identifier
-        Id(unsigned linenum, const std::string &id);
+        Id(unsigned lineNum, const std::string &id);
         virtual std::string toString() const override;
 
     protected:

@@ -28,13 +28,13 @@ namespace AST::Op
     {
     }
 
-    Binary::Binary(unsigned linenum)
-        : Node::Node(linenum)
+    Binary::Binary(unsigned lineNum)
+        : Node::Node(lineNum)
     {
     }
 
-    Binary::Binary(unsigned linenum, Type type, Node *exp1, Node *exp2)
-        : Node::Node(linenum),
+    Binary::Binary(unsigned lineNum, Type type, Node *exp1, Node *exp2)
+        : Node::Node(lineNum),
           m_type(type)
     {
         addChild(exp1);

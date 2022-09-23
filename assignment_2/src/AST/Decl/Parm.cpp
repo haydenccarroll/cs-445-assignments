@@ -11,13 +11,13 @@ namespace AST::Decl
     {
     }
 
-    Parm::Parm(unsigned linenum)
-        : Decl::Decl(linenum)
+    Parm::Parm(unsigned lineNum)
+        : Decl::Decl(lineNum)
     {
     }
 
-    Parm::Parm(unsigned linenum, const std::string &id, bool isArray)
-        : Decl::Decl(linenum),
+    Parm::Parm(unsigned lineNum, const std::string &id, bool isArray)
+        : Decl::Decl(lineNum),
           m_isArray(isArray)
     {
         m_id = id;

@@ -18,13 +18,13 @@ namespace AST::Op
     {
     }
 
-    Unary::Unary(unsigned linenum)
-        : Node::Node(linenum)
+    Unary::Unary(unsigned lineNum)
+        : Node::Node(lineNum)
     {
     }
 
-    Unary::Unary(unsigned linenum, Type type, Node *exp)
-        : Node::Node(linenum),
+    Unary::Unary(unsigned lineNum, Type type, Node *exp)
+        : Node::Node(lineNum),
           m_type(type)
     {
         addChild(exp);

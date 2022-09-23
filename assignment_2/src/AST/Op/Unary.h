@@ -22,21 +22,20 @@ namespace AST::Op
         };
 
         Unary();
-        /// @param linenum
-        Unary(unsigned linenum);
+        /// @param lineNum
+        Unary(unsigned lineNum);
         /// exp is optional in this constructor, but must be provided eventually!
         /// Set later with addExp.
-        /// @param linenum
+        /// @param lineNum
         /// @param type Unary operator type
         /// @param exp Optional child expression
-        Unary(unsigned linenum, Type type, Node *exp = nullptr);
+        Unary(unsigned lineNum, Type type, Node *exp = nullptr);
         /// @param exp Child node
         void addExp(Node *exp);
         virtual std::string toString() const override;
 
     protected:
         static const std::map<Type, std::string> s_typeToString;
-
         Type m_type;
     };
 }

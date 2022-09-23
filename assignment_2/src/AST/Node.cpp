@@ -12,9 +12,9 @@ namespace AST
     {
     }
 
-    Node::Node(unsigned linenum)
+    Node::Node(unsigned lineNum)
         : m_sibling(nullptr),
-          m_linenum(linenum)
+          m_lineNum(lineNum)
     {
     }
 
@@ -101,11 +101,11 @@ namespace AST
 
     std::string Node::lineTag() const
     {
-        return " [line: " + std::to_string(m_linenum) + "]";
+        return " [line: " + std::to_string(m_lineNum) + "]";
     }
 
     unsigned &Node::lineNumber()
     {
-        return m_linenum;
+        return m_lineNum;
     }
 }

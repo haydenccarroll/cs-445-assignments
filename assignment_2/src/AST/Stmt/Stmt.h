@@ -12,8 +12,8 @@ namespace AST::Stmt
     {
     public:
         Stmt();
-        /// @param linenum Line number the node appears on
-        Stmt(unsigned linenum);
+        /// @param lineNum Line number the node appears on
+        Stmt(unsigned lineNum);
         virtual std::string toString() const override;
 
     protected:
@@ -29,7 +29,6 @@ namespace AST::Stmt
         };
 
         static const std::map<Type, std::string> s_typeToString;
-
         Type m_type;
     };
 }

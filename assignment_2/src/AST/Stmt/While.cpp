@@ -12,14 +12,14 @@ namespace AST::Stmt
         m_type = Type::While;
     }
 
-    While::While(unsigned linenum)
-        : Stmt::Stmt(linenum)
+    While::While(unsigned lineNum)
+        : Stmt::Stmt(lineNum)
     {
         m_type = Type::While;
     }
 
-    While::While(unsigned linenum, Node *exp, Node *stmt)
-        : Stmt::Stmt(linenum)
+    While::While(unsigned lineNum, Node *exp, Node *stmt)
+        : Stmt::Stmt(lineNum)
     {
         m_type = Type::While;
         addChild(exp);

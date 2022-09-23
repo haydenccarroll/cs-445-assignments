@@ -17,8 +17,8 @@ namespace AST::Stmt
     {
     }
 
-    Stmt::Stmt(unsigned linenum)
-        : Node::Node(linenum)
+    Stmt::Stmt(unsigned lineNum)
+        : Node::Node(lineNum)
     {
     }
 

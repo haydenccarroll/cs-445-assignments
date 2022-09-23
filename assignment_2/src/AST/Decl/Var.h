@@ -13,12 +13,12 @@ namespace AST::Decl
     {
     public:
         Var();
-        /// @param linenum Line number the node appears on
-        Var(unsigned linenum);
-        /// @param linenum Line number the node appears on
+        /// @param lineNum Line number the node appears on
+        Var(unsigned lineNum);
+        /// @param lineNum Line number the node appears on
         /// @param id String identifier
         /// @param isArray Whether or not the variable is an array
-        Var(unsigned linenum, const std::string &id, bool isArray);
+        Var(unsigned lineNum, const std::string &id, bool isArray);
         virtual std::string toString() const override;
         /// Set the variable and its siblings to static
         void setStatic();

@@ -12,12 +12,12 @@ namespace AST::Stmt
     {
     public:
         For();
-        /// @param linenum Line number the node appears on
-        For(unsigned linenum);
-        /// @param linenum Line number the node appears on
+        /// @param lineNum Line number the node appears on
+        For(unsigned lineNum);
+        /// @param lineNum Line number the node appears on
         /// @param id Iterator variable identifier
         /// @param range Iteration range
         /// @param stmt Loop body
-        For(unsigned linenum, Node *id, Node *range, Node *stmt);
+        For(unsigned lineNum, Node *id, Node *range, Node *stmt);
     };
 }

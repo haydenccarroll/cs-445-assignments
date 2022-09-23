@@ -11,13 +11,13 @@ namespace AST::Exp
     {
     public:
         Range();
-        /// @param linenum Line number the node appears on
-        Range(unsigned linenum);
-        /// @param linenum Line number the node appears on
+        /// @param lineNum Line number the node appears on
+        Range(unsigned lineNum);
+        /// @param lineNum Line number the node appears on
         /// @param from Beginning of range
         /// @param to End of range
         /// @param by Optional, amount to increment by
-        Range(unsigned linenum, Node *from, Node *to, Node *by = nullptr);
+        Range(unsigned lineNum, Node *from, Node *to, Node *by = nullptr);
         virtual std::string toString() const override;
     };
 }

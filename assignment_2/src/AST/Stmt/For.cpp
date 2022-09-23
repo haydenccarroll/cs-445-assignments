@@ -12,14 +12,14 @@ namespace AST::Stmt
         m_type = Type::For;
     }
 
-    For::For(unsigned linenum)
-        : Stmt::Stmt(linenum)
+    For::For(unsigned lineNum)
+        : Stmt::Stmt(lineNum)
     {
         m_type = Type::For;
     }
 
-    For::For(unsigned linenum, Node *id, Node *range, Node *stmt)
-        : Stmt::Stmt(linenum)
+    For::For(unsigned lineNum, Node *id, Node *range, Node *stmt)
+        : Stmt::Stmt(lineNum)
     {
         m_type = Type::For;
         addChild(id);

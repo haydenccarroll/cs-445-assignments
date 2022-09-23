@@ -10,13 +10,13 @@ namespace AST::Exp
     {
     }
 
-    Id::Id(unsigned linenum)
-        : Node::Node(linenum)
+    Id::Id(unsigned lineNum)
+        : Node::Node(lineNum)
     {
     }
 
-    Id::Id(unsigned linenum, const std::string &id)
-        : Node::Node(linenum),
+    Id::Id(unsigned lineNum, const std::string &id)
+        : Node::Node(lineNum),
           m_id(id)
     {
     }

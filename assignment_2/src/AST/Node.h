@@ -14,8 +14,8 @@ namespace AST
     public:
         /// Default constructor
         Node();
-        /// @param linenum Line number the node appears on
-        Node(unsigned linenum);
+        /// @param lineNum Line number the node appears on
+        Node(unsigned lineNum);
         virtual ~Node();
         /// Recursively prints the tree
         void print() const;
@@ -31,7 +31,7 @@ namespace AST
     protected:
         std::vector<Node *> m_children;
         Node *m_sibling = nullptr;
-        unsigned m_linenum;
+        unsigned m_lineNum;
 
         /// @returns The line tag at the end of every node's print statement
         std::string lineTag() const;

@@ -36,37 +36,37 @@ statements : statements statement
               ;
 
 statement     : '\n'
-              | ID                      { std::cout << "Line " << $1->linenum << " Token: ID Value: " << $1->tokenstr << std::endl; }
-              | KEYWORD                 { std::cout << "Line " << $1->linenum << " Token: " << $1->tokenstr << std::endl; }
-              | NUMCONST                { std::cout << "Line " << $1->linenum << " Token: NUMCONST Value: " << $1->numConst << "  Input: " << $1->tokenstr << std::endl; }
+              | ID                      { std::cout << "Line " << $1->lineNum << " Token: ID Value: " << $1->tokenStr << std::endl; }
+              | KEYWORD                 { std::cout << "Line " << $1->lineNum << " Token: " << $1->tokenStr << std::endl; }
+              | NUMCONST                { std::cout << "Line " << $1->lineNum << " Token: NUMCONST Value: " << $1->numConst << "  Input: " << $1->tokenStr << std::endl; }
               | CHARCONST               {
                     if ($1->stringConst.length() > 1) {
-                        std::cout << "WARNING(" << $1->linenum << "): character is " << $1->stringConst.length() << " characters long and not a single character: ''" << $1->stringConst << "''.  The first char will be used.\n";
+                        std::cout << "WARNING(" << $1->lineNum << "): character is " << $1->stringConst.length() << " characters long and not a single character: ''" << $1->stringConst << "''.  The first char will be used.\n";
                     }
-                    std::cout << "Line " << $1->linenum << " Token: CHARCONST Value: '" << $1->charConst << "'  Input: " << $1->tokenstr << std::endl; 
+                    std::cout << "Line " << $1->lineNum << " Token: CHARCONST Value: '" << $1->charConst << "'  Input: " << $1->tokenStr << std::endl; 
                   }
-              | STRINGCONST             { std::cout << "Line " << $1->linenum << " Token: STRINGCONST Value: \"" << $1->stringConst << "\"  Len: " << $1->stringConst.length() << "  Input: " << $1->tokenstr << std::endl; }
-              | BOOLCONST               { printf("Line %i Token: BOOLCONST Value: %d  Input: %s\n", $1->linenum, $1->boolConst, $1->tokenstr.c_str()); }
+              | STRINGCONST             { std::cout << "Line " << $1->lineNum << " Token: STRINGCONST Value: \"" << $1->stringConst << "\"  Len: " << $1->stringConst.length() << "  Input: " << $1->tokenStr << std::endl; }
+              | BOOLCONST               { printf("Line %i Token: BOOLCONST Value: %d  Input: %s\n", $1->lineNum, $1->boolConst, $1->tokenStr.c_str()); }
               | TOKEN                   {
-                    std::cout << "Line " << $1->linenum << " Token: ";
-                    if ($1->tokenstr == "<-") {
+                    std::cout << "Line " << $1->lineNum << " Token: ";
+                    if ($1->tokenStr == "<-") {
                         std::cout << "ASGN\n";
-                    } else if ($1->tokenstr == "==") {
+                    } else if ($1->tokenStr == "==") {
                         std::cout << "EQ\n";
-                    } else if ($1->tokenstr == "+=") {
+                    } else if ($1->tokenStr == "+=") {
                         std::cout << "ADDASS\n";
-                    } else if ($1->tokenstr == "++") {
+                    } else if ($1->tokenStr == "++") {
                         std::cout << "INC\n";
-                    } else if ($1->tokenstr == "--") {
+                    } else if ($1->tokenStr == "--") {
                         std::cout << "DEC\n";
-                    } else if ($1->tokenstr == ">=") {
+                    } else if ($1->tokenStr == ">=") {
                         std::cout << "GEQ\n";
-                    } else if ($1->tokenstr == "<=") {
+                    } else if ($1->tokenStr == "<=") {
                         std::cout << "LEQ\n";
-                    } else if ($1->tokenstr == "!=") {
+                    } else if ($1->tokenStr == "!=") {
                         std::cout << "NEQ\n";
                     } else {
-                        std::cout << $1->tokenstr << std::endl;
+                        std::cout << $1->tokenStr << std::endl;
                     }
                   }
 

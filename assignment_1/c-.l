@@ -10,15 +10,15 @@
 int line = 1;
 int numErrors;    // ERR err count
 
-static int setValue(int linenum, int tokenClass, char* strVal)
+static int setValue(int lineNum, int tokenClass, char* strVal)
 {
     int i = 0;
     // create the pass-back data space
     yylval.tokenData = new TokenData;
 
     // fill it up
-    yylval.tokenData->linenum = linenum;
-    yylval.tokenData->tokenstr = std::string(strVal);
+    yylval.tokenData->lineNum = lineNum;
+    yylval.tokenData->tokenStr = std::string(strVal);
   
     switch (tokenClass) {
         case ID:
@@ -36,10 +36,10 @@ static int setValue(int linenum, int tokenClass, char* strVal)
             yylval.tokenData->charConst = helpers::toChar(helpers::removeQuotes(strVal));
             break;
         case BOOLCONST:
-            yylval.tokenData->boolConst = (yylval.tokenData->tokenstr == "true");
+            yylval.tokenData->boolConst = (yylval.tokenData->tokenStr == "true");
             break;
         case KEYWORD:
-            std::transform(yylval.tokenData->tokenstr.begin(), yylval.tokenData->tokenstr.end(), yylval.tokenData->tokenstr.begin(), toupper);
+            std::transform(yylval.tokenData->tokenStr.begin(), yylval.tokenData->tokenStr.end(), yylval.tokenData->tokenStr.begin(), toupper);
             break;
         default:
             break;

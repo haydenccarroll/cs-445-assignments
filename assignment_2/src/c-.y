@@ -36,7 +36,7 @@ void yyerror(const char *msg)
 %token <tokenData> WHILE IF FOR TO RETURN BREAK BY DO
 %token <tokenData> NOT AND OR
 %token <tokenData> ADD DASH RAND ASTERISK DIV MOD ASGN ADDASGN SUBASGN MULASGN DIVASGN
-%token <tokenData> THEN ELSE BGN END
+%token <tokenData> THEN ELSE LCURL RCURL
 %token <tokenData> RPAREN LPAREN RBRACK LBRACK
 %token <tokenData> STATIC
 %token <tokenData> SEMI LT LEQ GT GEQ EQ NEQ INC DEC COL COM
@@ -129,11 +129,11 @@ varDeclInit         : varDeclId
                 
 varDeclId           : ID
                     {
-                        $$ = new AST::Decl::Var($1->linenum, $1->tokenstr, false);
+                        $$ = new AST::Decl::Var($1->lineNum, $1->tokenStr, false);
                     }
                     | ID LBRACK NUMCONST RBRACK
                     {
-                        $$ = new AST::Decl::Var($1->linenum, $1->tokenstr, true);
+                        $$ = new AST::Decl::Var($1->lineNum, $1->tokenStr, true);
                     }
                     ;
 
@@ -153,11 +153,11 @@ typeSpec            : BOOL
 
 funDecl             : typeSpec ID LPAREN parms RPAREN compoundStmt
                     {
-                        $$ = new AST::Decl::Func($2->linenum, $1, $2->tokenstr, $4, $6);
+                        $$ = new AST::Decl::Func($2->lineNum, $1, $2->tokenStr, $4, $6);
                     }
                     | ID LPAREN parms RPAREN compoundStmt
                     {
-                        $$ = new AST::Decl::Func($1->linenum, $1->tokenstr, $3, $5);
+                        $$ = new AST::Decl::Func($1->lineNum, $1->tokenStr, $3, $5);
                     }
                     ;
 
@@ -203,11 +203,11 @@ parmIdList          : parmIdList COM parmId
 
 parmId              : ID
                     {
-                        $$ = new AST::Decl::Parm($1->linenum, $1->tokenstr, false);
+                        $$ = new AST::Decl::Parm($1->lineNum, $1->tokenStr, false);
 					}
                     | ID LBRACK RBRACK
                     {
-                        $$ = new AST::Decl::Parm($1->linenum, $1->tokenstr, true);
+                        $$ = new AST::Decl::Parm($1->lineNum, $1->tokenStr, true);
 					}
                     ;
 
@@ -231,9 +231,9 @@ expStmt             : exp SEMI
 					}
                     ;
 
-compoundStmt        : BGN localDecls stmtList END
+compoundStmt        : LCURL localDecls stmtList RCURL
                     {
-                        $$ = new AST::Stmt::Compound($1->linenum, $2, $3);
+                        $$ = new AST::Stmt::Compound($1->lineNum, $2, $3);
                     }
                     ;
 
@@ -305,41 +305,41 @@ openStmt            : selectStmtOpen
 
 selectStmtOpen      : IF simpleExp THEN stmt
                     {
-                        $$ = new AST::Stmt::Select($1->linenum, $2, $4);
+                        $$ = new AST::Stmt::Select($1->lineNum, $2, $4);
                     }
                     | IF simpleExp THEN closedStmt ELSE openStmt
                     {
-                        $$ = new AST::Stmt::Select($1->linenum, $2, $4, $6);
+                        $$ = new AST::Stmt::Select($1->lineNum, $2, $4, $6);
                     }
                     ;
 
 selectStmtClosed    : IF simpleExp THEN closedStmt ELSE closedStmt
                     {
-                        $$ = new AST::Stmt::Select($1->linenum, $2, $4, $6);
+                        $$ = new AST::Stmt::Select($1->lineNum, $2, $4, $6);
                     }
                     ;
 
 iterStmtOpen        : WHILE simpleExp DO openStmt
                     {
-                        $$ = new AST::Stmt::While($1->linenum, $2, $4);
+                        $$ = new AST::Stmt::While($1->lineNum, $2, $4);
                     }
                     | FOR ID ASGN iterRange DO openStmt
                     {
-                        AST::Decl::Var *iterator = new AST::Decl::Var($1->linenum, $2->tokenstr, false);
+                        AST::Decl::Var *iterator = new AST::Decl::Var($1->lineNum, $2->tokenStr, false);
                         iterator->setType(AST::Decl::Type::Int);
-                        $$ = new AST::Stmt::For($1->linenum, iterator, $4, $6);
+                        $$ = new AST::Stmt::For($1->lineNum, iterator, $4, $6);
                     }
                     ;
 
 iterStmtClosed      : WHILE simpleExp DO closedStmt
                     {
-                        $$ = new AST::Stmt::While($1->linenum, $2, $4);
+                        $$ = new AST::Stmt::While($1->lineNum, $2, $4);
                     }
                     | FOR ID ASGN iterRange DO closedStmt
                     {
-                        AST::Decl::Var *iterator = new AST::Decl::Var($1->linenum, $2->tokenstr, false);
+                        AST::Decl::Var *iterator = new AST::Decl::Var($1->lineNum, $2->tokenStr, false);
                         iterator->setType(AST::Decl::Type::Int);
-                        $$ = new AST::Stmt::For($1->linenum, iterator, $4, $6);
+                        $$ = new AST::Stmt::For($1->lineNum, iterator, $4, $6);
                     }
                     ;
 
@@ -355,17 +355,17 @@ iterRange           : simpleExp TO simpleExp
 
 returnStmt          : RETURN SEMI
                     {
-                        $$ = new AST::Stmt::Return($1->linenum, nullptr);
+                        $$ = new AST::Stmt::Return($1->lineNum, nullptr);
                     }
                     | RETURN exp SEMI
                     {
-                        $$ = new AST::Stmt::Return($1->linenum, $2);
+                        $$ = new AST::Stmt::Return($1->lineNum, $2);
                     }
                     ;
 
 breakStmt           : BREAK SEMI
                     {
-                        $$ = new AST::Stmt::Break($1->linenum);
+                        $$ = new AST::Stmt::Break($1->lineNum);
                     }
                     ;
 
@@ -391,23 +391,23 @@ exp                 : mutable assignop exp
 
 assignop            : ASGN
                     {
-                        $$ = new AST::Op::Asgn($1->linenum, AST::Op::Asgn::Type::Asgn);
+                        $$ = new AST::Op::Asgn($1->lineNum, AST::Op::Asgn::Type::Asgn);
 					}
                     | ADDASGN
                     {
-                        $$ = new AST::Op::Asgn($1->linenum, AST::Op::Asgn::Type::AddAsgn);
+                        $$ = new AST::Op::Asgn($1->lineNum, AST::Op::Asgn::Type::AddAsgn);
 					}
                     | SUBASGN
                     {
-                        $$ = new AST::Op::Asgn($1->linenum, AST::Op::Asgn::Type::SubAsgn);
+                        $$ = new AST::Op::Asgn($1->lineNum, AST::Op::Asgn::Type::SubAsgn);
 					}
                     | DIVASGN
                     {
-                        $$ = new AST::Op::Asgn($1->linenum, AST::Op::Asgn::Type::DivAsgn);
+                        $$ = new AST::Op::Asgn($1->lineNum, AST::Op::Asgn::Type::DivAsgn);
 					}
                     | MULASGN
                     {
-                        $$ = new AST::Op::Asgn($1->linenum, AST::Op::Asgn::Type::MulAsgn);
+                        $$ = new AST::Op::Asgn($1->lineNum, AST::Op::Asgn::Type::MulAsgn);
 					}
                     ;
 
@@ -433,7 +433,7 @@ andExp              : andExp AND unaryRelExp
 
 unaryRelExp         : NOT unaryRelExp
                     {
-                        $$ = new AST::Op::Unary($1->linenum, AST::Op::Unary::Type::Not, $2);
+                        $$ = new AST::Op::Unary($1->lineNum, AST::Op::Unary::Type::Not, $2);
                     }
                     | relExp
                     {
@@ -455,27 +455,27 @@ relExp              : sumExp relop sumExp
 
 relop               : LT
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::LT);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::LT);
 					}
                     | LEQ
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::LEQ);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::LEQ);
 					}
                     | GT
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::GT);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::GT);
 					}
                     | GEQ
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::GEQ);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::GEQ);
 					}
                     | EQ
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::EQ);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::EQ);
 					}
                     | NEQ
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::NEQ);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::NEQ);
 					}
                     ;
 
@@ -493,11 +493,11 @@ sumExp              : sumExp sumop mulExp
 
 sumop               : ADD
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::Add);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Add);
 					}
                     | DASH
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::Subtract);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Subtract);
 					}
                     ;
 
@@ -515,15 +515,15 @@ mulExp              : mulExp mulop unaryExp
 
 mulop               : ASTERISK
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::Mul);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Mul);
 					}
                     | DIV
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::Div);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Div);
 					}
                     | MOD
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::Mod);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Mod);
 					}
                     ;
 
@@ -541,15 +541,15 @@ unaryExp            : unaryop unaryExp
 
 unaryop             : DASH
                     {
-                        $$ = new AST::Op::Unary($1->linenum, AST::Op::Unary::Type::Chsign);
+                        $$ = new AST::Op::Unary($1->lineNum, AST::Op::Unary::Type::Chsign);
 					}
                     | ASTERISK
                     {
-                        $$ = new AST::Op::Unary($1->linenum, AST::Op::Unary::Type::Sizeof);
+                        $$ = new AST::Op::Unary($1->lineNum, AST::Op::Unary::Type::Sizeof);
 					}
                     | RAND
                     {
-                        $$ = new AST::Op::Unary($1->linenum, AST::Op::Unary::Type::Random);
+                        $$ = new AST::Op::Unary($1->lineNum, AST::Op::Unary::Type::Random);
 					}
                     ;
 
@@ -565,11 +565,11 @@ factor              : mutable
 
 mutable             : ID
                     {
-                        $$ = new AST::Exp::Id($1->linenum, $1->tokenstr);
+                        $$ = new AST::Exp::Id($1->lineNum, $1->tokenStr);
 					}
                     | ID LBRACK exp RBRACK
                     {
-                        $$ = new AST::Op::Binary($1->linenum, AST::Op::Binary::Type::Index, new AST::Exp::Id($1->linenum, $1->tokenstr), $3);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Index, new AST::Exp::Id($1->lineNum, $1->tokenStr), $3);
                     }
                     ;
 
@@ -589,11 +589,11 @@ immutable           : LPAREN exp RPAREN
 
 call                : ID LPAREN argList RPAREN
                     {
-                        $$ = new AST::Exp::Call($1->linenum, $1->tokenstr, $3);
+                        $$ = new AST::Exp::Call($1->lineNum, $1->tokenStr, $3);
                     }
                     | ID LPAREN RPAREN
                     {
-                        $$ = new AST::Exp::Call($1->linenum, $1->tokenstr);
+                        $$ = new AST::Exp::Call($1->lineNum, $1->tokenStr);
                     }
                     ;
 
@@ -610,19 +610,19 @@ argList             : argList COM exp
 
 constant            : NUMCONST
                     {
-                        $$ = new AST::Exp::Const($1->linenum, AST::Exp::Const::Type::Int, $1->tokenstr);
+                        $$ = new AST::Exp::Const($1->lineNum, AST::Exp::Const::Type::Int, $1->tokenStr);
                     }
                     | CHARCONST
                     {
-                        $$ = new AST::Exp::Const($1->linenum, AST::Exp::Const::Type::Char, $1->tokenstr);
+                        $$ = new AST::Exp::Const($1->lineNum, AST::Exp::Const::Type::Char, $1->tokenStr);
                     }
                     | STRINGCONST
                     {
-                        $$ = new AST::Exp::Const($1->linenum, AST::Exp::Const::Type::String, $1->tokenstr);
+                        $$ = new AST::Exp::Const($1->lineNum, AST::Exp::Const::Type::String, $1->tokenStr);
                     }
                     | BOOLCONST
                     {
-                        $$ = new AST::Exp::Const($1->linenum, AST::Exp::Const::Type::Bool, $1->tokenstr);
+                        $$ = new AST::Exp::Const($1->lineNum, AST::Exp::Const::Type::Bool, $1->tokenStr);
                     }
                     ;
 

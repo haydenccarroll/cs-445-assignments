@@ -12,13 +12,13 @@ namespace AST::Decl
     {
     }
 
-    Var::Var(unsigned linenum)
-        : Decl::Decl(linenum)
+    Var::Var(unsigned lineNum)
+        : Decl::Decl(lineNum)
     {
     }
 
-    Var::Var(unsigned linenum, const std::string &id, bool isArray)
-        : Decl::Decl(linenum),
+    Var::Var(unsigned lineNum, const std::string &id, bool isArray)
+        : Decl::Decl(lineNum),
           m_isArray(isArray)
     {
         m_id = id;

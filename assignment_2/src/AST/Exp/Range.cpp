@@ -10,13 +10,13 @@ namespace AST::Exp
     {
     }
 
-    Range::Range(unsigned linenum)
-        : Node::Node(linenum)
+    Range::Range(unsigned lineNum)
+        : Node::Node(lineNum)
     {
     }
 
-    Range::Range(unsigned linenum, Node *from, Node *to, Node *by)
-        : Node::Node(linenum)
+    Range::Range(unsigned lineNum, Node *from, Node *to, Node *by)
+        : Node::Node(lineNum)
     {
         addChild(from);
         addChild(to);

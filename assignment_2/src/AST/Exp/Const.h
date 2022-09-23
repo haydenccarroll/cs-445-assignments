@@ -20,12 +20,12 @@ namespace AST::Exp
         };
 
         Const();
-        /// @param linenum Line number the node appears on
-        Const(unsigned linenum);
-        /// @param linenum Line number the node appears on
+        /// @param lineNum Line number the node appears on
+        Const(unsigned lineNum);
+        /// @param lineNum Line number the node appears on
         /// @param Type Type of the constant
         /// @param data String value of the data
-        Const(unsigned linenum, Type type, std::string data);
+        Const(unsigned lineNum, Type type, std::string data);
         virtual std::string toString() const override;
 
     protected:

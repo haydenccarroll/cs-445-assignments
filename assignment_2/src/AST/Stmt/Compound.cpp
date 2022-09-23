@@ -12,14 +12,14 @@ namespace AST::Stmt
         m_type = Type::Compound;
     }
 
-    Compound::Compound(unsigned linenum)
-        : Stmt::Stmt(linenum)
+    Compound::Compound(unsigned lineNum)
+        : Stmt::Stmt(lineNum)
     {
         m_type = Type::Compound;
     }
 
-    Compound::Compound(unsigned linenum, Node *localdecls, Node *stmtlist)
-        : Stmt::Stmt(linenum)
+    Compound::Compound(unsigned lineNum, Node *localdecls, Node *stmtlist)
+        : Stmt::Stmt(lineNum)
     {
         m_type = Type::Compound;
         addChild(localdecls);

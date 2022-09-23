@@ -19,13 +19,13 @@ namespace AST::Op
     {
     }
 
-    Asgn::Asgn(unsigned linenum)
-        : Node::Node(linenum)
+    Asgn::Asgn(unsigned lineNum)
+        : Node::Node(lineNum)
     {
     }
 
-    Asgn::Asgn(unsigned linenum, Type type, Node *exp1, Node *exp2)
-        : Node::Node(linenum),
+    Asgn::Asgn(unsigned lineNum, Type type, Node *exp1, Node *exp2)
+        : Node::Node(lineNum),
           m_type(type)
     {
         addChild(exp1);

@@ -27,8 +27,8 @@ namespace AST::Decl
     {
     public:
         Decl();
-        /// @param linenum Line number the node appears on
-        Decl(unsigned linenum);
+        /// @param lineNum Line number the node appears on
+        Decl(unsigned lineNum);
         /// Set the node and its sibling's types to the provided type
         /// @param type Type to set
         virtual void setType(Type type);

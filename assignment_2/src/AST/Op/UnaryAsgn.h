@@ -19,17 +19,16 @@ namespace AST::Op
         };
 
         UnaryAsgn();
-        /// @param linenum Line number the node appears on
-        UnaryAsgn(unsigned linenum);
-        /// @param linenum Line number the node appears on
+        /// @param lineNum Line number the node appears on
+        UnaryAsgn(unsigned lineNum);
+        /// @param lineNum Line number the node appears on
         /// @param type Assignment type
         /// @param exp The node being assigned
-        UnaryAsgn(unsigned linenum, Type type, Node *exp);
+        UnaryAsgn(unsigned lineNum, Type type, Node *exp);
         virtual std::string toString() const override;
 
     protected:
         static const std::map<Type, std::string> s_typeToString;
-
         Type m_type;
     };
 }

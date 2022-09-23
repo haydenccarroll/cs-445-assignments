@@ -12,14 +12,14 @@ namespace AST::Stmt
         m_type = Type::Select;
     }
 
-    Select::Select(unsigned linenum)
-        : Stmt::Stmt(linenum)
+    Select::Select(unsigned lineNum)
+        : Stmt::Stmt(lineNum)
     {
         m_type = Type::Select;
     }
 
-    Select::Select(unsigned linenum, Node *exp, Node *stmt1, Node *stmt2)
-        : Stmt::Stmt(linenum)
+    Select::Select(unsigned lineNum, Node *exp, Node *stmt1, Node *stmt2)
+        : Stmt::Stmt(lineNum)
     {
         m_type = Type::Select;
         addChild(exp);
