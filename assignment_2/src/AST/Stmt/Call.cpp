@@ -3,20 +3,20 @@
 
 #include <string>
 
-namespace AST::Exp
+namespace AST::Stmt
 {
     Call::Call()
-        : Node::Node()
+        : Stmt::Stmt()
     {
     }
 
     Call::Call(unsigned lineNum)
-        : Node::Node(lineNum)
+        : Stmt::Stmt(lineNum)
     {
     }
 
     Call::Call(unsigned lineNum, const std::string &id, Node *arglist)
-        : Node::Node(lineNum),
+        : Stmt::Stmt(lineNum),
           m_id(id)
     {
         addChild(arglist);

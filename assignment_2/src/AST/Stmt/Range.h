@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../Node.h"
+#include "Stmt.h"
 
 #include <string>
 
-namespace AST::Exp
+namespace AST::Stmt
 {
     /// Range node
-    class Range : public Node
+    class Range : public Stmt
     {
     public:
         Range();

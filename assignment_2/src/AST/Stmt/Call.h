@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../Node.h"
+#include "Stmt.h"
 
 #include <string>
 
-namespace AST::Exp
+namespace AST::Stmt
 {
     /// Function call node
-    class Call : public Node
+    class Call : public Stmt
     {
     public:
         Call();

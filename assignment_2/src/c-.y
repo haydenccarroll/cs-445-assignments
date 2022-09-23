@@ -345,11 +345,11 @@ iterStmtClosed      : WHILE simpleExp DO closedStmt
 
 iterRange           : simpleExp TO simpleExp
                     {
-                        $$ = new AST::Exp::Range($1->lineNumber(), $1, $3);
+                        $$ = new AST::Stmt::Range($1->lineNumber(), $1, $3);
                     }
                     | simpleExp TO simpleExp BY simpleExp
                     {
-                        $$ = new AST::Exp::Range($1->lineNumber(), $1, $3, $5);
+                        $$ = new AST::Stmt::Range($1->lineNumber(), $1, $3, $5);
                     }
                     ;
 
@@ -565,11 +565,11 @@ factor              : mutable
 
 mutable             : ID
                     {
-                        $$ = new AST::Exp::Id($1->lineNum, $1->tokenStr);
+                        $$ = new AST::Stmt::Id($1->lineNum, $1->tokenStr);
 					}
                     | ID LBRACK exp RBRACK
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Index, new AST::Exp::Id($1->lineNum, $1->tokenStr), $3);
+                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Index, new AST::Stmt::Id($1->lineNum, $1->tokenStr), $3);
                     }
                     ;
 
@@ -589,11 +589,11 @@ immutable           : LPAREN exp RPAREN
 
 call                : ID LPAREN argList RPAREN
                     {
-                        $$ = new AST::Exp::Call($1->lineNum, $1->tokenStr, $3);
+                        $$ = new AST::Stmt::Call($1->lineNum, $1->tokenStr, $3);
                     }
                     | ID LPAREN RPAREN
                     {
-                        $$ = new AST::Exp::Call($1->lineNum, $1->tokenStr);
+                        $$ = new AST::Stmt::Call($1->lineNum, $1->tokenStr);
                     }
                     ;
 
@@ -610,19 +610,19 @@ argList             : argList COM exp
 
 constant            : NUMCONST
                     {
-                        $$ = new AST::Exp::Const($1->lineNum, AST::Exp::Const::Type::Int, $1->tokenStr);
+                        $$ = new AST::Stmt::Const($1->lineNum, AST::Stmt::Const::Type::Int, $1->tokenStr);
                     }
                     | CHARCONST
                     {
-                        $$ = new AST::Exp::Const($1->lineNum, AST::Exp::Const::Type::Char, $1->tokenStr);
+                        $$ = new AST::Stmt::Const($1->lineNum, AST::Stmt::Const::Type::Char, $1->tokenStr);
                     }
                     | STRINGCONST
                     {
-                        $$ = new AST::Exp::Const($1->lineNum, AST::Exp::Const::Type::String, $1->tokenStr);
+                        $$ = new AST::Stmt::Const($1->lineNum, AST::Stmt::Const::Type::String, $1->tokenStr);
                     }
                     | BOOLCONST
                     {
-                        $$ = new AST::Exp::Const($1->lineNum, AST::Exp::Const::Type::Bool, $1->tokenStr);
+                        $$ = new AST::Stmt::Const($1->lineNum, AST::Stmt::Const::Type::Bool, $1->tokenStr);
                     }
                     ;
 

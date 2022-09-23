@@ -39,3 +39,7 @@ namespace AST::Stmt
 #include "Return.h"
 #include "Select.h"
 #include "While.h"
+#include "Range.h"
+#include "Id.h"
+#include "Const.h"
+#include "Call.h"

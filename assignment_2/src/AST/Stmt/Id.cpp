@@ -3,20 +3,20 @@
 
 #include <string>
 
-namespace AST::Exp
+namespace AST::Stmt
 {
     Id::Id()
-        : Node::Node()
+        : Stmt::Stmt()
     {
     }
 
     Id::Id(unsigned lineNum)
-        : Node::Node(lineNum)
+        : Stmt::Stmt(lineNum)
     {
     }
 
     Id::Id(unsigned lineNum, const std::string &id)
-        : Node::Node(lineNum),
+        : Stmt::Stmt(lineNum),
           m_id(id)
     {
     }

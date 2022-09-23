@@ -4,20 +4,20 @@
 #include <string>
 #include <variant>
 
-namespace AST::Exp
+namespace AST::Stmt
 {
     Const::Const()
-        : Node::Node()
+        : Stmt::Stmt()
     {
     }
 
     Const::Const(unsigned lineNum)
-        : Node::Node(lineNum)
+        : Stmt::Stmt(lineNum)
     {
     }
 
     Const::Const(unsigned lineNum, Type type, std::string value)
-        : Node::Node(lineNum),
+        : Stmt::Stmt(lineNum),
           m_type(type)
     {
         switch (m_type)

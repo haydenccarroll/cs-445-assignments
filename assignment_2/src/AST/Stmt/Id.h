@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../Node.h"
+#include "Stmt.h"
 
 #include <string>
 
-namespace AST::Exp
+namespace AST::Stmt
 {
     /// Identifier node
-    class Id : public Node
+    class Id : public Stmt
     {
     public:
         Id();

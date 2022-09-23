@@ -3,20 +3,20 @@
 
 #include <string>
 
-namespace AST::Exp
+namespace AST::Stmt
 {
     Range::Range()
-        : Node::Node()
+        : Stmt::Stmt()
     {
     }
 
     Range::Range(unsigned lineNum)
-        : Node::Node(lineNum)
+        : Stmt::Stmt(lineNum)
     {
     }
 
     Range::Range(unsigned lineNum, Node *from, Node *to, Node *by)
-        : Node::Node(lineNum)
+        : Stmt::Stmt(lineNum)
     {
         addChild(from);
         addChild(to);

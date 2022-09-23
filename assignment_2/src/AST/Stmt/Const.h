@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../Node.h"
+#include "Stmt.h"
 
 #include <variant>
 
-namespace AST::Exp
+namespace AST::Stmt
 {
     /// Node for constants
-    class Const : public Node
+    class Const : public Stmt
     {
     public:
         /// Constant types
