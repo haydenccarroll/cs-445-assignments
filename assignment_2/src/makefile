@@ -1,13 +1,22 @@
-all: c-
+BIN = c-
+CC = g++ --std=c++17 -g
 
-c-.tab.c c-.tab.h:	c-.y
-	bison -t -v -d c-.y
+SRCS = $(BIN).y  $(BIN).l
+CCSRCS = helpers.cpp AST/*.cpp AST/*/*.cpp Options/*.cpp Options/ourgetopt/*.cpp
+HDRS = scanType.h helpers.h AST/*.h AST/*/*.h Options/*.h Options/ourgetopt/*.h
+OBJS = lex.yy.o $(BIN).tab.o
 
-lex.yy.c: c-.l c-.tab.h
-	flex c-.l
+$(BIN) : $(OBJS)
+	$(CC) $(OBJS) $(CCSRCS) -o $(BIN)
 
-c-: lex.yy.c c-.tab.c c-.tab.h scanType.h helpers.h helpers.cpp
-	g++ -o c- c-.tab.c lex.yy.c helpers.cpp
+lex.yy.c : $(BIN).l $(BIN).tab.h $(HDR)
+	flex $(BIN).l
 
-clean:
-	rm c- c-.tab.c lex.yy.c c-.tab.h c-.output
+$(BIN).tab.h $(BIN).tab.c : $(BIN).y
+	bison -v -t -d $(BIN).y
+
+clean :
+	rm -f *~ $(OBJS) $(BIN) lex.yy.c $(BIN).tab.h $(BIN).tab.c $(BIN).output
+
+tar : $(HDR) $(SRCS) makefile
+	tar -cvf $(BIN).tar $(HDRS) $(SRCS) $(CCSRCS) makefile

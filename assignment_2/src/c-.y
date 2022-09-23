@@ -1,8 +1,8 @@
 %{
-#include "AST/AST.hpp"
+#include "AST/AST.h"
 #include "scanType.h"  // TokenData Type
 #include "helpers.h"
-#include "Options/Options.hpp"
+#include "Options/Options.h"
 
 #include <iostream>
 #include <string>
@@ -27,17 +27,18 @@ void yyerror(const char *msg)
 %}
 
 // this is included in the tab.h file
-// so scanType.hpp must be included before the tab.h file!!!!
+// so scanType.h must be included before the tab.h file!!!!
 %union {
     AST::Decl::Type type;
     AST::Node *node;
     TokenData *tokenData;
+    double value;
 }
 
 %token <tokenData> WHILE IF FOR TO RETURN BREAK BY DO
 %token <tokenData> NOT AND OR
 %token <tokenData> ADD DASH RAND ASTERISK DIV MOD ASGN ADDASGN SUBASGN MULASGN DIVASGN
-%token <tokenData> THEN ELSE LCURL RCURL
+%token <tokenData> THEN ELSE BGN END
 %token <tokenData> RPAREN LPAREN RBRACK LBRACK
 %token <tokenData> STATIC
 %token <tokenData> SEMI LT LEQ GT GEQ EQ NEQ INC DEC COL COM
@@ -162,13 +163,13 @@ funDecl             : typeSpec ID LPAREN parms RPAREN compoundStmt
                     }
                     ;
 
-parms               : parmList
-                    {
-                        $$ = $1;
-					}
-                    |
+parms               :
                     {
                         $$ = nullptr;
+					}
+                    | parmList
+                    {
+                        $$ = $1;
 					}
                     ;
 
@@ -232,13 +233,17 @@ expStmt             : exp SEMI
 					}
                     ;
 
-compoundStmt        : LCURL localDecls stmtList RCURL
+compoundStmt        : BGN localDecls stmtList END
                     {
                         $$ = new AST::Stmt::Compound($1->linenum, $2, $3);
                     }
                     ;
 
-localDecls          : localDecls scopedVarDecl
+localDecls          :
+                    {
+                        $$ = nullptr;
+					}
+                    | localDecls scopedVarDecl
                     {
                         if ($1 == nullptr) {
                             $$ = $2;
@@ -247,13 +252,13 @@ localDecls          : localDecls scopedVarDecl
                             $$->addSibling($2);
                         }
                     }
-                    |
-                    {
-                        $$ = nullptr;
-					}
                     ;
 
-stmtList            : stmtList stmt
+stmtList            :
+                    {
+                        $$ = nullptr;
+					}
+                    | stmtList stmt
                     {
                         if ($1 == nullptr) {
                             $$ = $2;
@@ -262,10 +267,6 @@ stmtList            : stmtList stmt
                             $$->addSibling($2);
                         }
                     }
-                    |
-                    {
-                        $$ = nullptr;
-					}
                     ;
 
 closedStmt          : selectStmtClosed

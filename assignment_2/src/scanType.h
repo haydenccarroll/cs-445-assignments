@@ -1,16 +1,14 @@
-#ifndef SCANTYPE_H
-#define SCANTYPE_H
+#pragma once
+
+#include "AST/AST.h"
 
 #include <string>
+#include <vector>
+#include <memory>
 
 struct TokenData {
+    int tokenclass;  // token class
+    unsigned linenum;     // what line did this token occur on?
     std::string tokenstr;
-    std::string stringConst;
-    char charConst;
-    int numConst;
-    int boolConst;
-    int tokenclass;
-    int linenum;
+    int idIndex;     // index for id
 };
-
-#endif

@@ -1,57 +1,97 @@
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
 #include "helpers.h"
 
-namespace helpers
+std::string helpers::remove_quotes(std::string s)
 {
-    std::string removeQuotes(std::string str)
-    {
-        return str.substr(1, str.size() - 2);
-    }
+    return s.erase(0, 1).erase(s.length() - 1, s.length());
+}
 
-    std::string toString(std::string str)
+int helpers::str_len(const std::string &s)
+{
+    int counter = 0;
+    for (unsigned i = 0; i < s.length(); i++)
     {
-        std::string cumString = "";
-        for (int i=0; i < str.length(); i++) {
-            if (str[i] == '\\' && i < str.length() - 1) {
-                i++;
-                switch (str[i]) {
-                    case 'n':
-                        cumString += '\n';
-                        break;
-                    case '0':
-                        cumString += '\0';
-                        break;
-                    default:
-                        cumString += str[i];
-                }
+        if (s[i] == '\\')
+        {
+            if (i == s.length() - 1)
+            {
+                return counter;
             }
-            else {
-                cumString += str[i];
+            else
+            {
+                i++;
             }
         }
-        return cumString;
+        counter++;
     }
 
-    char toChar(std::string str)
+    return counter;
+}
+
+char helpers::get_char(const std::string &s, int &index)
+{
+    if (index >= s.length())
     {
-        for (int i=0; i < str.length(); i++) {
-            if (str[i] == '\\' && i < str.length() - 1) {
-                i++;
-                switch (str[i]) {
-                    case 'n':
-                        return '\n';
-                    case '0':
-                        return '\0';
-                    default:
-                        return str[i];
-                }
-            }
-            else {
-                return str[i];
+        throw std::runtime_error("getChar(): index out of bounds");
+    }
+
+    char c = '\0';
+
+    if (s[index] == '\\')
+    {
+        if (s.length() - index > 1)
+        {
+            switch (s[index + 1])
+            {
+            case 'n':
+                c = '\n';
+                break;
+            case '0':
+                c = '\0';
+                break;
+            default:
+                c = s[index + 1];
+                break;
             }
         }
-        return '\0';
+        index += 2;
     }
+    else
+    {
+        c = s[index];
+        index++;
+    }
+    return c;
+}
+
+std::string helpers::make_str(const std::string &str)
+{
+    std::string str2;
+    for (int i = 0; i < str.length();)
+    {
+        str2 += get_char(str, i);
+    }
+    return str2;
+}
+
+char helpers::make_char(const std::string &str)
+{
+    int index = 0;
+    return get_char(str, index);
+}
+
+char helpers::make_char(const std::string &str, int linenumber)
+{
+    char c = make_char(str);
+    int strlen = str_len(str);
+    if (strlen > 1)
+    {
+        std::cout << "WARNING(" + std::to_string(linenumber) + "): character is " + std::to_string(strlen) +
+                         " characters long and not a single character: ''" + str + "''. The first char will be used.";
+    }
+
+    return c;
 }
