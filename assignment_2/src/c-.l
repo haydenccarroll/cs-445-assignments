@@ -8,25 +8,16 @@
 
 #include "scanType.h"  // TokenData Type
 #include "c-.tab.h"  // token definitions from the bison
-#include "helpers.h"
 
 int line = 1;
 int numErrors;    // ERR err count
-std::vector<std::unique_ptr<TokenData>> tokens;
+std::vector<std::unique_ptr<TokenData>> token_vec;
 
-static int setValue(int linenum, int tokenClass, char *svalue)
+static int setValue(int lineNum, int tokenClass, char *svalue)
 {
-    /// A vector of unique pointers to all tokens
-    /// Once they go out of scope they are automatically freed
-    /// They go out of scope in main in c-.y, when tokens.clear() is called
-    tokens.push_back(std::move(std::make_unique<TokenData>()));
-
-    // create the pass-back data space
-    yylval.tokenData = tokens.back().get();
-
-
-    // fill it up
-    yylval.tokenData->linenum = linenum;
+    token_vec.push_back(std::move(std::make_unique<TokenData>()));
+    yylval.tokenData = token_vec.back().get();
+    yylval.tokenData->linenum = lineNum;
     yylval.tokenData->tokenstr = std::string(svalue);
 
     // return the tokenclass
@@ -39,38 +30,39 @@ static int setValue(int linenum, int tokenClass, char *svalue)
 
 %%
 \/\/.*\n                    { line++; }
+\n                          { line++; }
 \"((\\\")|([^\n\"]))*\"     { return setValue(line, STRINGCONST, yytext); }
 \'((\\\')|([^\n\']))*\'     { return setValue(line, CHARCONST, yytext); }
-\n                          { line++; }
-"while"                     { return setValue(line, WHILE, yytext); }
-"if"                        { return setValue(line, IF, yytext); }
-"for"                       { return setValue(line, FOR, yytext); }
-"to"                        { return setValue(line, TO, yytext); }
-"return"                    { return setValue(line, RETURN, yytext); }
-"break"                     { return setValue(line, BREAK, yytext); }
-"not"                       { return setValue(line, NOT, yytext); }
-"and"                       { return setValue(line, AND, yytext); }
-"or"                        { return setValue(line, OR, yytext); }
-"by"                        { return setValue(line, BY, yytext); }
-"do"                        { return setValue(line, DO, yytext); }
-"then"                      { return setValue(line, THEN, yytext); }
-"else"                      { return setValue(line, ELSE, yytext); }
-"{"                         { return setValue(line, BGN, yytext); }
-"}"                         { return setValue(line, END, yytext); }
-"static"                    { return setValue(line, STATIC, yytext); }
+"true"|"false"              { return setValue(line, BOOLCONST, yytext); }
+[0-9]+                      { return setValue(line, NUMCONST, yytext); }
 "int"                       { return INT; }
 "bool"                      { return BOOL; }
 "char"                      { return CHAR; }
-"true"|"false"              { return setValue(line, BOOLCONST, yytext); }
-"("                         { return setValue(line, LPAREN, yytext); }
-")"                         { return setValue(line, RPAREN, yytext); }
-"["                         { return setValue(line, LBRACK, yytext); }
-"]"                         { return setValue(line, RBRACK, yytext); }
+"return"                    { return setValue(line, RETURN, yytext); }
+"break"                     { return setValue(line, BREAK, yytext); }
+"not"                       { return setValue(line, NOT, yytext); }
+"else"                      { return setValue(line, ELSE, yytext); }
+"or"                        { return setValue(line, OR, yytext); }
+"by"                        { return setValue(line, BY, yytext); }
+"do"                        { return setValue(line, DO, yytext); }
+"while"                     { return setValue(line, WHILE, yytext); }
+"if"                        { return setValue(line, IF, yytext); }
+"for"                       { return setValue(line, FOR, yytext); }
+"and"                       { return setValue(line, AND, yytext); }
+"to"                        { return setValue(line, TO, yytext); }
+"then"                      { return setValue(line, THEN, yytext); }
+"{"                         { return setValue(line, BGN, yytext); }
+"}"                         { return setValue(line, END, yytext); }
+"static"                    { return setValue(line, STATIC, yytext); }
 "?"                         { return setValue(line, RAND, yytext); }
 "*"                         { return setValue(line, ASTERISK, yytext); }
 "/"                         { return setValue(line, DIV, yytext); }
 "%"                         { return setValue(line, MOD, yytext); }
 "+"                         { return setValue(line, ADD, yytext); }
+"("                         { return setValue(line, LPAREN, yytext); }
+")"                         { return setValue(line, RPAREN, yytext); }
+"["                         { return setValue(line, LBRACK, yytext); }
+"]"                         { return setValue(line, RBRACK, yytext); }
 "-"                         { return setValue(line, DASH, yytext); }
 "="                         { return setValue(line, ASGN, yytext); }
 "+="                        { return setValue(line, ADDASGN, yytext); }
@@ -89,7 +81,6 @@ static int setValue(int linenum, int tokenClass, char *svalue)
 ":"                         { return setValue(line, COL, yytext); }
 ","                         { return setValue(line, COM, yytext); }
 [a-zA-Z][a-zA-Z0-9]*        { return setValue(line, ID, yytext); }
-[0-9]+                      { return setValue(line, NUMCONST, yytext); }
 [ \t]                       ;
 .                           { printf("ERROR(%d): Invalid or misplaced input character: \'%c\'. Character Ignored.\n", line, yytext[0]); numErrors++; }
 %%

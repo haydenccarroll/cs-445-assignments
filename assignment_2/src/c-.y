@@ -1,7 +1,6 @@
 %{
 #include "AST/AST.h"
 #include "scanType.h"  // TokenData Type
-#include "helpers.h"
 #include "Options/Options.h"
 
 #include <iostream>
@@ -11,11 +10,11 @@
 #include <stdio.h>
 
 extern int yylex();
-extern FILE *yyin;
+extern FILE* yyin;
 extern int line;         // ERR line number from the scanner!!
 extern int numErrors;    // ERR err count
-extern char *yytext;
-AST::Node* tree_root;
+extern char* yytext;
+AST::Node* root;
 
 #define YYERROR_VERBOSE
 void yyerror(const char *msg)
@@ -32,7 +31,6 @@ void yyerror(const char *msg)
     AST::Decl::Type type;
     AST::Node *node;
     TokenData *tokenData;
-    double value;
 }
 
 %token <tokenData> WHILE IF FOR TO RETURN BREAK BY DO
@@ -59,7 +57,7 @@ void yyerror(const char *msg)
 program             : declList
                     {
                         $$ = $1;
-                        tree_root = $$;
+                        root = $$;
                     }
                     ;
 
@@ -630,7 +628,7 @@ constant            : NUMCONST
 
 %%
 extern int yydebug;
-extern std::vector<std::unique_ptr<TokenData>> tokens;
+extern std::vector<std::unique_ptr<TokenData>> token_vec;
 int main(int argc, char *argv[])
 {
     Options options(argc, argv);
@@ -645,13 +643,13 @@ int main(int argc, char *argv[])
                 numErrors = 0;
                 yyparse();
 
-                if (tree_root != nullptr && options.print()) {
-                    tree_root->print();
-                    delete tree_root;
+                if (root != nullptr && options.print()) {
+                    root->print();
+                    delete root;
                     
                     /// Smart pointers, so destructors are called when vector is cleared
                     /// Frees all tokens
-                    tokens.clear();
+                    token_vec.clear();
 
                     if (i != options.files().size() - 1) {
                         std::cout << std::endl;

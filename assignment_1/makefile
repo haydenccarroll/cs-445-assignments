@@ -6,8 +6,8 @@ c-.tab.c c-.tab.h:	c-.y
 lex.yy.c: c-.l c-.tab.h
 	flex c-.l
 
-c-: lex.yy.c c-.tab.c c-.tab.h scanType.h helpers.h helpers.cpp
-	g++ -o c- c-.tab.c lex.yy.c helpers.cpp
+c-: lex.yy.c c-.tab.c c-.tab.h scanType.h
+	g++ -o c- c-.tab.c lex.yy.c
 
 clean:
 	rm c- c-.tab.c lex.yy.c c-.tab.h c-.output

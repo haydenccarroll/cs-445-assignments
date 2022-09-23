@@ -29,7 +29,7 @@ namespace AST::Exp
         virtual std::string toString() const override;
 
     protected:
-
+        char _toChar(std::string str) const;
         std::variant<int, bool, char, std::string> m_value;
         Type m_type;
     };
