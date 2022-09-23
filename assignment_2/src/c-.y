@@ -1,5 +1,5 @@
 %{
-#include "AST/AST.h"
+#include "Tree/Tree.h"
 #include "scanType.h"  // TokenData Type
 #include "Options/Options.h"
 
@@ -14,7 +14,7 @@ extern FILE* yyin;
 extern int line;         // ERR line number from the scanner!!
 extern int numErrors;    // ERR err count
 extern char* yytext;
-AST::Node* root;
+Tree::Node* root;
 
 #define YYERROR_VERBOSE
 void yyerror(const char *msg)
@@ -28,8 +28,8 @@ void yyerror(const char *msg)
 // this is included in the tab.h file
 // so scanType.h must be included before the tab.h file!!!!
 %union {
-    AST::Decl::Type type;
-    AST::Node *node;
+    Tree::Decl::Type type;
+    Tree::Node *node;
     TokenData *tokenData;
 }
 
@@ -84,7 +84,7 @@ decl                : varDecl
 
 varDecl             : typeSpec varDeclList SEMI
                     {
-                        AST::Decl::Var *var = (AST::Decl::Var *)$2;
+                        Tree::Decl::Var *var = (Tree::Decl::Var *)$2;
                         var->setType($1);
                         $$ = var;
 					}
@@ -92,14 +92,14 @@ varDecl             : typeSpec varDeclList SEMI
 
 scopedVarDecl       : STATIC typeSpec varDeclList SEMI
                     {
-                        AST::Decl::Var *var = (AST::Decl::Var *)$3;
+                        Tree::Decl::Var *var = (Tree::Decl::Var *)$3;
                         var->setType($2);
                         var->setStatic();
                         $$ = var;
 					}
                     | typeSpec varDeclList SEMI
                     {
-                        AST::Decl::Var *var = (AST::Decl::Var *)$2;
+                        Tree::Decl::Var *var = (Tree::Decl::Var *)$2;
                         var->setType($1);
                         $$ = var;
 					}
@@ -129,35 +129,35 @@ varDeclInit         : varDeclId
                 
 varDeclId           : ID
                     {
-                        $$ = new AST::Decl::Var($1->lineNum, $1->tokenStr, false);
+                        $$ = new Tree::Decl::Var($1->lineNum, $1->tokenStr, false);
                     }
                     | ID LBRACK NUMCONST RBRACK
                     {
-                        $$ = new AST::Decl::Var($1->lineNum, $1->tokenStr, true);
+                        $$ = new Tree::Decl::Var($1->lineNum, $1->tokenStr, true);
                     }
                     ;
 
 typeSpec            : BOOL
                     {
-                        $$ = AST::Decl::Type::Bool;
+                        $$ = Tree::Decl::Type::Bool;
                     }
                     | CHAR
                     {
-                        $$ = AST::Decl::Type::Char;
+                        $$ = Tree::Decl::Type::Char;
                     }
                     | INT
                     {
-                        $$ = AST::Decl::Type::Int;
+                        $$ = Tree::Decl::Type::Int;
                     }
                     ;
 
 funDecl             : typeSpec ID LPAREN parms RPAREN compoundStmt
                     {
-                        $$ = new AST::Decl::Func($2->lineNum, $1, $2->tokenStr, $4, $6);
+                        $$ = new Tree::Decl::Func($2->lineNum, $1, $2->tokenStr, $4, $6);
                     }
                     | ID LPAREN parms RPAREN compoundStmt
                     {
-                        $$ = new AST::Decl::Func($1->lineNum, $1->tokenStr, $3, $5);
+                        $$ = new Tree::Decl::Func($1->lineNum, $1->tokenStr, $3, $5);
                     }
                     ;
 
@@ -184,7 +184,7 @@ parmList            : parmList SEMI parmTypeList
 
 parmTypeList        : typeSpec parmIdList
                     {
-                        AST::Decl::Parm *parms = (AST::Decl::Parm *)$2;
+                        Tree::Decl::Parm *parms = (Tree::Decl::Parm *)$2;
                         parms->setType($1);
                         $$ = parms;
 					}
@@ -203,11 +203,11 @@ parmIdList          : parmIdList COM parmId
 
 parmId              : ID
                     {
-                        $$ = new AST::Decl::Parm($1->lineNum, $1->tokenStr, false);
+                        $$ = new Tree::Decl::Parm($1->lineNum, $1->tokenStr, false);
 					}
                     | ID LBRACK RBRACK
                     {
-                        $$ = new AST::Decl::Parm($1->lineNum, $1->tokenStr, true);
+                        $$ = new Tree::Decl::Parm($1->lineNum, $1->tokenStr, true);
 					}
                     ;
 
@@ -233,7 +233,7 @@ expStmt             : exp SEMI
 
 compoundStmt        : LCURL localDecls stmtList RCURL
                     {
-                        $$ = new AST::Stmt::Compound($1->lineNum, $2, $3);
+                        $$ = new Tree::Stmt::Compound($1->lineNum, $2, $3);
                     }
                     ;
 
@@ -305,83 +305,83 @@ openStmt            : selectStmtOpen
 
 selectStmtOpen      : IF simpleExp THEN stmt
                     {
-                        $$ = new AST::Stmt::Select($1->lineNum, $2, $4);
+                        $$ = new Tree::Stmt::Select($1->lineNum, $2, $4);
                     }
                     | IF simpleExp THEN closedStmt ELSE openStmt
                     {
-                        $$ = new AST::Stmt::Select($1->lineNum, $2, $4, $6);
+                        $$ = new Tree::Stmt::Select($1->lineNum, $2, $4, $6);
                     }
                     ;
 
 selectStmtClosed    : IF simpleExp THEN closedStmt ELSE closedStmt
                     {
-                        $$ = new AST::Stmt::Select($1->lineNum, $2, $4, $6);
+                        $$ = new Tree::Stmt::Select($1->lineNum, $2, $4, $6);
                     }
                     ;
 
 iterStmtOpen        : WHILE simpleExp DO openStmt
                     {
-                        $$ = new AST::Stmt::While($1->lineNum, $2, $4);
+                        $$ = new Tree::Stmt::While($1->lineNum, $2, $4);
                     }
                     | FOR ID ASGN iterRange DO openStmt
                     {
-                        AST::Decl::Var *iterator = new AST::Decl::Var($1->lineNum, $2->tokenStr, false);
-                        iterator->setType(AST::Decl::Type::Int);
-                        $$ = new AST::Stmt::For($1->lineNum, iterator, $4, $6);
+                        Tree::Decl::Var *iterator = new Tree::Decl::Var($1->lineNum, $2->tokenStr, false);
+                        iterator->setType(Tree::Decl::Type::Int);
+                        $$ = new Tree::Stmt::For($1->lineNum, iterator, $4, $6);
                     }
                     ;
 
 iterStmtClosed      : WHILE simpleExp DO closedStmt
                     {
-                        $$ = new AST::Stmt::While($1->lineNum, $2, $4);
+                        $$ = new Tree::Stmt::While($1->lineNum, $2, $4);
                     }
                     | FOR ID ASGN iterRange DO closedStmt
                     {
-                        AST::Decl::Var *iterator = new AST::Decl::Var($1->lineNum, $2->tokenStr, false);
-                        iterator->setType(AST::Decl::Type::Int);
-                        $$ = new AST::Stmt::For($1->lineNum, iterator, $4, $6);
+                        Tree::Decl::Var *iterator = new Tree::Decl::Var($1->lineNum, $2->tokenStr, false);
+                        iterator->setType(Tree::Decl::Type::Int);
+                        $$ = new Tree::Stmt::For($1->lineNum, iterator, $4, $6);
                     }
                     ;
 
 iterRange           : simpleExp TO simpleExp
                     {
-                        $$ = new AST::Stmt::Range($1->lineNumber(), $1, $3);
+                        $$ = new Tree::Stmt::Range($1->lineNumber(), $1, $3);
                     }
                     | simpleExp TO simpleExp BY simpleExp
                     {
-                        $$ = new AST::Stmt::Range($1->lineNumber(), $1, $3, $5);
+                        $$ = new Tree::Stmt::Range($1->lineNumber(), $1, $3, $5);
                     }
                     ;
 
 returnStmt          : RETURN SEMI
                     {
-                        $$ = new AST::Stmt::Return($1->lineNum, nullptr);
+                        $$ = new Tree::Stmt::Return($1->lineNum, nullptr);
                     }
                     | RETURN exp SEMI
                     {
-                        $$ = new AST::Stmt::Return($1->lineNum, $2);
+                        $$ = new Tree::Stmt::Return($1->lineNum, $2);
                     }
                     ;
 
 breakStmt           : BREAK SEMI
                     {
-                        $$ = new AST::Stmt::Break($1->lineNum);
+                        $$ = new Tree::Stmt::Break($1->lineNum);
                     }
                     ;
 
 exp                 : mutable assignop exp
                     {
-                        AST::Op::Asgn *op = (AST::Op::Asgn *)$2;
+                        Tree::Op::Asgn *op = (Tree::Op::Asgn *)$2;
                         op->addChildren($1, $3);
                         $$ = op;
                     }
                     | mutable INC
                     {
-                        $$ = new AST::Op::UnaryAsgn($1->lineNumber(), AST::Op::UnaryAsgn::Type::Inc, $1);
+                        $$ = new Tree::Op::UnaryAsgn($1->lineNumber(), Tree::Op::UnaryAsgn::Type::Inc, $1);
                     }
                     | mutable DEC
                     {
-                        $$ = new AST::Op::UnaryAsgn($1->lineNumber(), AST::Op::UnaryAsgn::Type::Dec, $1);
+                        $$ = new Tree::Op::UnaryAsgn($1->lineNumber(), Tree::Op::UnaryAsgn::Type::Dec, $1);
                     }
                     | simpleExp
                     {
@@ -391,29 +391,29 @@ exp                 : mutable assignop exp
 
 assignop            : ASGN
                     {
-                        $$ = new AST::Op::Asgn($1->lineNum, AST::Op::Asgn::Type::Asgn);
+                        $$ = new Tree::Op::Asgn($1->lineNum, Tree::Op::Asgn::Type::Asgn);
 					}
                     | ADDASGN
                     {
-                        $$ = new AST::Op::Asgn($1->lineNum, AST::Op::Asgn::Type::AddAsgn);
+                        $$ = new Tree::Op::Asgn($1->lineNum, Tree::Op::Asgn::Type::AddAsgn);
 					}
                     | SUBASGN
                     {
-                        $$ = new AST::Op::Asgn($1->lineNum, AST::Op::Asgn::Type::SubAsgn);
+                        $$ = new Tree::Op::Asgn($1->lineNum, Tree::Op::Asgn::Type::SubAsgn);
 					}
                     | DIVASGN
                     {
-                        $$ = new AST::Op::Asgn($1->lineNum, AST::Op::Asgn::Type::DivAsgn);
+                        $$ = new Tree::Op::Asgn($1->lineNum, Tree::Op::Asgn::Type::DivAsgn);
 					}
                     | MULASGN
                     {
-                        $$ = new AST::Op::Asgn($1->lineNum, AST::Op::Asgn::Type::MulAsgn);
+                        $$ = new Tree::Op::Asgn($1->lineNum, Tree::Op::Asgn::Type::MulAsgn);
 					}
                     ;
 
 simpleExp           : simpleExp OR andExp
                     {
-                        $$ = new AST::Op::Binary($1->lineNumber(), AST::Op::Binary::Type::Or, $1, $3);
+                        $$ = new Tree::Op::Binary($1->lineNumber(), Tree::Op::Binary::Type::Or, $1, $3);
                     }
                     | andExp
                     {
@@ -423,7 +423,7 @@ simpleExp           : simpleExp OR andExp
 
 andExp              : andExp AND unaryRelExp
                     {
-                        $$ = new AST::Op::Binary($1->lineNumber(), AST::Op::Binary::Type::And, $1, $3);
+                        $$ = new Tree::Op::Binary($1->lineNumber(), Tree::Op::Binary::Type::And, $1, $3);
                     }
                     | unaryRelExp
                     {
@@ -433,7 +433,7 @@ andExp              : andExp AND unaryRelExp
 
 unaryRelExp         : NOT unaryRelExp
                     {
-                        $$ = new AST::Op::Unary($1->lineNum, AST::Op::Unary::Type::Not, $2);
+                        $$ = new Tree::Op::Unary($1->lineNum, Tree::Op::Unary::Type::Not, $2);
                     }
                     | relExp
                     {
@@ -443,7 +443,7 @@ unaryRelExp         : NOT unaryRelExp
 
 relExp              : sumExp relop sumExp
                     {
-                        AST::Op::Binary *op = (AST::Op::Binary *)$2;
+                        Tree::Op::Binary *op = (Tree::Op::Binary *)$2;
                         op->addChildren($1, $3);
                         $$ = op;
                     }
@@ -455,33 +455,33 @@ relExp              : sumExp relop sumExp
 
 relop               : LT
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::LT);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::LT);
 					}
                     | LEQ
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::LEQ);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::LEQ);
 					}
                     | GT
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::GT);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::GT);
 					}
                     | GEQ
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::GEQ);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::GEQ);
 					}
                     | EQ
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::EQ);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::EQ);
 					}
                     | NEQ
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::NEQ);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::NEQ);
 					}
                     ;
 
 sumExp              : sumExp sumop mulExp
                     {
-                        AST::Op::Binary *op = (AST::Op::Binary *)$2;
+                        Tree::Op::Binary *op = (Tree::Op::Binary *)$2;
                         op->addChildren($1, $3);
                         $$ = op;
 					}
@@ -493,17 +493,17 @@ sumExp              : sumExp sumop mulExp
 
 sumop               : ADD
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Add);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::Add);
 					}
                     | DASH
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Subtract);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::Subtract);
 					}
                     ;
 
 mulExp              : mulExp mulop unaryExp
                     {
-                        AST::Op::Binary *op = (AST::Op::Binary *)$2;
+                        Tree::Op::Binary *op = (Tree::Op::Binary *)$2;
                         op->addChildren($1, $3);
                         $$ = op;
 					}
@@ -515,21 +515,21 @@ mulExp              : mulExp mulop unaryExp
 
 mulop               : ASTERISK
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Mul);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::Mul);
 					}
                     | DIV
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Div);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::Div);
 					}
                     | MOD
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Mod);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::Mod);
 					}
                     ;
 
 unaryExp            : unaryop unaryExp
                     {
-                        AST::Op::Unary *op = (AST::Op::Unary *)$1;
+                        Tree::Op::Unary *op = (Tree::Op::Unary *)$1;
                         op->addExp($2);
                         $$ = op;
 					}
@@ -541,15 +541,15 @@ unaryExp            : unaryop unaryExp
 
 unaryop             : DASH
                     {
-                        $$ = new AST::Op::Unary($1->lineNum, AST::Op::Unary::Type::Chsign);
+                        $$ = new Tree::Op::Unary($1->lineNum, Tree::Op::Unary::Type::Chsign);
 					}
                     | ASTERISK
                     {
-                        $$ = new AST::Op::Unary($1->lineNum, AST::Op::Unary::Type::Sizeof);
+                        $$ = new Tree::Op::Unary($1->lineNum, Tree::Op::Unary::Type::Sizeof);
 					}
                     | RAND
                     {
-                        $$ = new AST::Op::Unary($1->lineNum, AST::Op::Unary::Type::Random);
+                        $$ = new Tree::Op::Unary($1->lineNum, Tree::Op::Unary::Type::Random);
 					}
                     ;
 
@@ -565,11 +565,11 @@ factor              : mutable
 
 mutable             : ID
                     {
-                        $$ = new AST::Stmt::Id($1->lineNum, $1->tokenStr);
+                        $$ = new Tree::Stmt::Id($1->lineNum, $1->tokenStr);
 					}
                     | ID LBRACK exp RBRACK
                     {
-                        $$ = new AST::Op::Binary($1->lineNum, AST::Op::Binary::Type::Index, new AST::Stmt::Id($1->lineNum, $1->tokenStr), $3);
+                        $$ = new Tree::Op::Binary($1->lineNum, Tree::Op::Binary::Type::Index, new Tree::Stmt::Id($1->lineNum, $1->tokenStr), $3);
                     }
                     ;
 
@@ -589,11 +589,11 @@ immutable           : LPAREN exp RPAREN
 
 call                : ID LPAREN argList RPAREN
                     {
-                        $$ = new AST::Stmt::Call($1->lineNum, $1->tokenStr, $3);
+                        $$ = new Tree::Stmt::Call($1->lineNum, $1->tokenStr, $3);
                     }
                     | ID LPAREN RPAREN
                     {
-                        $$ = new AST::Stmt::Call($1->lineNum, $1->tokenStr);
+                        $$ = new Tree::Stmt::Call($1->lineNum, $1->tokenStr);
                     }
                     ;
 
@@ -610,19 +610,19 @@ argList             : argList COM exp
 
 constant            : NUMCONST
                     {
-                        $$ = new AST::Stmt::Const($1->lineNum, AST::Stmt::Const::Type::Int, $1->tokenStr);
+                        $$ = new Tree::Stmt::Const($1->lineNum, Tree::Stmt::Const::Type::Int, $1->tokenStr);
                     }
                     | CHARCONST
                     {
-                        $$ = new AST::Stmt::Const($1->lineNum, AST::Stmt::Const::Type::Char, $1->tokenStr);
+                        $$ = new Tree::Stmt::Const($1->lineNum, Tree::Stmt::Const::Type::Char, $1->tokenStr);
                     }
                     | STRINGCONST
                     {
-                        $$ = new AST::Stmt::Const($1->lineNum, AST::Stmt::Const::Type::String, $1->tokenStr);
+                        $$ = new Tree::Stmt::Const($1->lineNum, Tree::Stmt::Const::Type::String, $1->tokenStr);
                     }
                     | BOOLCONST
                     {
-                        $$ = new AST::Stmt::Const($1->lineNum, AST::Stmt::Const::Type::Bool, $1->tokenStr);
+                        $$ = new Tree::Stmt::Const($1->lineNum, Tree::Stmt::Const::Type::Bool, $1->tokenStr);
                     }
                     ;
 

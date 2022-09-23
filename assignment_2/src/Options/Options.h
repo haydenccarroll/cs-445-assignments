@@ -18,9 +18,9 @@ public:
     const std::vector<std::string> &files() const;
 
 private:
-    std::vector<std::string> m_files;
-    bool m_print = false;
-    bool m_debug = false;
+    std::vector<std::string> _files;
+    bool _print = false;
+    bool _debug = false;
 };
 
 #endif

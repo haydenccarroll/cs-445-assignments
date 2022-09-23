@@ -1,7 +1,7 @@
 #ifndef SCANTYPE_H
 #define SCANTYPE_H
 
-#include "AST/AST.h"
+#include "Tree/Tree.h"
 
 #include <string>
 #include <vector>

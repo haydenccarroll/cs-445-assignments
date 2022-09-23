@@ -24,10 +24,10 @@ Options::Options(int argc, char **argv)
             switch (c)
             {
             case 'p':
-                m_print = true;
+                _print = true;
                 break;
             case 'd':
-                m_debug = true;
+                _debug = true;
                 break;
             case 'h':
                 hflag = true;
@@ -61,7 +61,7 @@ Options::Options(int argc, char **argv)
         {
             if (optind < argc)
             {
-                m_files.push_back(argv[optind]);
+                _files.push_back(argv[optind]);
                 optind++;
             }
             else
@@ -74,15 +74,15 @@ Options::Options(int argc, char **argv)
 
 bool Options::print() const
 {
-    return m_print;
+    return _print;
 }
 
 bool Options::debug() const
 {
-    return m_debug;
+    return _debug;
 }
 
 const std::vector<std::string> &Options::files() const
 {
-    return m_files;
+    return _files;
 }
