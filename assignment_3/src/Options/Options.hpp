@@ -9,19 +9,26 @@
 #include <string>
 #include <vector>
 
+namespace Options {
+
 class Options {
   public:
     Options(int argc, char **argv);
-    bool print() const;
-    bool debug() const;
-    bool debugSymbolTable() const;
-    bool printTypeInfo() const;
-    const std::optional<std::string> &file() const;
+    bool isYYdebug() const;
+    bool isSymbolTableDebug() const;
+    bool isPrintAST() const;
+    bool isPrintASTWithTypes() const;
+    const std::optional<std::string> file() const;
 
   private:
     std::optional<std::string> m_file;
-    bool m_print = false;
-    bool m_debug = false;
-    bool m_debugSymTbl = false;
-    bool m_printTypeInfo = false;
+    bool m_isYYdebug = false;
+    bool m_isSymbolTableDebug = false;
+    bool m_isPrintAST = false;
+    bool m_isPrintASTWithTypes = false;
+
+    bool m_isHelp = false;
+    bool m_isError = false;
 };
+
+}

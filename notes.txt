@@ -1,12 +1,10 @@
-line 218 in new_c-.y has some differences.
-it has stmt -> closed and open stmt, which is not in the official grammar.
-its possible that this is where the danging else ambiguity is solved.
-line 274 is also different.
+TODO:
+options stuff
+strutil stuff
+ast stuff
+SymbolTable stuff
+SemanticsChecker stuff
 
-why is typespec not part of tokenData
-
-
-stuff to change:
-
-the setStatic function for Vars.cpp, should only set itself static potentially.
-get rid of all pragmas
+DONE:
+c-.l
+c-.y 

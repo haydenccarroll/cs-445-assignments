@@ -638,26 +638,24 @@ constant            : NUMCONST
 extern std::vector<std::unique_ptr<TokenData>> token_vec;
 int main(int argc, char *argv[])
 {
-    Options options(argc, argv);
+    numErrors = 0;
+    Options::Options options(argc, argv);
     bool fileExists = true;
-    yydebug = options.debug();
+    yydebug = options.isYYdebug();
     std::optional<std::string> file = options.file();
 
     if (file.has_value()) {
-        SemanticsChecker semantics = SemanticsChecker(options.debugSymbolTable());
+        SemanticsChecker semantics = SemanticsChecker(options.isSymbolTableDebug());
         if ((yyin = fopen(file.value().c_str(), "r"))) {
             // file open successful
-            // do the parsing
-            numErrors = 0;
             yyparse();
 
-            if (options.print()) {
+            if (options.isPrintAST()) {
                 root->print(false);
             }
-
             semantics.analyze(root);
 
-            if (options.printTypeInfo()) {
+            if (options.isPrintASTWithTypes()) {
                 semantics.print();
             }
 
@@ -668,12 +666,14 @@ int main(int argc, char *argv[])
             token_vec.clear();
         }
         else {
+            // custom error for file not found, increment num errors later on
             std::cout << "ERROR(ARGLIST): source file \"" + file.value() + "\" could not be opened." << std::endl;
             fileExists = false;
         }
         std::cout << "Number of warnings: " << semantics.numWarnings() << std::endl;
         std::cout << "Number of errors: " << semantics.numErrors() + !fileExists << std::endl;
     } else {
+        // do this forever, since it will always be pulling from stdin
         yyparse();
     }
     

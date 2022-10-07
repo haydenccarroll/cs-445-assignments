@@ -8,50 +8,49 @@
 #include <string>
 #include <vector>
 
+// from ourgetopt
+extern int optind;
+extern char* optarg;
+
+namespace Options {
+
 Options::Options(int argc, char **argv) {
-    bool errflag = false;
-    bool hflag = false;
-
     char c;
-    extern char *optarg;
-    extern int optind;
-
     while (true) {
         while ((c = ourGetopt(argc, argv, (char *)"hpdPD")) != EOF) {
             switch (c) {
             case 'p':
-                m_print = true;
+                m_isPrintAST = true;
                 break;
             case 'd':
-                m_debug = true;
+                m_isYYdebug = true;
                 break;
             case 'h':
-                hflag = true;
+                m_isHelp = true;
                 break;
             case 'D':
-                m_debugSymTbl = true;
+                m_isSymbolTableDebug = true;
                 break;
             case 'P':
-                m_printTypeInfo = true;
+                m_isPrintASTWithTypes = true;
                 break;
             default:
-                errflag = true;
+                m_isError = true;
                 break;
             }
         }
 
-        if (hflag || errflag) {
-            std::cout << "usage: c- [options] [sourcefile]" << std::endl;
-            std::cout << "options:" << std::endl;
-            std::cout << "-d - turn on parser debugging" << std::endl;
-            std::cout << "-D - turn on symbol table debugging" << std::endl;
-            std::cout << "-h - print this usage message" << std::endl;
-            std::cout << "-p - print the abstract syntax tree" << std::endl;
-            std::cout
-                << "-P - print the abstract syntax tree plus type information"
-                << std::endl;
+        if (m_isError || m_isHelp) {
+            std::cout << "usage: c- [options] [sourcefile]\n"
+            << "options:\n"
+            << "-d - turn on parser debugging\n"
+            << "-D - turn on symbol table debugging\n"
+            << "-h - print this usage message\n"
+            << "-p - print the abstract syntax tree\n"
+            << "-P - print the abstract syntax tree plus type information"
+            << std::endl;
 
-            exit(!errflag);
+            exit(!m_isError);
         } else {
             if (optind < argc) {
                 m_file = argv[optind];
@@ -61,12 +60,29 @@ Options::Options(int argc, char **argv) {
     }
 }
 
-bool Options::print() const { return m_print; }
+bool Options::isYYdebug() const
+{
+    return m_isYYdebug;
+}
 
-bool Options::debug() const { return m_debug; }
+bool Options::isSymbolTableDebug() const
+{
+    return m_isSymbolTableDebug;
+}
 
-bool Options::debugSymbolTable() const { return m_debugSymTbl; }
+bool Options::isPrintAST() const
+{
+    return m_isPrintAST;
+}
 
-bool Options::printTypeInfo() const { return m_printTypeInfo; }
+bool Options::isPrintASTWithTypes() const
+{
+    return m_isPrintASTWithTypes;
+}
 
-const std::optional<std::string> &Options::file() const { return m_file; }
+const std::optional<std::string> Options::file() const 
+{
+    return m_file;
+}
+
+}
