@@ -9,10 +9,10 @@ namespace AST::Stmt {
 
 Stmt::Stmt() : Node::Node() { m_nodeType = AST::NodeType::Stmt; }
 
-Stmt::Stmt(unsigned linenum) : Node::Node(linenum, AST::NodeType::Stmt) {}
+Stmt::Stmt(unsigned lineNum) : Node::Node(lineNum, AST::NodeType::Stmt) {}
 
-Stmt::Stmt(unsigned linenum, StmtType stmtType)
-    : Node::Node(linenum, AST::NodeType::Stmt) {
+Stmt::Stmt(unsigned lineNum, StmtType stmtType)
+    : Node::Node(lineNum, AST::NodeType::Stmt) {
     m_stmtType = stmtType;
 }
 

@@ -11,10 +11,10 @@
 namespace AST::Exp::Op {
 Binary::Binary() : Op::Op() { m_opType = OpType::Binary; }
 
-Binary::Binary(unsigned linenum) : Op::Op(linenum, OpType::Binary) {}
+Binary::Binary(unsigned lineNum) : Op::Op(lineNum, OpType::Binary) {}
 
-Binary::Binary(unsigned linenum, BinaryOpType opType, Node *exp1, Node *exp2)
-    : Op::Op(linenum, OpType::Binary), m_binaryOpType(opType) {
+Binary::Binary(unsigned lineNum, BinaryOpType opType, Node *exp1, Node *exp2)
+    : Op::Op(lineNum, OpType::Binary), m_binaryOpType(opType) {
     addChild(exp1);
     addChild(exp2);
 }

@@ -12,8 +12,8 @@ class Symbol {
     Symbol();
     Symbol &name(const std::string &);
     Symbol &declare(AST::Decl::Decl *decl);
-    Symbol &define(unsigned linenum);
-    Symbol &use(unsigned linenum);
+    Symbol &define(unsigned lineNum);
+    Symbol &use(unsigned lineNum);
     bool isDeclared() const;
     bool isDefined() const;
     bool isUsed() const;

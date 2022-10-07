@@ -10,7 +10,7 @@ namespace AST::Stmt {
 class Break : public Stmt {
   public:
     Break();
-    /// @param linenum Line number the node appears on
-    Break(unsigned linenum);
+    /// @param lineNum Line number the node appears on
+    Break(unsigned lineNum);
 };
 } // namespace AST::Stmt

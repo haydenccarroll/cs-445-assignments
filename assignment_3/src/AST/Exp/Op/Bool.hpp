@@ -7,8 +7,8 @@ namespace AST::Exp::Op {
 class Bool : public Binary {
   public:
     Bool();
-    Bool(unsigned linenum);
-    Bool(unsigned linenum, BoolOpType boolOpType);
+    Bool(unsigned lineNum);
+    Bool(unsigned lineNum, BoolOpType boolOpType);
 
     const BoolOpType &boolOpType() const;
     

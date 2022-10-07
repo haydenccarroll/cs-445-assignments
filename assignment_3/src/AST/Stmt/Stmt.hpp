@@ -11,9 +11,9 @@ namespace AST::Stmt {
 class Stmt : public Node {
   public:
     Stmt();
-    /// @param linenum Line number the node appears on
-    Stmt(unsigned linenum);
-    Stmt(unsigned linenum, StmtType stmtType);
+    /// @param lineNum Line number the node appears on
+    Stmt(unsigned lineNum);
+    Stmt(unsigned lineNum, StmtType stmtType);
 
     const StmtType &stmtType() const;
 

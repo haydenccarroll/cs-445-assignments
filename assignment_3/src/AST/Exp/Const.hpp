@@ -10,12 +10,12 @@ namespace AST::Exp {
 class Const : public Exp {
   public:
     Const();
-    /// @param linenum Line number the node appears on
-    Const(unsigned linenum);
-    /// @param linenum Line number the node appears on
+    /// @param lineNum Line number the node appears on
+    Const(unsigned lineNum);
+    /// @param lineNum Line number the node appears on
     /// @param Type Type of the constant
     /// @param data String value of the data
-    Const(unsigned linenum, TypeInfo typeInfo, std::string data);
+    Const(unsigned lineNum, TypeInfo typeInfo, std::string data);
     
     virtual std::string toString(bool debugging = false) const override;
 

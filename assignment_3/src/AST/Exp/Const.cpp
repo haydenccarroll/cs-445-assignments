@@ -9,12 +9,12 @@
 namespace AST::Exp {
 Const::Const() : Exp::Exp() {}
 
-Const::Const(unsigned linenum) : Exp::Exp(linenum, ExpType::Const) {
+Const::Const(unsigned lineNum) : Exp::Exp(lineNum, ExpType::Const) {
     m_typeInfo.isConst = true;
 }
 
-Const::Const(unsigned linenum, TypeInfo typeInfo, std::string value)
-    : Exp::Exp(linenum, ExpType::Const) {
+Const::Const(unsigned lineNum, TypeInfo typeInfo, std::string value)
+    : Exp::Exp(lineNum, ExpType::Const) {
     m_typeInfo = typeInfo;
     m_typeInfo.isConst = true;
     switch (m_typeInfo.type.value()) {
@@ -28,7 +28,7 @@ Const::Const(unsigned linenum, TypeInfo typeInfo, std::string value)
             break;
         } else {
             m_value =
-                strutil::make_char(strutil::remove_quotes(value), m_linenum);
+                strutil::make_char(strutil::remove_quotes(value), m_lineNum);
             break;
         }
     };

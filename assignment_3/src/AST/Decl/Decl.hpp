@@ -13,9 +13,9 @@ namespace AST::Decl {
 class Decl : public Node {
   public:
     Decl();
-    /// @param linenum Line number the node appears on
-    Decl(unsigned linenum);
-    Decl(unsigned linenum, DeclType declType);
+    /// @param lineNum Line number the node appears on
+    Decl(unsigned lineNum);
+    Decl(unsigned lineNum, DeclType declType);
     
     const std::string &id() const;
     const DeclType &declType() const;

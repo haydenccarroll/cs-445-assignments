@@ -15,14 +15,14 @@ class Unary : public Op {
     /// Unary operators
 
     Unary();
-    /// @param linenum
-    Unary(unsigned linenum);
+    /// @param lineNum
+    Unary(unsigned lineNum);
     /// exp is optional in this constructor, but must be provided eventually!
     /// Set later with addExp.
-    /// @param linenum
+    /// @param lineNum
     /// @param opType Unary operator type
     /// @param exp Optional child expression
-    Unary(unsigned linenum, UnaryOpType opType, Node *exp = nullptr);
+    Unary(unsigned lineNum, UnaryOpType opType, Node *exp = nullptr);
 
     const UnaryOpType &unaryOpType() const;
     /// @param exp Child node

@@ -15,15 +15,15 @@ class Binary : public Op {
     /// Binary operators
 
     Binary();
-    /// @param linenum Line number the node appears on
-    Binary(unsigned linenum);
+    /// @param lineNum Line number the node appears on
+    Binary(unsigned lineNum);
     /// exp1 and exp2 are optional arguments, but they must be set later if not
     /// provided in the constructor! Set them with addChildren
-    /// @param linenum Line number the node appears on
+    /// @param lineNum Line number the node appears on
     /// @param opType Operator type
     /// @param exp1 First argument
     /// @param exp2 Second argument
-    Binary(unsigned linenum, BinaryOpType opType, Node *exp1 = nullptr,
+    Binary(unsigned lineNum, BinaryOpType opType, Node *exp1 = nullptr,
            Node *exp2 = nullptr);
 
     const BinaryOpType &binaryOpType() const;

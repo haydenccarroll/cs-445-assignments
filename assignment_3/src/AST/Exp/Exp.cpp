@@ -3,10 +3,10 @@
 namespace AST::Exp {
 Exp::Exp() : Node::Node() { m_nodeType = NodeType::Exp; }
 
-Exp::Exp(unsigned linenum) : Node::Node(linenum, NodeType::Exp) {}
+Exp::Exp(unsigned lineNum) : Node::Node(lineNum, NodeType::Exp) {}
 
-Exp::Exp(unsigned linenum, ExpType expType)
-    : Node::Node(linenum, NodeType::Exp), m_expType(expType) {}
+Exp::Exp(unsigned lineNum, ExpType expType)
+    : Node::Node(lineNum, NodeType::Exp), m_expType(expType) {}
 
 const ExpType &Exp::expType() const { return m_expType; }
 

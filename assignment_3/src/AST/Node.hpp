@@ -18,11 +18,11 @@ class Node {
 #pragma region Constructors / Destructors
     /// Default constructor
     Node();
-    /// @param linenum Line number the node appears on
-    Node(unsigned linenum);
-    /// @param linenum Line number the node appears on
+    /// @param lineNum Line number the node appears on
+    Node(unsigned lineNum);
+    /// @param lineNum Line number the node appears on
     /// @param nodeType Type of node
-    Node(unsigned linenum, NodeType nodeType);
+    Node(unsigned lineNum, NodeType nodeType);
     /// Virtual destructor, release all dynamically allocated memory
     virtual ~Node();
 #pragma endregion
@@ -114,7 +114,7 @@ class Node {
     std::vector<Node *> m_children;
     Node *m_sibling = nullptr;
     Node *m_parent = nullptr;
-    unsigned m_linenum;
+    unsigned m_lineNum;
 
     /// @returns The line tag at the end of every node's print statement
     std::string lineTag() const;

@@ -9,8 +9,8 @@ namespace AST::Exp::Op {
 class Op : public Exp {
   public:
     Op();
-    Op(unsigned linenum);
-    Op(unsigned linenum, OpType opType);
+    Op(unsigned lineNum);
+    Op(unsigned lineNum, OpType opType);
     
     const OpType &opType() const;
 

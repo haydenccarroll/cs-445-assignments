@@ -103,14 +103,14 @@ void SemanticsChecker::leaveScope() {
 
             if (!symbol.linesUsedBeforeDefined().empty()) {
 
-                auto linenumber = symbol.linesUsedBeforeDefined().front();
-                if (!symbol.isDefined() || linenumber <= symbol.lineDefined()) {
+                auto lineNumber = symbol.linesUsedBeforeDefined().front();
+                if (!symbol.isDefined() || lineNumber <= symbol.lineDefined()) {
                     std::string warning =
                         "Variable '" + id +
                         "' may be uninitialized when used here.";
 
-                    m_messages[linenumber].insert(
-                        m_messages[linenumber].begin(),
+                    m_messages[lineNumber].insert(
+                        m_messages[lineNumber].begin(),
                         {Message::Type::Warning, warning});
                 }
             }

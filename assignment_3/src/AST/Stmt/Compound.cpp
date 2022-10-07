@@ -8,11 +8,11 @@
 namespace AST::Stmt {
 Compound::Compound() : Stmt::Stmt() { m_stmtType = StmtType::Compound; }
 
-Compound::Compound(unsigned linenum)
-    : Stmt::Stmt(linenum, StmtType::Compound) {}
+Compound::Compound(unsigned lineNum)
+    : Stmt::Stmt(lineNum, StmtType::Compound) {}
 
-Compound::Compound(unsigned linenum, Node *localdecls, Node *stmtlist)
-    : Stmt::Stmt(linenum, StmtType::Compound) {
+Compound::Compound(unsigned lineNum, Node *localdecls, Node *stmtlist)
+    : Stmt::Stmt(lineNum, StmtType::Compound) {
     addChild(localdecls);
     addChild(stmtlist);
 }

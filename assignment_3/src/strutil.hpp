@@ -7,7 +7,7 @@ class strutil {
     static std::string remove_quotes(std::string);
     static std::string make_str(const std::string &);
     static char make_char(const std::string &);
-    static char make_char(const std::string &, int linenumber);
+    static char make_char(const std::string &, int lineNumber);
     static int str_len(const std::string &);
 
   private:

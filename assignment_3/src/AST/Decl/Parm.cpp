@@ -7,10 +7,10 @@
 namespace AST::Decl {
 Parm::Parm() : Decl::Decl() { m_declType = DeclType::Parm; }
 
-Parm::Parm(unsigned linenum) : Decl::Decl(linenum, DeclType::Parm) {}
+Parm::Parm(unsigned lineNum) : Decl::Decl(lineNum, DeclType::Parm) {}
 
-Parm::Parm(unsigned linenum, const std::string &id, bool isArray)
-    : Decl::Decl(linenum, DeclType::Parm) {
+Parm::Parm(unsigned lineNum, const std::string &id, bool isArray)
+    : Decl::Decl(lineNum, DeclType::Parm) {
     m_typeInfo.isArray = isArray;
     m_id = id;
 }

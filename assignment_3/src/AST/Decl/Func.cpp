@@ -13,13 +13,13 @@ Func::Func() : Decl::Decl() {
     m_typeInfo.type = Type::Void;
 }
 
-Func::Func(unsigned linenum) : Decl::Decl(linenum, DeclType::Func) {
+Func::Func(unsigned lineNum) : Decl::Decl(lineNum, DeclType::Func) {
     m_typeInfo.type = Type::Void;
 }
 
-Func::Func(unsigned linenum, const std::string &id, Node *parms,
+Func::Func(unsigned lineNum, const std::string &id, Node *parms,
            Node *compoundstmt)
-    : Decl::Decl(linenum, DeclType::Func) {
+    : Decl::Decl(lineNum, DeclType::Func) {
     m_typeInfo = {Type::Void, false, false};
     m_id = id;
     addChild(parms);
@@ -28,9 +28,9 @@ Func::Func(unsigned linenum, const std::string &id, Node *parms,
     m_compoundStmt = (Stmt::Compound *)compoundstmt;
 }
 
-Func::Func(unsigned linenum, Type returnType, const std::string &id,
+Func::Func(unsigned lineNum, Type returnType, const std::string &id,
            Node *parms, Node *compoundstmt)
-    : Decl::Decl(linenum) {
+    : Decl::Decl(lineNum) {
     m_typeInfo = {returnType, false, false};
     m_id = id;
     addChild(parms);

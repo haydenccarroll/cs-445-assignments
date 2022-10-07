@@ -19,18 +19,18 @@ Symbol &Symbol::declare(AST::Decl::Decl *decl) {
     return *this;
 }
 
-Symbol &Symbol::define(unsigned linenum) {
+Symbol &Symbol::define(unsigned lineNum) {
     if (!m_lineDefined.has_value()) {
-        m_lineDefined = linenum;
+        m_lineDefined = lineNum;
     }
     return *this;
 }
 
-Symbol &Symbol::use(unsigned linenum) {
+Symbol &Symbol::use(unsigned lineNum) {
     if (!isDefined()) {
-        m_linesUsedBeforeDefined.push_back(linenum);
+        m_linesUsedBeforeDefined.push_back(lineNum);
     } else {
-        m_linesUsedAfterDefined.push_back(linenum);
+        m_linesUsedAfterDefined.push_back(lineNum);
     }
     return *this;
 }

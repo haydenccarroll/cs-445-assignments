@@ -11,10 +11,10 @@ namespace AST::Stmt {
 class Return : public Stmt {
   public:
     Return();
-    /// @param linenum Line number the node appears on
-    Return(unsigned linenum);
-    /// @param linenum Line number the node appears on
-    Return(unsigned linenum, Node *exp);
+    /// @param lineNum Line number the node appears on
+    Return(unsigned lineNum);
+    /// @param lineNum Line number the node appears on
+    Return(unsigned lineNum, Node *exp);
     /// @returns Value to return
     Exp::Exp *exp() const;
 };

@@ -9,10 +9,10 @@
 namespace AST::Stmt {
 For::For() : Stmt::Stmt() { m_stmtType = StmtType::For; }
 
-For::For(unsigned linenum) : Stmt::Stmt(linenum, StmtType::For) {}
+For::For(unsigned lineNum) : Stmt::Stmt(lineNum, StmtType::For) {}
 
-For::For(unsigned linenum, Node *id, Node *range, Node *stmt)
-    : Stmt::Stmt(linenum, StmtType::For) {
+For::For(unsigned lineNum, Node *id, Node *range, Node *stmt)
+    : Stmt::Stmt(lineNum, StmtType::For) {
     addChild(id);
     addChild(range);
     addChild(stmt);

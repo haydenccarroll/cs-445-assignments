@@ -15,12 +15,12 @@ class UnaryAsgn : public Unary {
     /// Assignment type
 
     UnaryAsgn();
-    /// @param linenum Line number the node appears on
-    UnaryAsgn(unsigned linenum);
-    /// @param linenum Line number the node appears on
+    /// @param lineNum Line number the node appears on
+    UnaryAsgn(unsigned lineNum);
+    /// @param lineNum Line number the node appears on
     /// @param opType Assignment type
     /// @param exp The node being assigned
-    UnaryAsgn(unsigned linenum, UnaryAsgnType opType, Node *exp);
+    UnaryAsgn(unsigned lineNum, UnaryAsgnType opType, Node *exp);
 
     UnaryAsgnType unaryAsgnType() const;
     Exp *mutableExp() const;

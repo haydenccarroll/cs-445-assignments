@@ -8,10 +8,10 @@
 namespace AST::Stmt {
 Select::Select() : Stmt::Stmt() { m_stmtType = StmtType::Select; }
 
-Select::Select(unsigned linenum) : Stmt::Stmt(linenum, StmtType::Select) {}
+Select::Select(unsigned lineNum) : Stmt::Stmt(lineNum, StmtType::Select) {}
 
-Select::Select(unsigned linenum, Node *exp, Node *stmt1, Node *stmt2)
-    : Stmt::Stmt(linenum, StmtType::Select) {
+Select::Select(unsigned lineNum, Node *exp, Node *stmt1, Node *stmt2)
+    : Stmt::Stmt(lineNum, StmtType::Select) {
     addChild(exp);
     addChild(stmt1);
     addChild(stmt2);

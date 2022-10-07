@@ -6,12 +6,12 @@ Bool::Bool() : Binary::Binary() {
     m_typeInfo.type = Type::Bool;
 }
 
-Bool::Bool(unsigned linenum) : Binary::Binary(linenum, BinaryOpType::Bool) {
+Bool::Bool(unsigned lineNum) : Binary::Binary(lineNum, BinaryOpType::Bool) {
     m_typeInfo.type = Type::Bool;
 }
 
-Bool::Bool(unsigned linenum, BoolOpType boolOpType)
-    : Binary::Binary(linenum, BinaryOpType::Bool), m_boolOpType(boolOpType) {
+Bool::Bool(unsigned lineNum, BoolOpType boolOpType)
+    : Binary::Binary(lineNum, BinaryOpType::Bool), m_boolOpType(boolOpType) {
     m_typeInfo.type = Type::Bool;
 }
 

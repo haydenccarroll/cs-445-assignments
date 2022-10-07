@@ -8,10 +8,10 @@
 namespace AST::Stmt {
 Range::Range() : Stmt::Stmt() { m_stmtType = StmtType::Range; }
 
-Range::Range(unsigned linenum) : Stmt::Stmt(linenum, StmtType::Range) {}
+Range::Range(unsigned lineNum) : Stmt::Stmt(lineNum, StmtType::Range) {}
 
-Range::Range(unsigned linenum, Node *from, Node *to, Node *by)
-    : Stmt::Stmt(linenum, StmtType::Range) {
+Range::Range(unsigned lineNum, Node *from, Node *to, Node *by)
+    : Stmt::Stmt(lineNum, StmtType::Range) {
     addChild(from);
     addChild(to);
     addChild(by);

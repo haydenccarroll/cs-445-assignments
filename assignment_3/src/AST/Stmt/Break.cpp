@@ -7,5 +7,5 @@
 namespace AST::Stmt {
 Break::Break() : Stmt::Stmt() { m_stmtType = StmtType::Break; }
 
-Break::Break(unsigned linenum) : Stmt::Stmt(linenum, StmtType::Break) {}
+Break::Break(unsigned lineNum) : Stmt::Stmt(lineNum, StmtType::Break) {}
 } // namespace AST::Stmt

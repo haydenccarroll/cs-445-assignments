@@ -10,10 +10,10 @@
 namespace AST::Exp::Op {
 Asgn::Asgn() : Binary::Binary() { m_binaryOpType = BinaryOpType::Asgn; }
 
-Asgn::Asgn(unsigned linenum) : Binary::Binary(linenum, BinaryOpType::Asgn) {}
+Asgn::Asgn(unsigned lineNum) : Binary::Binary(lineNum, BinaryOpType::Asgn) {}
 
-Asgn::Asgn(unsigned linenum, AsgnType asgnType, Node *exp1, Node *exp2)
-    : Binary::Binary(linenum, BinaryOpType::Asgn), m_asgnType(asgnType) {
+Asgn::Asgn(unsigned lineNum, AsgnType asgnType, Node *exp1, Node *exp2)
+    : Binary::Binary(lineNum, BinaryOpType::Asgn), m_asgnType(asgnType) {
     addChild(exp1);
     addChild(exp2);
 }

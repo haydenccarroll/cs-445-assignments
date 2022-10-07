@@ -66,11 +66,11 @@ char strutil::make_char(const std::string &str) {
     return get_char(str, index);
 }
 
-char strutil::make_char(const std::string &str, int linenumber) {
+char strutil::make_char(const std::string &str, int lineNumber) {
     char c = make_char(str);
     int strlen = str_len(str);
     if (strlen > 1) {
-        std::cout << "WARNING(" + std::to_string(linenumber) +
+        std::cout << "WARNING(" + std::to_string(lineNumber) +
                          "): character is " + std::to_string(strlen) +
                          " characters long and not a single character: ''" +
                          str + "''. The first char will be used.";

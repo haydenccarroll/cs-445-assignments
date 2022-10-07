@@ -8,10 +8,10 @@
 namespace AST::Stmt {
 While::While() : Stmt::Stmt() { m_stmtType = StmtType::While; }
 
-While::While(unsigned linenum) : Stmt::Stmt(linenum, StmtType::While) {}
+While::While(unsigned lineNum) : Stmt::Stmt(lineNum, StmtType::While) {}
 
-While::While(unsigned linenum, Node *exp, Node *stmt)
-    : Stmt::Stmt(linenum, StmtType::While) {
+While::While(unsigned lineNum, Node *exp, Node *stmt)
+    : Stmt::Stmt(lineNum, StmtType::While) {
     addChild(exp);
     addChild(stmt);
 }

@@ -13,10 +13,10 @@ namespace AST {
 
 Node::Node() : m_sibling(nullptr) {}
 
-Node::Node(unsigned linenum) : m_sibling(nullptr), m_linenum(linenum) {}
+Node::Node(unsigned lineNum) : m_sibling(nullptr), m_lineNum(lineNum) {}
 
-Node::Node(unsigned linenum, NodeType nodeType)
-    : m_linenum(linenum), m_nodeType(nodeType) {}
+Node::Node(unsigned lineNum, NodeType nodeType)
+    : m_lineNum(lineNum), m_nodeType(nodeType) {}
 
 Node::~Node() {
     if (m_sibling != nullptr) {
@@ -126,7 +126,7 @@ void Node::print(bool debugging) const {
 
 bool Node::hasSibling() const { return m_sibling != nullptr; }
 
-unsigned &Node::lineNumber() { return m_linenum; }
+unsigned &Node::lineNumber() { return m_lineNum; }
 
 const NodeType &Node::nodeType() const { return m_nodeType; }
 
@@ -152,7 +152,7 @@ bool Node::is(AsgnType t) const { return false; }
 #pragma region Private functions
 
 std::string Node::lineTag() const {
-    return " [line: " + std::to_string(m_linenum) + "]";
+    return " [line: " + std::to_string(m_lineNum) + "]";
 }
 
 std::string Node::typeTag() const { return ""; }

@@ -8,10 +8,10 @@
 namespace AST::Stmt {
 Return::Return() : Stmt::Stmt() { m_stmtType = StmtType::Return; }
 
-Return::Return(unsigned linenum) : Stmt::Stmt(linenum, StmtType::Return) {}
+Return::Return(unsigned lineNum) : Stmt::Stmt(lineNum, StmtType::Return) {}
 
-Return::Return(unsigned linenum, Node *exp)
-    : Stmt::Stmt(linenum, StmtType::Return) {
+Return::Return(unsigned lineNum, Node *exp)
+    : Stmt::Stmt(lineNum, StmtType::Return) {
     addChild(exp);
 }
 
