@@ -23,12 +23,12 @@ def test(dir):
     compiler_path = os.path.join(os.path.join(dir, 'src'), 'c-')
     actual_out_path = os.path.join("", 'test.out')
     for i, test in enumerate(tests):
-        print(f'Running test suite \'{test[:-3]}\' {i + 1} / {len(tests)}...', end='')
+        print(f'Running test suite \'{test[:-3]}\' {i + 1} / {len(tests)}...', flush=True)
 
         test_path = os.path.join(test_dir, test)
         expected_out_path = os.path.join(test_path[:-3] + '.out')
 
-        os.system(f'{compiler_path} -p {test_path} > {actual_out_path}')
+        os.system(f'{compiler_path} -p -P {test_path} > {actual_out_path}')
         expected = open(expected_out_path, 'r')
         actual = open(actual_out_path, 'r')
         
@@ -37,9 +37,6 @@ def test(dir):
         else:
             print('Failed!')
             os.system(f'diff {expected_out_path} {actual_out_path}')
-            expected.close()
-            actual.close()
-            break
 
         expected.close()
         actual.close()
