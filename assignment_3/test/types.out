@@ -301,8 +301,10 @@ Func: main returns type int [line: 2]
 .   .   .   Child: 0  Const true [line: 114]
 .   .   Sibling: 78  Return [line: 116]
 .   .   .   Child: 0  Id: ba [line: 116]
+WARNING(8): The variable 'c' seems not to be used.
 ERROR(8): Symbol 'c' is already declared at line 8.
 ERROR(9): Symbol 'i' is already declared at line 4.
+WARNING(10): The variable 'pumpkin' seems not to be used.
 WARNING(12): Variable 'i' may be uninitialized when used here.
 WARNING(13): Variable 'b' may be uninitialized when used here.
 ERROR(13): '+' requires operands of type int but rhs is of type bool.
@@ -377,7 +379,5 @@ ERROR(112): Symbol 'a' is not declared.
 ERROR(113): The operation 'sizeof' only works with arrays.
 ERROR(114): Unary 'chsign' requires an operand of type int but was given type bool.
 ERROR(116): Cannot return an array.
-WARNING(8): The variable 'c' seems not to be used.
-WARNING(10): The variable 'pumpkin' seems not to be used.
 Number of warnings: 6
 Number of errors: 72

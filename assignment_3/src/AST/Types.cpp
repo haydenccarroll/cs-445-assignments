@@ -35,13 +35,7 @@ std::string toString(TypeInfo t) {
         str += " is array";
     }
 
-    str += " of";
-
-    if (t.isStatic) {
-        str += " static";
-    }
-
-    str += " type " + toString(t.type);
+    str += " of type " + toString(t.type);
 
     return str;
 }
@@ -74,7 +68,7 @@ std::string toString(BoolOpType t) {
     case BoolOpType::Or:
         return "or";
     case BoolOpType::EQ:
-        return "=";
+        return "==";
     case BoolOpType::GEQ:
         return ">=";
     case BoolOpType::GT:
@@ -140,7 +134,7 @@ std::string toString(AsgnType t) {
     case AsgnType::AddAsgn:
         return "+=";
     case AsgnType::Asgn:
-        return "<-";
+        return "=";
     case AsgnType::DivAsgn:
         return "/=";
     case AsgnType::MulAsgn:

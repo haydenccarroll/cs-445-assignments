@@ -93,6 +93,7 @@ Func: main returns type void [line: 2]
 .   .   .   .   .   Child: 0  Op: * [line: 29]
 .   .   .   .   .   .   Child: 0  Id: i [line: 29]
 .   .   .   .   .   .   Child: 1  Id: j [line: 29]
+WARNING(5): The variable 'ba' seems not to be used.
 ERROR(12): Symbol 'bb' is not declared.
 ERROR(12): Cannot index nonarray 'bb'.
 ERROR(13): Symbol 'bb' is not declared.
@@ -116,6 +117,5 @@ ERROR(26): Symbol 'c' is not declared.
 ERROR(26): Cannot index nonarray 'c'.
 ERROR(27): Symbol 'outnl' is not declared.
 ERROR(29): Symbol 'output' is not declared.
-WARNING(5): The variable 'ba' seems not to be used.
 Number of warnings: 1
 Number of errors: 23

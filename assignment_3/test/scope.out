@@ -78,6 +78,7 @@ ERROR(25): Symbol 'b' is not declared.
 ERROR(26): Symbol 'c' is not declared.
 ERROR(30): Symbol 'b' is not declared.
 ERROR(31): Symbol 'c' is not declared.
+WARNING(40): The variable 'bat' seems not to be used.
 ERROR(41): Symbol 'x' is not declared.
 WARNING(44): Variable 'z' may be uninitialized when used here.
 ERROR(45): Symbol 'p' is not declared.
@@ -90,7 +91,6 @@ ERROR(48): Symbol 'cow' is not declared.
 ERROR(48): Symbol 'v' is not declared.
 ERROR(49): Symbol 'abraxsis' is not declared.
 ERROR(50): Symbol 'a' is not declared.
-WARNING(40): The variable 'bat' seems not to be used.
 ERROR(55): Symbol 'g' is already declared at line 2.
 ERROR(57): Symbol 'g' is already declared at line 2.
 ERROR(59): Symbol 'x' is not declared.

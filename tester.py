@@ -36,7 +36,7 @@ def test(dir):
             print('Passed!')
         else:
             print('Failed!')
-            os.system(f'diff {expected_out_path} {actual_out_path}')
+            os.system(f'sort {expected_out_path} > expected.out; sort {actual_out_path} > actual.out; diff expected.out actual.out')
 
         expected.close()
         actual.close()

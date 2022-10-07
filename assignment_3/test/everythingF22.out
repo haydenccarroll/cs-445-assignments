@@ -503,11 +503,11 @@ Sibling: 20  Var: dog of type char [line: 137]
 Sibling: 21  Var: hog of type char [line: 138]
 .   Child: 0  Const ' ' [line: 138]
 WARNING(46): Variable 'trousers' may be uninitialized when used here.
-WARNING(62): Variable 'Wensleydale' may be uninitialized when used here.
-WARNING(58): The variable 'c' seems not to be used.
 WARNING(54): The variable 'cheese' seems not to be used.
-WARNING(59): The variable 'i' seems not to be used.
 WARNING(54): The variable 'launch' seems not to be used.
+WARNING(58): The variable 'c' seems not to be used.
+WARNING(59): The variable 'i' seems not to be used.
+WARNING(62): Variable 'Wensleydale' may be uninitialized when used here.
 WARNING(70): The variable 'skein' seems not to be used.
 WARNING(82): Variable 'chicken' may be uninitialized when used here.
 WARNING(82): Variable 'run' may be uninitialized when used here.
@@ -515,9 +515,9 @@ WARNING(85): Variable 'wallace' may be uninitialized when used here.
 WARNING(85): Variable 'gromit' may be uninitialized when used here.
 WARNING(90): The variable 'y' seems not to be used.
 WARNING(98): The variable 'pastry' seems not to be used.
+WARNING(116): The variable 'wool' seems not to be used.
 WARNING(125): Variable 'yarn' may be uninitialized when used here.
 WARNING(127): Variable 'preston' may be uninitialized when used here.
 WARNING(127): Variable 'shaun' may be uninitialized when used here.
-WARNING(116): The variable 'wool' seems not to be used.
 Number of warnings: 17
 Number of errors: 0

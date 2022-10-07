@@ -13,7 +13,7 @@ Sibling: 2  Func: main returns type void [line: 6]
 .   .   .   Child: 0  Id: z [line: 13]
 .   .   .   Child: 1  Const 999 [line: 13]
 WARNING(8): The variable 'b' seems not to be used.
-WARNING(10): The variable 'c' seems not to be used.
 WARNING(9): The variable 'y' seems not to be used.
+WARNING(10): The variable 'c' seems not to be used.
 Number of warnings: 3
 Number of errors: 0

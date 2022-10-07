@@ -57,8 +57,7 @@ std::string Const::toString(bool debugging) const {
     }
     case Type::Char: {
         if (m_typeInfo.isArray) {
-            str += "is array \"" + std::get<std::string>(m_value) +
-                   "\" of type char";
+            str += "is array \"" + std::get<std::string>(m_value) + "\"";
             break;
         } else {
             str += "'" + std::string(1, std::get<char>(m_value)) + "'";

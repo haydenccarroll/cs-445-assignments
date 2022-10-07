@@ -30,11 +30,7 @@ std::string Var::toString(bool debugging) const {
     if (m_typeInfo.isArray) {
         str += " is array";
     }
-    str += " of";
-    if (m_typeInfo.isStatic) {
-        str += " static";
-    }
-    str += " type " + Types::toString(m_typeInfo.type.value()) + lineTag();
+    str += " of type " + Types::toString(m_typeInfo.type.value()) + lineTag();
     return str;
 }
 

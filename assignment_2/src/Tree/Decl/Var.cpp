@@ -30,12 +30,7 @@ namespace Tree::Decl
         {
             str += " of array";
         }
-        str += " of";
-        if (_isStatic)
-        {
-            str += " static";
-        }
-        str += " type " + _typeStringMap.at(_type.value()) + lineTag();
+        str += " of type " + _typeStringMap.at(_type.value()) + lineTag();
         return str;
     }
 }

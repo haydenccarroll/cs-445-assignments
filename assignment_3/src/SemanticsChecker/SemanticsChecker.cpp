@@ -675,7 +675,7 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Asgn *op) {
             };
 
             std::string error =
-                "'<-' requires both operands be arrays or not but lhs" +
+                "'=' requires both operands be arrays or not but lhs" +
                 isArrayToString(op->exp1()->typeInfo().isArray) + " and rhs" +
                 isArrayToString(op->exp2()->typeInfo().isArray) + ".";
             m_messages[op->lineNumber()].push_back(
@@ -686,7 +686,7 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Asgn *op) {
             op->exp1()->typeInfo().type.has_value() &&
             op->exp2()->typeInfo().type.has_value()) {
             std::string error =
-                "'<-' requires operands of the same type but lhs is type " +
+                "'=' requires operands of the same type but lhs is type " +
                 AST::Types::toString(op->exp1()->typeInfo().type) +
                 " and rhs is type " +
                 AST::Types::toString(op->exp2()->typeInfo().type) + ".";

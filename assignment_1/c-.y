@@ -49,7 +49,7 @@ statement     : '\n'
               | BOOLCONST               { printf("Line %i Token: BOOLCONST Value: %d  Input: %s\n", $1->lineNum, $1->boolConst, $1->tokenStr.c_str()); }
               | TOKEN                   {
                     std::cout << "Line " << $1->lineNum << " Token: ";
-                    if ($1->tokenStr == "<-") {
+                    if ($1->tokenStr == "=") {
                         std::cout << "ASGN\n";
                     } else if ($1->tokenStr == "==") {
                         std::cout << "EQ\n";
