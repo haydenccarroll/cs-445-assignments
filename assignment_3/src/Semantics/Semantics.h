@@ -2,12 +2,30 @@
 
 #include "../Tree/Tree.h"
 #include "SymbolTable.h"
-#include "Message.h"
 
 #include <map>
 #include <optional>
 #include <string>
 #include <vector>
+
+class Msg {
+  public:
+    enum class MsgType { Error, Warning };
+    Msg(MsgType type, const std::string &content);
+
+    MsgType type() const;
+    std::string content() const;
+
+    static unsigned numWarnings();
+    static unsigned numErrors();
+
+  private:
+    static unsigned s_numerrors;
+    static unsigned s_numwarnings;
+
+    MsgType m_type;
+    std::string m_content;
+};
 
 class Semantics {
   public:
@@ -21,9 +39,7 @@ class Semantics {
 
   private:
     SymbolTable m_symbolTable;
-    // Mapping for errors and warning messages
-    // Maps from line number to bucket of messages
-    std::map<unsigned, std::vector<Message>> m_messages;
+    std::map<unsigned, std::vector<Msg>> m_messages;
     unsigned m_numErrors = 0;
     unsigned m_numWarnings = 0;
     std::optional<std::string> m_scopeName;

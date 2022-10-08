@@ -4,6 +4,26 @@
 
 #include <iostream>
 
+unsigned Msg::s_numerrors = 0;
+unsigned Msg::s_numwarnings = 0;
+
+Msg::Msg(MsgType type, const std::string &content)
+    : m_type(type), m_content(content) {
+    if (type == MsgType::Error) {
+        s_numerrors++;
+    } else {
+        s_numwarnings++;
+    }
+}
+
+Msg::MsgType Msg::type() const { return m_type; }
+
+std::string Msg::content() const { return m_content; }
+
+unsigned Msg::numErrors() { return s_numerrors; }
+
+unsigned Msg::numWarnings() { return s_numwarnings; }
+
 Semantics::Semantics() : m_mainIsDefined(false) {}
 
 Semantics::Semantics(bool debug)
@@ -14,10 +34,10 @@ const SymbolTable &Semantics::symbolTable() const {
 }
 
 int Semantics::numErrors() const {
-    return Message::numErrors() + (!m_mainIsDefined - !m_analyzed);
+    return Msg::numErrors() + (!m_mainIsDefined - !m_analyzed);
 }
 
-int Semantics::numWarnings() const { return Message::numWarnings(); }
+int Semantics::numWarnings() const { return Msg::numWarnings(); }
 
 void Semantics::print() const {
     if (!m_mainIsDefined) {
@@ -31,7 +51,7 @@ void Semantics::print() const {
             auto message = bucket[i];
             std::string tag;
 
-            if (message.type() == Message::MsgType::Error) {
+            if (message.type() == Msg::MsgType::Error) {
                 tag = "ERROR(" + std::to_string(lineNumber) + "): ";
             } else {
                 tag = "WARNING(" + std::to_string(lineNumber) + "): ";
@@ -72,7 +92,7 @@ void Semantics::enterScope(const std::optional<std::string> &name) {
                 std::to_string(originalSymbol->lineNumber()) + ".";
 
             m_messages[parm->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
 
         } else {
             m_symbolTable.declare(parm->id(), parm);
@@ -93,7 +113,7 @@ void Semantics::leaveScope() {
             if (symbol.isDeclared()) {
                 m_messages[symbol.decl()->lineNumber()].insert(
                     m_messages[symbol.decl()->lineNumber()].begin(),
-                    {Message::MsgType::Warning, warning});
+                    {Msg::MsgType::Warning, warning});
             }
         }
 
@@ -111,7 +131,7 @@ void Semantics::leaveScope() {
 
                     m_messages[lineNumber].insert(
                         m_messages[lineNumber].begin(),
-                        {Message::MsgType::Warning, warning});
+                        {Msg::MsgType::Warning, warning});
                 }
             }
         }
@@ -296,7 +316,7 @@ void Semantics::analyzeNode(Tree::Decl::Decl *decl) {
                     std::to_string(originalSymbol->lineNumber()) + ".";
 
                 m_messages[decl->lineNumber()].push_back(
-                    {Message::MsgType::Error, error});
+                    {Msg::MsgType::Error, error});
             }
         } else {
             m_symbolTable.declare(decl->id(), decl);
@@ -330,7 +350,7 @@ void Semantics::analyzeNode(Tree::Exp::Exp *exp) {
 
             std::string error = "Symbol '" + call->id() + "' is not declared.";
             m_messages[call->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         } else if (m_symbolTable[call->id()].isDeclared()) {
 
             m_symbolTable[call->id()].use(call->lineNumber());
@@ -342,7 +362,7 @@ void Semantics::analyzeNode(Tree::Exp::Exp *exp) {
                     "'" + call->id() +
                     "' is a simple variable and cannot be called.";
                 m_messages[call->lineNumber()].push_back(
-                    {Message::MsgType::Error, error});
+                    {Msg::MsgType::Error, error});
             } else {
                 call->typeInfo() = m_symbolTable[call->id()].decl()->typeInfo();
             }
@@ -362,14 +382,14 @@ void Semantics::analyzeNode(Tree::Exp::Exp *exp) {
                 std::string error =
                     "Cannot use function '" + id->id() + "' as a variable.";
                 m_messages[id->lineNumber()].push_back(
-                    {Message::MsgType::Error, error});
+                    {Msg::MsgType::Error, error});
             } else {
             }
 
         } else {
             std::string error = "Symbol '" + id->id() + "' is not declared.";
             m_messages[id->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
 
         bool isUsed = true;
@@ -427,7 +447,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Op *op) {
                     "' does not work with arrays.";
 
                 m_messages[binary->lineNumber()].push_back(
-                    {Message::MsgType::Error, error});
+                    {Msg::MsgType::Error, error});
             }
 
             if (binary->exp1()->typeInfo().type != Tree::DataType::Int &&
@@ -437,7 +457,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Op *op) {
                     "' requires operands of type int but lhs is of type " +
                     Tree::Types::toString(binary->exp1()->typeInfo().type) + ".";
                 m_messages[binary->lineNumber()].push_back(
-                    {Message::MsgType::Error, error});
+                    {Msg::MsgType::Error, error});
             }
 
             if (binary->exp2()->typeInfo().type != Tree::DataType::Int &&
@@ -447,7 +467,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Op *op) {
                     "' requires operands of type int but rhs is of type " +
                     Tree::Types::toString(binary->exp2()->typeInfo().type) + ".";
                 m_messages[binary->lineNumber()].push_back(
-                    {Message::MsgType::Error, error});
+                    {Msg::MsgType::Error, error});
             }
 
         }
@@ -475,7 +495,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Op *op) {
                     std::string error =
                         "Cannot index nonarray '" + id->id() + "'.";
                     m_messages[id->lineNumber()].push_back(
-                        {Message::MsgType::Error, error});
+                        {Msg::MsgType::Error, error});
                 }
 
                 auto *index = binary->exp2();
@@ -491,7 +511,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Op *op) {
                             "Array index is the unindexed array '" +
                             indexId->id() + "'.";
                         m_messages[binary->lineNumber()].push_back(
-                            {Message::MsgType::Error, error});
+                            {Msg::MsgType::Error, error});
                     }
                 }
 
@@ -506,7 +526,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Op *op) {
                         Tree::Types::toString(binary->exp2()->typeInfo().type) +
                         ".";
                     m_messages[binary->lineNumber()].push_back(
-                        {Message::MsgType::Error, error});
+                        {Msg::MsgType::Error, error});
                 }
 
                 break;
@@ -548,7 +568,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Unary *op) {
                 Tree::Types::toString(unaryasgn->unaryAsgnType()) +
                 "' does not work with arrays.";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
 
         if (unaryasgn->operand()->typeInfo().type != Tree::DataType::Int &&
@@ -559,7 +579,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Unary *op) {
                 Tree::Types::toString(unaryasgn->operand()->typeInfo().type) +
                 ".";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
 
         break;
@@ -571,7 +591,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Unary *op) {
                                 Tree::Types::toString(op->unaryOpType()) +
                                 "' does not work with arrays.";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
 
         if (op->operand()->typeInfo().type != Tree::DataType::Int &&
@@ -581,7 +601,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Unary *op) {
                 "' requires an operand of type int but was given type " +
                 Tree::Types::toString(op->operand()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
         break;
     }
@@ -592,7 +612,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Unary *op) {
                                 Tree::Types::toString(op->unaryOpType()) +
                                 "' does not work with arrays.";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
 
         if (op->operand()->typeInfo().type != Tree::DataType::Bool &&
@@ -602,7 +622,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Unary *op) {
                 "' requires an operand of type bool but was given type " +
                 Tree::Types::toString(op->operand()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
         break;
     }
@@ -611,7 +631,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Unary *op) {
             op->operand()->typeInfo().type.has_value()) {
             std::string error = "The operation '?' does not work with arrays.";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
 
         if (op->operand()->typeInfo().type != Tree::DataType::Int &&
@@ -621,7 +641,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Unary *op) {
                 "was given type " +
                 Tree::Types::toString(op->operand()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
         break;
     }
@@ -631,7 +651,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Unary *op) {
             std::string error =
                 "The operation 'sizeof' only works with arrays.";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
         break;
     }
@@ -648,7 +668,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Asgn *op) {
                 "' requires operands of type int but lhs is of type " +
                 Tree::Types::toString(op->exp1()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
 
         if (op->exp2()->typeInfo().type != Tree::DataType::Int &&
@@ -658,7 +678,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Asgn *op) {
                 "' requires operands of type int but rhs is of type " +
                 Tree::Types::toString(op->exp2()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
     }
 
@@ -679,7 +699,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Asgn *op) {
                 isArrayToString(op->exp1()->typeInfo().isArray) + " and rhs" +
                 isArrayToString(op->exp2()->typeInfo().isArray) + ".";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
 
         if (op->exp1()->typeInfo().type != op->exp2()->typeInfo().type &&
@@ -691,7 +711,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Asgn *op) {
                 " and rhs is type " +
                 Tree::Types::toString(op->exp2()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
         break;
     }
@@ -710,7 +730,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Bool *op) {
                                 Tree::Types::toString(op->boolOpType()) +
                                 "' does not work with arrays.";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
 
         if (op->exp1()->typeInfo().type != Tree::DataType::Bool &&
@@ -721,7 +741,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Bool *op) {
                 Tree::Types::toString(op->exp1()->typeInfo().type) + ".";
 
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
 
         if (op->exp2()->typeInfo().type != Tree::DataType::Bool) {
@@ -731,7 +751,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Bool *op) {
                 Tree::Types::toString(op->exp2()->typeInfo().type) + ".";
 
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
     } else {
         if (op->exp1()->typeInfo().type != op->exp2()->typeInfo().type &&
@@ -745,7 +765,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Bool *op) {
                 " and rhs is type " +
                 Tree::Types::toString(op->exp2()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
 
         if (op->exp1()->typeInfo().isArray != op->exp2()->typeInfo().isArray) {
@@ -762,7 +782,7 @@ void Semantics::analyzeNode(Tree::Exp::Op::Bool *op) {
                 isArrayToString(op->exp1()->typeInfo().isArray) + " and rhs" +
                 isArrayToString(op->exp2()->typeInfo().isArray) + ".";
             m_messages[op->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
     }
 }
@@ -781,7 +801,7 @@ void Semantics::analyzeNode(Tree::Stmt::Stmt *stmt) {
             returnNode->exp()->typeInfo().isArray) {
             std::string error = "Cannot return an array.";
             m_messages[returnNode->lineNumber()].push_back(
-                {Message::MsgType::Error, error});
+                {Msg::MsgType::Error, error});
         }
         break;
     }
