@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Tree/Tree.h"
-#include "../SymbolTable/SymbolTable.h"
+#include "SymbolTable.h"
 #include "Message.h"
 
 #include <map>
@@ -9,10 +9,10 @@
 #include <string>
 #include <vector>
 
-class SemanticsChecker {
+class Semantics {
   public:
-    SemanticsChecker();
-    SemanticsChecker(bool debug);
+    Semantics();
+    Semantics(bool debug);
     const SymbolTable &symbolTable() const;
     void analyze(Tree::Node *);
     void print() const;

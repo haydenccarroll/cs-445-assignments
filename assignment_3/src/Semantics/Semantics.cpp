@@ -1,25 +1,25 @@
-#include "SemanticsChecker.h"
+#include "Semantics.h"
 #include "../Tree/Tree.h"
-#include "../SymbolTable/SymbolTable.h"
+#include "SymbolTable.h"
 
 #include <iostream>
 
-SemanticsChecker::SemanticsChecker() : m_mainIsDefined(false) {}
+Semantics::Semantics() : m_mainIsDefined(false) {}
 
-SemanticsChecker::SemanticsChecker(bool debug)
+Semantics::Semantics(bool debug)
     : m_mainIsDefined(false), m_debug(debug) {}
 
-const SymbolTable &SemanticsChecker::symbolTable() const {
+const SymbolTable &Semantics::symbolTable() const {
     return m_symbolTable;
 }
 
-int SemanticsChecker::numErrors() const {
+int Semantics::numErrors() const {
     return Message::numErrors() + (!m_mainIsDefined - !m_analyzed);
 }
 
-int SemanticsChecker::numWarnings() const { return Message::numWarnings(); }
+int Semantics::numWarnings() const { return Message::numWarnings(); }
 
-void SemanticsChecker::print() const {
+void Semantics::print() const {
     if (!m_mainIsDefined) {
         std::cout << "ERROR(LINKER): A function named 'main()' must be defined."
                   << std::endl;
@@ -41,7 +41,7 @@ void SemanticsChecker::print() const {
     }
 }
 
-void SemanticsChecker::enterScope() {
+void Semantics::enterScope() {
     // Use function name as name for the scope
     if (m_scopeName.has_value()) {
         enterScope(m_scopeName.value());
@@ -51,7 +51,7 @@ void SemanticsChecker::enterScope() {
     }
 }
 
-void SemanticsChecker::enterScope(const std::optional<std::string> &name) {
+void Semantics::enterScope(const std::optional<std::string> &name) {
     if (name.has_value()) {
         m_symbolTable.enter(name.value());
     } else {
@@ -81,7 +81,7 @@ void SemanticsChecker::enterScope(const std::optional<std::string> &name) {
     m_parms = nullptr;
 }
 
-void SemanticsChecker::leaveScope() {
+void Semantics::leaveScope() {
     auto symbols = m_symbolTable.getImmediateSymbols();
 
     for (const auto &[id, symbol] : symbols) {
@@ -120,7 +120,7 @@ void SemanticsChecker::leaveScope() {
     m_symbolTable.leave();
 }
 
-void SemanticsChecker::analyze(Tree::Node *tree) {
+void Semantics::analyze(Tree::Node *tree) {
     m_analyzed = true;
     m_mainIsDefined = false;
     m_symbolTable = SymbolTable(m_debug);
@@ -130,7 +130,7 @@ void SemanticsChecker::analyze(Tree::Node *tree) {
     analyzeTree(tree);
 }
 
-void SemanticsChecker::analyzeTree(Tree::Node *tree) {
+void Semantics::analyzeTree(Tree::Node *tree) {
 
     // This is where nodes should be analyzed if they are declarations, uses,
     // or definitions. They will be analyzed before their children. Set
@@ -209,7 +209,7 @@ void SemanticsChecker::analyzeTree(Tree::Node *tree) {
     }
 }
 
-void SemanticsChecker::analyzeDefinitions(Tree::Exp::Op::Asgn *op) {
+void Semantics::analyzeDefinitions(Tree::Exp::Op::Asgn *op) {
     if (op->exp1()->is(Tree::ExpType::Id)) {
 
         bool shouldDefine = true;
@@ -266,7 +266,7 @@ void SemanticsChecker::analyzeDefinitions(Tree::Exp::Op::Asgn *op) {
     }
 }
 
-void SemanticsChecker::analyzeNode(Tree::Decl::Decl *decl) {
+void Semantics::analyzeNode(Tree::Decl::Decl *decl) {
     // Check to see if it's defining main()
     if (decl->is(Tree::DeclType::Func)) {
         m_scopeName = decl->id();
@@ -320,7 +320,7 @@ void SemanticsChecker::analyzeNode(Tree::Decl::Decl *decl) {
     }
 }
 
-void SemanticsChecker::analyzeNode(Tree::Exp::Exp *exp) {
+void Semantics::analyzeNode(Tree::Exp::Exp *exp) {
 
     switch (exp->expType()) {
     case Tree::ExpType::Call: {
@@ -404,7 +404,7 @@ void SemanticsChecker::analyzeNode(Tree::Exp::Exp *exp) {
     }
 }
 
-void SemanticsChecker::analyzeNode(Tree::Exp::Op::Op *op) {
+void Semantics::analyzeNode(Tree::Exp::Op::Op *op) {
     op->deduceType();
 
     switch (op->opType()) {
@@ -536,7 +536,7 @@ void SemanticsChecker::analyzeNode(Tree::Exp::Op::Op *op) {
     }
 }
 
-void SemanticsChecker::analyzeNode(Tree::Exp::Op::Unary *op) {
+void Semantics::analyzeNode(Tree::Exp::Op::Unary *op) {
     switch (op->unaryOpType()) {
     case Tree::UnaryOpType::Asgn: {
         auto *unaryasgn = op->cast<Tree::Exp::Op::UnaryAsgn *>();
@@ -638,7 +638,7 @@ void SemanticsChecker::analyzeNode(Tree::Exp::Op::Unary *op) {
     }
 }
 
-void SemanticsChecker::analyzeNode(Tree::Exp::Op::Asgn *op) {
+void Semantics::analyzeNode(Tree::Exp::Op::Asgn *op) {
 
     if (!op->is(Tree::AsgnType::Asgn)) {
         if (op->exp1()->typeInfo().type != Tree::DataType::Int &&
@@ -698,7 +698,7 @@ void SemanticsChecker::analyzeNode(Tree::Exp::Op::Asgn *op) {
     }
 }
 
-void SemanticsChecker::analyzeNode(Tree::Exp::Op::Bool *op) {
+void Semantics::analyzeNode(Tree::Exp::Op::Bool *op) {
     if (op->boolOpType() == Tree::BoolOpType::And ||
         op->boolOpType() == Tree::BoolOpType::Or) {
 
@@ -767,7 +767,7 @@ void SemanticsChecker::analyzeNode(Tree::Exp::Op::Bool *op) {
     }
 }
 
-void SemanticsChecker::analyzeNode(Tree::Stmt::Stmt *stmt) {
+void Semantics::analyzeNode(Tree::Stmt::Stmt *stmt) {
     switch (stmt->stmtType()) {
     case Tree::StmtType::Compound: {
         break;

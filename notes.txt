@@ -2,7 +2,7 @@ TODO:
 strutil stuff
 ast stuff
 SymbolTable stuff
-SemanticsChecker stuff
+Semantics stuff
 
 
 FOR AST STUFF:

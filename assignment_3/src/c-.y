@@ -2,7 +2,7 @@
 #include "Tree/Tree.h"
 #include "scanType.h"  // TokenData Type
 #include "Options/Options.h"
-#include "SemanticsChecker/SemanticsChecker.h"
+#include "Semantics/Semantics.h"
 
 #include <iostream>
 #include <string>
@@ -644,7 +644,7 @@ int main(int argc, char *argv[])
     std::optional<std::string> file = options.file();
 
     if (file.has_value()) {
-        SemanticsChecker semantics = SemanticsChecker(options.isSymbolTableDebug());
+        Semantics semantics = Semantics(options.isSymbolTableDebug());
         if ((yyin = fopen(file.value().c_str(), "r"))) {
             // file open successful
             yyparse();

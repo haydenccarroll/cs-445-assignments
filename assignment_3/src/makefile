@@ -2,20 +2,15 @@ BIN = c-
 AR = ar rvs
 CC = g++ --std=c++17 -g
 
-# Changed this to multiple compile steps that can be executed at the same time
-
 Tree_DIR = .Tree.d
 Tree_SRCS = Tree/*.cpp Tree/*/*.cpp Tree/*/*.cpp
 Tree_HDRS = Tree/*.hpp Tree/*/*.hpp Tree/*/*.h
 OPTIONS_DIR = .options.d
 OPTIONS_SRCS = Options/*.cpp Options/*/*.cpp
 OPTIONS_HDRS = Options/*.hpp Options/*/*.hpp
-SYMTBL_DIR = .symtbl.d
-SYMTBL_SRCS = SymbolTable/*.cpp
-SYMTBL_HDRS = SymbolTable/*.hpp
 SEMCHCK_DIR = .semchck.d
-SEMCHCK_SRCS = SemanticsChecker/*.cpp
-SEMCHCK_HDRS = SemanticsChecker/*.hpp
+SEMCHCK_SRCS = Semantics/*.cpp
+SEMCHCK_HDRS = Semantics/*.h
 
 SRCS = $(BIN).y $(BIN).l $(Tree_SRCS) $(OPTIONS_SRCS) $(SYMTBL_SRCS) $(SEMCHCK_SRCS) strutil.cpp
 HDRS = $(Tree_HDRS) $(OPTIONS_HDRS) $(SYMTBL_HDRS) $(SEMCHCK_HDRS) strutil.h scanType.h
