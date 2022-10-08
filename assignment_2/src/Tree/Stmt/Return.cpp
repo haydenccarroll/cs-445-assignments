@@ -9,7 +9,7 @@ namespace Tree::Stmt
     Return::Return(unsigned lineNum, Node *exp)
         : Stmt::Stmt(lineNum)
     {
-        _type = Type::Return;
+        _type = DataType::Return;
         addChild(exp);
     }
 }

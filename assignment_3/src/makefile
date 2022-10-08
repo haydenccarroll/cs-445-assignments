@@ -23,7 +23,7 @@ OBJS = lex.yy.o $(BIN).tab.o
 
 $(BIN) : $(OBJS) $(Tree_DIR) $(OPTIONS_DIR) $(SYMTBL_DIR) $(SEMCHCK_DIR)
 	$(CC) strutil.cpp *.o -o $(BIN)
-	$(MAKE) clean
+	$(MAKE) cleanJunk
 
 lex.yy.c : $(BIN).l $(BIN).tab.h
 	flex -o lex.yy.c $(BIN).l
@@ -47,10 +47,14 @@ $(SEMCHCK_DIR):
 	$(CC) -c $(SEMCHCK_SRCS)
 	mkdir $(SEMCHCK_DIR)
 
-clean :
+cleanJunk :
 	rm -f *.o
 	rm -f lex.yy.c lex.yy.o $(BIN).tab.c $(BIN).tab.o $(BIN).tab.h $(BIN).output
 	rm -rf $(Tree_DIR) $(OPTIONS_DIR) $(SYMTBL_DIR) $(SEMCHCK_DIR)
+
+clean :
+	rm -f c-
+	$(MAKE) cleanJunk
 
 tar : $(HDR) $(SRCS) makefile
 	tar -cvf $(BIN).tar $(HDRS) $(SRCS) makefile

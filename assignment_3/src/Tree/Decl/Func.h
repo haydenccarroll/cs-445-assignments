@@ -9,25 +9,25 @@
 #include <string>
 
 namespace Tree::Decl {
-/// Function declaration node
+// Function declaration node
 class Func : public Decl {
   public:
     Func();
-    /// @param lineNum Line number the node appears on
+    // param lineNum - Line number the node appears on
     Func(unsigned lineNum);
-    /// Function type is set to void
-    /// @param lineNum Line number the node appears on
-    /// @param id Function identifier
-    /// @param parms Function parameters
-    /// @param compoundstmt Function body
+    // Function type is set to void
+    // param lineNum - Line number the node appears on
+    // param id - Function identifier
+    // param parms - Function parameters
+    // param compoundstmt - Function body
     Func(unsigned lineNum, const std::string &id, Node *parms,
          Node *compoundstmt);
-    /// @param lineNum Line number the node appears on
-    /// @param type Function return type
-    /// @param id Function identifier
-    /// @param parms Function parameters
-    /// @param compoundstmt Function body
-    Func(unsigned lineNum, Type type, const std::string &id, Node *parms,
+    // param lineNum - Line number the node appears on
+    // param type - Function return type
+    // param id - Function identifier
+    // param parms - Function parameters
+    // param compoundstmt - Function body
+    Func(unsigned lineNum, DataType type, const std::string &id, Node *parms,
          Node *compoundstmt);
 
     bool hasParms() const;

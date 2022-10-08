@@ -8,24 +8,24 @@
 #include <string>
 
 namespace Tree::Exp::Op {
-/// Generic class for unary operator nodes
-/// "Generic" as in one-size-fits-all, not using generics or templates.
+// Generic class for unary operator nodes
+// "Generic" as in one-size-fits-all, not using generics or templates.
 class Unary : public Op {
   public:
-    /// Unary operators
+    // Unary operators
 
     Unary();
-    /// @param lineNum
+    // param lineNum -
     Unary(unsigned lineNum);
-    /// exp is optional in this constructor, but must be provided eventually!
-    /// Set later with addExp.
-    /// @param lineNum
-    /// @param opType Unary operator type
-    /// @param exp Optional child expression
+    // exp is optional in this constructor, but must be provided eventually!
+    // Set later with addExp.
+    // param lineNum -
+    // param opType - Unary operator type
+    // param exp - Optional child expression
     Unary(unsigned lineNum, UnaryOpType opType, Node *exp = nullptr);
 
     const UnaryOpType &unaryOpType() const;
-    /// @param exp Child node
+    // param exp - Child node
     void addExp(Node *exp);
     Exp *operand() const;
 

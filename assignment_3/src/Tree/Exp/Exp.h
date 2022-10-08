@@ -2,7 +2,7 @@
 
 #include "../Node.h"
 
-/// Namespace for expression nodes
+// Namespace for expression nodes
 namespace Tree::Exp {
 
 class Exp : public Node {
@@ -13,13 +13,13 @@ class Exp : public Node {
     
     const ExpType &expType() const;
 
-    virtual void setType(TypeInfo);
-    virtual const TypeInfo &typeInfo() const;
-    virtual TypeInfo &typeInfo();
+    virtual void setType(SuperDataType);
+    virtual const SuperDataType &typeInfo() const;
+    virtual SuperDataType &typeInfo();
     virtual bool is(ExpType) const override;
 
   protected:
-    TypeInfo m_typeInfo;
+    SuperDataType m_typeInfo;
     ExpType m_expType;
 
     virtual std::string typeTag() const override;

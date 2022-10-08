@@ -7,11 +7,11 @@
 
 namespace Tree::Stmt {
 
-/// Base statement node
+// Base statement node
 class Stmt : public Node {
   public:
     Stmt();
-    /// @param lineNum Line number the node appears on
+    // param lineNum - Line number the node appears on
     Stmt(unsigned lineNum);
     Stmt(unsigned lineNum, StmtType stmtType);
 

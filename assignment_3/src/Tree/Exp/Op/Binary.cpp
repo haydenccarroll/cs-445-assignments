@@ -62,7 +62,7 @@ void Binary::deduceType() {
         m_binaryOpType == BinaryOpType::Mod ||
         m_binaryOpType == BinaryOpType::Mul ||
         m_binaryOpType == BinaryOpType::Subtract) {
-        m_typeInfo.type = Type::Int;
+        m_typeInfo.type = DataType::Int;
     } else {
         switch (m_binaryOpType) {
         case BinaryOpType::Asgn: {
@@ -72,7 +72,7 @@ void Binary::deduceType() {
             break;
         }
         case BinaryOpType::Bool: {
-            m_typeInfo.type = Type::Bool;
+            m_typeInfo.type = DataType::Bool;
             break;
         }
         case BinaryOpType::Index: {

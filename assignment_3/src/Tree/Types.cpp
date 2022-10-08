@@ -1,30 +1,30 @@
 #include "Types.h"
 
 namespace Tree::Types {
-std::string toString(Type t) {
+std::string toString(DataType t) {
     switch (t) {
-    case Type::Bool:
+    case DataType::Bool:
         return "bool";
-    case Type::Char:
+    case DataType::Char:
         return "char";
-    case Type::Int:
+    case DataType::Int:
         return "int";
-    case Type::Void:
+    case DataType::Void:
         return "void";
     default:
         return "type";
     }
 }
 
-std::string toString(std::optional<Type> t) {
-    if (t.has_value()) {
-        return toString(t.value());
+std::string toString(std::optional<DataType> type) {
+    if (type.has_value()) {
+        return toString(type.value());
     } else {
         return "undefined";
     }
 }
 
-std::string toString(TypeInfo t) {
+std::string toString(SuperDataType t) {
     if (!t.type.has_value()) {
         return " of undefined type";
     }

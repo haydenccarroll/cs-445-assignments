@@ -126,9 +126,9 @@ void Node::print(bool debugging) const {
 
 bool Node::hasSibling() const { return m_sibling != nullptr; }
 
-unsigned &Node::lineNumber() { return m_lineNum; }
+unsigned int Node::lineNumber() const { return m_lineNum; }
 
-const NodeType &Node::nodeType() const { return m_nodeType; }
+NodeType Node::nodeType() const { return m_nodeType; }
 
 #pragma endregion
 

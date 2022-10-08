@@ -12,24 +12,24 @@ namespace Tree::Stmt
     {
         switch (_type)
         {
-        case Type::String:
+        case DataType::String:
         {
 
             _value = value.substr(1, value.length() - 2);
             break;
         }
-        case Type::Bool:
+        case DataType::Bool:
         {
             _value = (value == "true");
             break;
         }
-        case Type::Char:
+        case DataType::Char:
         {
             std::string tempStr = value.substr(1, value.length() - 2);
             _value = _toChar(tempStr);
             break;
         };
-        case Type::Int:
+        case DataType::Int:
         {
             _value = std::atoi(value.c_str());
             break;
@@ -43,12 +43,12 @@ namespace Tree::Stmt
 
         switch (_type)
         {
-        case Type::Int:
+        case DataType::Int:
         {
             str += std::to_string(std::get<int>(_value));
             break;
         }
-        case Type::Bool:
+        case DataType::Bool:
         {
             if (std::get<bool>(_value))
             {
@@ -60,12 +60,12 @@ namespace Tree::Stmt
             }
             break;
         }
-        case Type::Char:
+        case DataType::Char:
         {
             str += "'" + std::string(1, std::get<char>(_value)) + "'";
             break;
         }
-        case Type::String:
+        case DataType::String:
         {
             str += "\"" + std::get<std::string>(_value) + "\"";
             break;

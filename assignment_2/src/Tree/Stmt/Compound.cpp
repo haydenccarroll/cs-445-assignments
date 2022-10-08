@@ -9,7 +9,7 @@ namespace Tree::Stmt
     Compound::Compound(unsigned lineNum, Node *localdecls, Node *stmtlist)
         : Stmt::Stmt(lineNum)
     {
-        _type = Type::Compound;
+        _type = DataType::Compound;
         addChild(localdecls);
         addChild(stmtlist);
     }

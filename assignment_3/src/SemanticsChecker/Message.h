@@ -4,10 +4,10 @@
 
 class Message {
   public:
-    enum class Type { Error, Warning };
+    enum class MsgType { Error, Warning };
 
-    Message(Type type, const std::string &content);
-    Type type() const;
+    Message(MsgType type, const std::string &content);
+    MsgType type() const;
     std::string content() const;
 
     static unsigned numWarnings();
@@ -17,6 +17,6 @@ class Message {
     static unsigned s_numerrors;
     static unsigned s_numwarnings;
 
-    Type m_type;
+    MsgType m_type;
     std::string m_content;
 };

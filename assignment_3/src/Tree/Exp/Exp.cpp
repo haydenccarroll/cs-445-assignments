@@ -10,11 +10,11 @@ Exp::Exp(unsigned lineNum, ExpType expType)
 
 const ExpType &Exp::expType() const { return m_expType; }
 
-void Exp::setType(TypeInfo typeInfo) { m_typeInfo = typeInfo; }
+void Exp::setType(SuperDataType typeInfo) { m_typeInfo = typeInfo; }
 
-TypeInfo &Exp::typeInfo() { return m_typeInfo; }
+SuperDataType &Exp::typeInfo() { return m_typeInfo; }
 
-const TypeInfo &Exp::typeInfo() const { return m_typeInfo; }
+const SuperDataType &Exp::typeInfo() const { return m_typeInfo; }
 
 std::string Exp::typeTag() const { return Types::toString(m_typeInfo); }
 

@@ -6,7 +6,7 @@
 
 namespace Tree
 {
-    /// Abstract Base Node class
+    // Abstract Base Node class
     class Node
     {
     public:

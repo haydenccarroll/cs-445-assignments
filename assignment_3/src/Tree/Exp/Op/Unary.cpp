@@ -60,19 +60,19 @@ void Unary::deduceType() {
         break;
     }
     case UnaryOpType::Chsign: {
-        m_typeInfo.type = Type::Int;
+        m_typeInfo.type = DataType::Int;
         break;
     }
     case UnaryOpType::Not: {
-        m_typeInfo.type = Type::Bool;
+        m_typeInfo.type = DataType::Bool;
         break;
     }
     case UnaryOpType::Random: {
-        m_typeInfo.type = Type::Int;
+        m_typeInfo.type = DataType::Int;
         break;
     }
     case UnaryOpType::Sizeof: {
-        m_typeInfo.type = Type::Int;
+        m_typeInfo.type = DataType::Int;
         break;
     }
     }

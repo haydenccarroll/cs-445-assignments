@@ -645,7 +645,7 @@ int main(int argc, char *argv[])
                     root->print();
                     delete root;
                     
-                    /// Gets rid of all unique_ptr tokens
+                    // Gets rid of all unique_ptr tokens
                     token_vec.clear();
 
                     if (i != options.files().size() - 1) {

@@ -9,7 +9,7 @@ namespace Tree::Stmt
     While::While(unsigned lineNum, Node *exp, Node *stmt)
         : Stmt::Stmt(lineNum)
     {
-        _type = Type::While;
+        _type = DataType::While;
         addChild(exp);
         addChild(stmt);
     }

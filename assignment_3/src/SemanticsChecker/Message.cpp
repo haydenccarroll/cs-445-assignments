@@ -3,16 +3,16 @@
 unsigned Message::s_numerrors = 0;
 unsigned Message::s_numwarnings = 0;
 
-Message::Message(Type type, const std::string &content)
+Message::Message(MsgType type, const std::string &content)
     : m_type(type), m_content(content) {
-    if (type == Type::Error) {
+    if (type == MsgType::Error) {
         s_numerrors++;
     } else {
         s_numwarnings++;
     }
 }
 
-Message::Type Message::type() const { return m_type; }
+Message::MsgType Message::type() const { return m_type; }
 
 std::string Message::content() const { return m_content; }
 

@@ -13,16 +13,16 @@ Const::Const(unsigned lineNum) : Exp::Exp(lineNum, ExpType::Const) {
     m_typeInfo.isConst = true;
 }
 
-Const::Const(unsigned lineNum, TypeInfo typeInfo, std::string value)
+Const::Const(unsigned lineNum, SuperDataType typeInfo, std::string value)
     : Exp::Exp(lineNum, ExpType::Const) {
     m_typeInfo = typeInfo;
     m_typeInfo.isConst = true;
     switch (m_typeInfo.type.value()) {
-    case Type::Bool: {
+    case DataType::Bool: {
         m_value = (value == "true");
         break;
     }
-    case Type::Char: {
+    case DataType::Char: {
         if (m_typeInfo.isArray) {
             m_value = strutil::remove_quotes(value);
             break;
@@ -32,7 +32,7 @@ Const::Const(unsigned lineNum, TypeInfo typeInfo, std::string value)
             break;
         }
     };
-    case Type::Int: {
+    case DataType::Int: {
         m_value = std::atoi(value.c_str());
         break;
     }
@@ -43,11 +43,11 @@ std::string Const::toString(bool debugging) const {
     std::string str = "Const ";
 
     switch (m_typeInfo.type.value()) {
-    case Type::Int: {
+    case DataType::Int: {
         str += std::to_string(std::get<int>(m_value));
         break;
     }
-    case Type::Bool: {
+    case DataType::Bool: {
         if (std::get<bool>(m_value)) {
             str += "true";
         } else {
@@ -55,7 +55,7 @@ std::string Const::toString(bool debugging) const {
         }
         break;
     }
-    case Type::Char: {
+    case DataType::Char: {
         if (m_typeInfo.isArray) {
             str += "is array \"" + std::get<std::string>(m_value) + "\"";
             break;
@@ -71,7 +71,7 @@ std::string Const::toString(bool debugging) const {
     };
 
     if (debugging &&
-        !(m_typeInfo.type.value() == Type::Char && m_typeInfo.isArray)) {
+        !(m_typeInfo.type.value() == DataType::Char && m_typeInfo.isArray)) {
         str += typeTag();
     }
 

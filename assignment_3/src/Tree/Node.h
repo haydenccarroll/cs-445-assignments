@@ -9,58 +9,50 @@
 
 namespace Tree {
 
-/// String to print for indentations
+// string for indentations
 static const std::string s_indentString = ".   ";
 
-/// Base AST Node class
+// base node class
 class Node {
   public:
-#pragma region Constructors / Destructors
-    /// Default constructor
     Node();
-    /// @param lineNum Line number the node appears on
+    // param lineNum  - Line number the node appears on
     Node(unsigned lineNum);
-    /// @param lineNum Line number the node appears on
-    /// @param nodeType Type of node
+    // param lineNum - Line number the node appears on
+    // param nodeType - Type of node
     Node(unsigned lineNum, NodeType nodeType);
-    /// Virtual destructor, release all dynamically allocated memory
+    // should release all dynamic memory associated with Node.
     virtual ~Node();
-#pragma endregion
 
-#pragma region Tree traversal and construction
-    /// Adds a child node
+    // Adds child node
     void addChild(Node *node);
-    /// Sets the child at the index to the node
-    /// If there is already a node at the index, it is freed
-    /// @param index Child index
-    /// @param node Node to set the child at the index
+    // Sets the child at given index
+    // If there is already a node at the index, it is deleted
+    // param index - Child index
+    // param node - node to replace put at index
     void setChild(int index, Node *node);
-    /// Adds a sibling node
+    // Adds a sibling node
     void addSibling(Node *node);
-    /// @returns The address of the sibling, nullptr if none
+    // returns address of the sibling, nullptr if none
     Node *sibling() const;
-    /// @returns The address of the parent, nullptr if none
+    // returns address of the parent, nullptr if none
     Node *parent() const;
-    /// @returns The vector of children nodes
+    // returns vector of children nodes
     const std::vector<Node *> &children() const;
-#pragma endregion
 
-#pragma region Info
-    /// Recursively prints the tree
+    // Recursively prints the tree
     void print(bool debugging = false) const;
-    /// @returns True if the node has a sibling
+    // returns true if the node has a sibling
     bool hasSibling() const;
-    /// Gets reference to the line number member
-    unsigned &lineNumber();
-    /// @returns Type of node
-    const NodeType &nodeType() const;
-#pragma endregion
+    // Gets current line number
+    unsigned int lineNumber() const;
+    // returns Type of node
+    NodeType nodeType() const;
 
-#pragma region Virtual functions
-    /// Get a string representation of the node
+    // Get a string of node for printing purposes. (debugging=false by default)
     virtual std::string toString(bool debugging = false) const;
 
-    /// Functions to determine node type from base Node pointer
+    // Functions to determine what "type" of node the node is.
     virtual bool is(NodeType) const;
     virtual bool is(StmtType) const;
     virtual bool is(DeclType) const;
@@ -71,12 +63,10 @@ class Node {
     virtual bool is(UnaryAsgnType) const;
     virtual bool is(BinaryOpType) const;
     virtual bool is(AsgnType) const;
-#pragma endregion
 
-#pragma region Templated functions
-
-    /// @param t Node type (enum)
-    /// @returns True if the node has an ancestor of type t
+    // param t - Node type (enum)
+    // returns true if the node has a node of type t in its parent list
+    // this is useful templated because there are many different type enums (such as StmtType, DeclType...)
     template <typename T> bool hasAncestor(T t) const {
         Node *walker = parent();
         while (walker != nullptr) {
@@ -89,12 +79,13 @@ class Node {
         return false;
     }
 
-    /// Casts the address of the Node to some type
-    /// @returns The casted address
+    // Casts the address of the Node to some type
+    // returns The casted address
+    // this is useful for when dealing with different types of nodes.
     template <typename T> T cast() const { return (T)this; }
 
-    /// @param t Node type (enum)
-    /// @returns Address of the closest ancestor that is the provided type
+    // param t - Node type (enum)
+    // returns the  of the closest ancestor in the parent list that is the type T
     template <typename T> Node *getClosestAncestor(T t) const {
         Node *walker = parent();
         while (walker != nullptr) {
@@ -106,7 +97,6 @@ class Node {
 
         return nullptr;
     }
-#pragma endregion
 
   private:
   protected:
@@ -116,12 +106,11 @@ class Node {
     Node *m_parent = nullptr;
     unsigned m_lineNum;
 
-    /// @returns The line tag at the end of every node's print statement
+    // returns The line tag at the end of a node's print, (just line number)
     std::string lineTag() const;
-    /// @returns The type tag to print for type debugging
+    // returns The type string to be printed if type debuggging is on.
     virtual std::string typeTag() const;
-    /// @param index Returns the child at the specified index, nullptr if none
-    /// exists
+    // returns child at given index
     Node *getChild(int index) const;
 };
-} // namespace Tree
+}

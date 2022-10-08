@@ -9,6 +9,6 @@ namespace Tree::Stmt
     Break::Break(unsigned lineNum)
         : Stmt::Stmt(lineNum)
     {
-        _type = Type::Break;
+        _type = DataType::Break;
     }
 }

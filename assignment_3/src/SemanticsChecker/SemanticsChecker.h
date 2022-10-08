@@ -21,8 +21,8 @@ class SemanticsChecker {
 
   private:
     SymbolTable m_symbolTable;
-    /// Mapping for errors and warning messages
-    /// Maps from line number to bucket of messages
+    // Mapping for errors and warning messages
+    // Maps from line number to bucket of messages
     std::map<unsigned, std::vector<Message>> m_messages;
     unsigned m_numErrors = 0;
     unsigned m_numWarnings = 0;

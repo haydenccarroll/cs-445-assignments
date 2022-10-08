@@ -6,11 +6,11 @@
 #include <string>
 
 namespace Tree::Stmt {
-/// Break statement node
+// Break statement node
 class Break : public Stmt {
   public:
     Break();
-    /// @param lineNum Line number the node appears on
+    // param lineNum - Line number the node appears on
     Break(unsigned lineNum);
 };
 } // namespace Tree::Stmt

@@ -1,10 +1,17 @@
 TODO:
-options stuff
 strutil stuff
 ast stuff
 SymbolTable stuff
 SemanticsChecker stuff
 
+
+FOR AST STUFF:
+done Node.h
+done Tree.h
+done Types.h
+
+
 DONE:
 c-.l
 c-.y 
+options stuff

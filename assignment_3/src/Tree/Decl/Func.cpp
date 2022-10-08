@@ -10,17 +10,17 @@
 namespace Tree::Decl {
 Func::Func() : Decl::Decl() {
     m_declType = DeclType::Func;
-    m_typeInfo.type = Type::Void;
+    m_typeInfo.type = DataType::Void;
 }
 
 Func::Func(unsigned lineNum) : Decl::Decl(lineNum, DeclType::Func) {
-    m_typeInfo.type = Type::Void;
+    m_typeInfo.type = DataType::Void;
 }
 
 Func::Func(unsigned lineNum, const std::string &id, Node *parms,
            Node *compoundstmt)
     : Decl::Decl(lineNum, DeclType::Func) {
-    m_typeInfo = {Type::Void, false, false};
+    m_typeInfo = {DataType::Void, false, false};
     m_id = id;
     addChild(parms);
     addChild(compoundstmt);
@@ -28,7 +28,7 @@ Func::Func(unsigned lineNum, const std::string &id, Node *parms,
     m_compoundStmt = (Stmt::Compound *)compoundstmt;
 }
 
-Func::Func(unsigned lineNum, Type returnType, const std::string &id,
+Func::Func(unsigned lineNum, DataType returnType, const std::string &id,
            Node *parms, Node *compoundstmt)
     : Decl::Decl(lineNum) {
     m_typeInfo = {returnType, false, false};

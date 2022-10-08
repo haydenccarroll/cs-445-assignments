@@ -9,17 +9,17 @@
 #include <string>
 
 namespace Tree::Exp::Op {
-/// Unary assignment operator
+// Unary assignment operator
 class UnaryAsgn : public Unary {
   public:
-    /// Assignment type
+    // Assignment type
 
     UnaryAsgn();
-    /// @param lineNum Line number the node appears on
+    // param lineNum - Line number the node appears on
     UnaryAsgn(unsigned lineNum);
-    /// @param lineNum Line number the node appears on
-    /// @param opType Assignment type
-    /// @param exp The node being assigned
+    // param lineNum - Line number the node appears on
+    // param opType - Assignment type
+    // param exp - The node being assigned
     UnaryAsgn(unsigned lineNum, UnaryAsgnType opType, Node *exp);
 
     UnaryAsgnType unaryAsgnType() const;

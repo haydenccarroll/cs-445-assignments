@@ -3,16 +3,16 @@
 namespace Tree::Exp::Op {
 Bool::Bool() : Binary::Binary() {
     m_binaryOpType = BinaryOpType::Bool;
-    m_typeInfo.type = Type::Bool;
+    m_typeInfo.type = DataType::Bool;
 }
 
 Bool::Bool(unsigned lineNum) : Binary::Binary(lineNum, BinaryOpType::Bool) {
-    m_typeInfo.type = Type::Bool;
+    m_typeInfo.type = DataType::Bool;
 }
 
 Bool::Bool(unsigned lineNum, BoolOpType boolOpType)
     : Binary::Binary(lineNum, BinaryOpType::Bool), m_boolOpType(boolOpType) {
-    m_typeInfo.type = Type::Bool;
+    m_typeInfo.type = DataType::Bool;
 }
 
 std::string Bool::toString(bool debugging) const {

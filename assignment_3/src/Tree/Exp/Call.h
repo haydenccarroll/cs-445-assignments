@@ -6,15 +6,15 @@
 #include <string>
 
 namespace Tree::Exp {
-/// Function call node
+// Function call node
 class Call : public Exp {
   public:
     Call();
-    /// @param lineNum Line number the node appears on
+    // param lineNum - Line number the node appears on
     Call(unsigned lineNum);
-    /// @param lineNum Line number the node appears on
-    /// @param id String identifier of the function
-    /// @param arglist Optional, argument list for function call
+    // param lineNum - Line number the node appears on
+    // param id - String identifier of the function
+    // param arglist - Optional, argument list for function call
     Call(unsigned lineNum, const std::string &id, Node *arglist = nullptr);
 
     const std::string &id() const;

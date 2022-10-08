@@ -22,7 +22,7 @@ namespace Tree::Decl
                                                                {Type::Int, "int"}};
     ;
 
-    /// Abstract base decl class inherits from node
+    // Abstract base decl class inherits from node
     class Decl : public Node
     {
     public:

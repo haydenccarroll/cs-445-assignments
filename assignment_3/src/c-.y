@@ -29,7 +29,7 @@ void yyerror(const char *msg)
 // this is included in the tab.h file
 // so scanType.h must be included before the tab.h file!!!!
 %union {
-    Tree::Type type;
+    Tree::DataType type;
     Tree::Node *node;
     TokenData *tokenData;
 }
@@ -140,15 +140,15 @@ varDeclId           : ID
 
 typeSpec            : BOOL
                     {
-                        $$ = Tree::Type::Bool;
+                        $$ = Tree::DataType::Bool;
                     }
                     | CHAR
                     {
-                        $$ = Tree::Type::Char;
+                        $$ = Tree::DataType::Char;
                     }
                     | INT
                     {
-                        $$ = Tree::Type::Int;
+                        $$ = Tree::DataType::Int;
                     }
                     ;
 
@@ -327,7 +327,7 @@ iterStmtOpen        : WHILE simpleExp DO openStmt
                     | FOR ID ASGN iterRange DO openStmt
                     {
                         Tree::Decl::Var *iterator = new Tree::Decl::Var($1->lineNum, $2->tokenStr, false);
-                        iterator->setType(Tree::Type::Int);
+                        iterator->setType(Tree::DataType::Int);
                         $$ = new Tree::Stmt::For($1->lineNum, iterator, $4, $6);
                     }
                     ;
@@ -339,7 +339,7 @@ iterStmtClosed      : WHILE simpleExp DO closedStmt
                     | FOR ID ASGN iterRange DO closedStmt
                     {
                         Tree::Decl::Var *iterator = new Tree::Decl::Var($1->lineNum, $2->tokenStr, false);
-                        iterator->setType(Tree::Type::Int);
+                        iterator->setType(Tree::DataType::Int);
                         $$ = new Tree::Stmt::For($1->lineNum, iterator, $4, $6);
                     }
                     ;
@@ -614,22 +614,22 @@ argList             : argList COM exp
 
 constant            : NUMCONST
                     {
-                        Tree::TypeInfo type = {Tree::Type::Int, false, false};
+                        Tree::SuperDataType type = {Tree::DataType::Int, false, false};
                         $$ = new Tree::Exp::Const($1->lineNum, type, $1->tokenStr);
                     }
                     | CHARCONST
                     {
-                        Tree::TypeInfo type = {Tree::Type::Char, false, false};
+                        Tree::SuperDataType type = {Tree::DataType::Char, false, false};
                         $$ = new Tree::Exp::Const($1->lineNum, type, $1->tokenStr);
                     }
                     | STRINGCONST
                     {
-                        Tree::TypeInfo type = {Tree::Type::Char, true, false};
+                        Tree::SuperDataType type = {Tree::DataType::Char, true, false};
                         $$ = new Tree::Exp::Const($1->lineNum, type, $1->tokenStr);
                     }
                     | BOOLCONST
                     {
-                        Tree::TypeInfo type = {Tree::Type::Bool, false, false};
+                        Tree::SuperDataType type = {Tree::DataType::Bool, false, false};
                         $$ = new Tree::Exp::Const($1->lineNum, type, $1->tokenStr);
                     }
                     ;
@@ -640,7 +640,6 @@ int main(int argc, char *argv[])
 {
     numErrors = 0;
     Options::Options options(argc, argv);
-    bool fileExists = true;
     yydebug = options.isYYdebug();
     std::optional<std::string> file = options.file();
 
@@ -665,13 +664,9 @@ int main(int argc, char *argv[])
             }
             token_vec.clear();
         }
-        else {
-            // custom error for file not found, increment num errors later on
-            std::cout << "ERROR(ARGLIST): source file \"" + file.value() + "\" could not be opened." << std::endl;
-            fileExists = false;
-        }
+
         std::cout << "Number of warnings: " << semantics.numWarnings() << std::endl;
-        std::cout << "Number of errors: " << semantics.numErrors() + !fileExists << std::endl;
+        std::cout << "Number of errors: " << semantics.numErrors() << std::endl;
     } else {
         // do this forever, since it will always be pulling from stdin
         yyparse();
