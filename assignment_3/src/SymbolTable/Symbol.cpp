@@ -1,4 +1,4 @@
-#include "Symbol.hpp"
+#include "Symbol.h"
 
 #include <algorithm>
 #include <iostream>
@@ -12,7 +12,7 @@ Symbol &Symbol::name(const std::string &name) {
     return *this;
 }
 
-Symbol &Symbol::declare(AST::Decl::Decl *decl) {
+Symbol &Symbol::declare(Tree::Decl::Decl *decl) {
     if (decl != nullptr) {
         m_decl = decl;
     }
@@ -39,7 +39,7 @@ bool Symbol::isDeclared() const { return m_decl != nullptr; }
 
 bool Symbol::isDefined() const {
     return m_lineDefined.has_value() ||
-           (isDeclared() && m_decl->declType() == AST::DeclType::Parm);
+           (isDeclared() && m_decl->declType() == Tree::DeclType::Parm);
 }
 
 bool Symbol::isUsed() const {
@@ -51,7 +51,7 @@ bool Symbol::isIterator() const { return m_isIterator; }
 
 void Symbol::setIterator(bool b) { m_isIterator = b; }
 
-AST::Decl::Decl *Symbol::decl() const { return m_decl; }
+Tree::Decl::Decl *Symbol::decl() const { return m_decl; }
 
 std::vector<unsigned> Symbol::linesUsedBeforeDefined() const {
     std::vector<unsigned> linesused = m_linesUsedBeforeDefined;

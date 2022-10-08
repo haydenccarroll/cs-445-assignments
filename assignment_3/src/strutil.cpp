@@ -2,7 +2,7 @@
 #include <string>
 #include <stdexcept>
 
-#include "strutil.hpp"
+#include "strutil.h"
 
 std::string strutil::remove_quotes(std::string s) {
     return s.erase(0, 1).erase(s.length() - 1, s.length());

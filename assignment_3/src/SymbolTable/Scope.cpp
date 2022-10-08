@@ -1,5 +1,5 @@
-#include "Scope.hpp"
-#include "Symbol.hpp"
+#include "Scope.h"
+#include "Symbol.h"
 
 #include <iostream>
 #include <map>

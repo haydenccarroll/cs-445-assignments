@@ -1,7 +1,7 @@
-#include "SymbolTable.hpp"
-#include "../AST/AST.hpp"
-#include "Scope.hpp"
-#include "Symbol.hpp"
+#include "SymbolTable.h"
+#include "../Tree/Tree.h"
+#include "Scope.h"
+#include "Symbol.h"
 
 #include <algorithm>
 #include <iostream>
@@ -39,9 +39,9 @@ void SymbolTable::leave() {
     }
 }
 
-void SymbolTable::declare(const std::string &id, AST::Decl::Decl *node) {
+void SymbolTable::declare(const std::string &id, Tree::Decl::Decl *node) {
 
-    auto *decl = (AST::Decl::Decl *)node;
+    auto *decl = (Tree::Decl::Decl *)node;
 
     m_scopes.back().getSymbol(id).declare(node);
 

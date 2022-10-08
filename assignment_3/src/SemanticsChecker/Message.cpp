@@ -1,4 +1,4 @@
-#include "Message.hpp"
+#include "Message.h"
 
 unsigned Message::s_numerrors = 0;
 unsigned Message::s_numwarnings = 0;

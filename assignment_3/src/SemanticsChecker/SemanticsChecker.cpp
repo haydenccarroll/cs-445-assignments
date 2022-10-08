@@ -1,6 +1,6 @@
-#include "SemanticsChecker.hpp"
-#include "../AST/AST.hpp"
-#include "../SymbolTable/SymbolTable.hpp"
+#include "SemanticsChecker.h"
+#include "../Tree/Tree.h"
+#include "../SymbolTable/SymbolTable.h"
 
 #include <iostream>
 
@@ -61,8 +61,8 @@ void SemanticsChecker::enterScope(const std::optional<std::string> &name) {
     /// Add any saved function parameters to the scope
     /// Parameters are declared before the scope begins, but exist inside of the
     /// scope
-    for (auto *parm = m_parms->cast<AST::Decl::Decl *>(); parm != nullptr;
-         parm = parm->sibling()->cast<AST::Decl::Decl *>()) {
+    for (auto *parm = m_parms->cast<Tree::Decl::Decl *>(); parm != nullptr;
+         parm = parm->sibling()->cast<Tree::Decl::Decl *>()) {
 
         if (m_symbolTable.containsImmediately(parm->id()) &&
             m_symbolTable[parm->id()].isDeclared()) {
@@ -98,7 +98,7 @@ void SemanticsChecker::leaveScope() {
         }
 
         if (symbol.isDeclared() &&
-            symbol.decl()->declType() != AST::DeclType::Parm &&
+            symbol.decl()->declType() != Tree::DeclType::Parm &&
             !symbol.decl()->typeInfo().isStatic) {
 
             if (!symbol.linesUsedBeforeDefined().empty()) {
@@ -120,7 +120,7 @@ void SemanticsChecker::leaveScope() {
     m_symbolTable.leave();
 }
 
-void SemanticsChecker::analyze(AST::Node *tree) {
+void SemanticsChecker::analyze(Tree::Node *tree) {
     m_analyzed = true;
     m_mainIsDefined = false;
     m_symbolTable = SymbolTable(m_debug);
@@ -130,39 +130,39 @@ void SemanticsChecker::analyze(AST::Node *tree) {
     analyzeTree(tree);
 }
 
-void SemanticsChecker::analyzeTree(AST::Node *tree) {
+void SemanticsChecker::analyzeTree(Tree::Node *tree) {
 
     /// This is where nodes should be analyzed if they are declarations, uses,
     /// or definitions. They will be analyzed before their children. Set
     /// nodeWasAnalyzed to make sure they do not get analyzed twice.
     bool nodeWasAnalyzed = true;
-    if (tree->is(AST::NodeType::Decl)) {
-        analyzeNode(tree->cast<AST::Decl::Decl *>());
-    } else if (tree->is(AST::ExpType::Id)) {
-        analyzeNode(tree->cast<AST::Exp::Exp *>());
-    } else if (tree->is(AST::ExpType::Call)) {
-        analyzeNode(tree->cast<AST::Exp::Exp *>());
+    if (tree->is(Tree::NodeType::Decl)) {
+        analyzeNode(tree->cast<Tree::Decl::Decl *>());
+    } else if (tree->is(Tree::ExpType::Id)) {
+        analyzeNode(tree->cast<Tree::Exp::Exp *>());
+    } else if (tree->is(Tree::ExpType::Call)) {
+        analyzeNode(tree->cast<Tree::Exp::Exp *>());
     } else {
         nodeWasAnalyzed = false;
     }
 
-    if (tree->is(AST::AsgnType::Asgn)) {
-        analyzeDefinitions(tree->cast<AST::Exp::Op::Asgn *>());
+    if (tree->is(Tree::AsgnType::Asgn)) {
+        analyzeDefinitions(tree->cast<Tree::Exp::Op::Asgn *>());
     }
 
     /// Entering scopes
     /// Compound statements define scopes, but they can share the same scope as
     /// a for scope.
-    if (tree->is(AST::StmtType::Compound) &&
+    if (tree->is(Tree::StmtType::Compound) &&
         !(tree->parent() != nullptr &&
-          tree->parent()->is(AST::StmtType::For))) {
+          tree->parent()->is(Tree::StmtType::For))) {
         if (m_scopeName.has_value()) {
             enterScope(m_scopeName.value());
             m_scopeName.reset();
         } else {
             enterScope("compound");
         }
-    } else if (tree->is(AST::StmtType::For)) {
+    } else if (tree->is(Tree::StmtType::For)) {
         enterScope("for");
     }
 
@@ -176,16 +176,16 @@ void SemanticsChecker::analyzeTree(AST::Node *tree) {
     /// If the node wasn't analyzed, then the children were analyzed first
     if (!nodeWasAnalyzed) {
         switch (tree->nodeType()) {
-        case AST::NodeType::Decl: {
+        case Tree::NodeType::Decl: {
             break;
         }
-        case AST::NodeType::Stmt: {
-            AST::Stmt::Stmt *stmt = (AST::Stmt::Stmt *)tree;
+        case Tree::NodeType::Stmt: {
+            Tree::Stmt::Stmt *stmt = (Tree::Stmt::Stmt *)tree;
             analyzeNode(stmt);
             break;
         }
-        case AST::NodeType::Exp: {
-            AST::Exp::Exp *exp = (AST::Exp::Exp *)tree;
+        case Tree::NodeType::Exp: {
+            Tree::Exp::Exp *exp = (Tree::Exp::Exp *)tree;
             analyzeNode(exp);
             break;
         }
@@ -195,11 +195,11 @@ void SemanticsChecker::analyzeTree(AST::Node *tree) {
     }
 
     /// Handle exiting scopes
-    if (tree->is(AST::StmtType::Compound) &&
+    if (tree->is(Tree::StmtType::Compound) &&
         !(tree->parent() != nullptr &&
-          tree->parent()->is(AST::StmtType::For))) {
+          tree->parent()->is(Tree::StmtType::For))) {
         leaveScope();
-    } else if (tree->is(AST::StmtType::For)) {
+    } else if (tree->is(Tree::StmtType::For)) {
         leaveScope();
     }
 
@@ -209,24 +209,24 @@ void SemanticsChecker::analyzeTree(AST::Node *tree) {
     }
 }
 
-void SemanticsChecker::analyzeDefinitions(AST::Exp::Op::Asgn *op) {
-    if (op->exp1()->is(AST::ExpType::Id)) {
+void SemanticsChecker::analyzeDefinitions(Tree::Exp::Op::Asgn *op) {
+    if (op->exp1()->is(Tree::ExpType::Id)) {
 
         bool shouldDefine = true;
 
-        auto *id1 = op->exp1()->cast<AST::Exp::Id *>();
+        auto *id1 = op->exp1()->cast<Tree::Exp::Id *>();
         if (m_symbolTable[id1->id()].isDeclared() &&
             m_symbolTable[id1->id()].decl()->declType() ==
-                AST::DeclType::Func) {
+                Tree::DeclType::Func) {
             shouldDefine = false;
-        } else if (op->exp2()->is(AST::ExpType::Id) &&
-                   op->exp2()->cast<AST::Exp::Id *>()->id() == id1->id()) {
+        } else if (op->exp2()->is(Tree::ExpType::Id) &&
+                   op->exp2()->cast<Tree::Exp::Id *>()->id() == id1->id()) {
             shouldDefine = false;
-        } else if (op->exp2()->cast<AST::Node *>()->is(
-                       AST::BinaryOpType::Index)) {
-            auto *indexOp = op->exp2()->cast<AST::Exp::Op::Binary *>();
-            if (indexOp->exp1()->is(AST::ExpType::Id) &&
-                indexOp->exp1()->cast<AST::Exp::Id *>()->id() == id1->id()) {
+        } else if (op->exp2()->cast<Tree::Node *>()->is(
+                       Tree::BinaryOpType::Index)) {
+            auto *indexOp = op->exp2()->cast<Tree::Exp::Op::Binary *>();
+            if (indexOp->exp1()->is(Tree::ExpType::Id) &&
+                indexOp->exp1()->cast<Tree::Exp::Id *>()->id() == id1->id()) {
                 shouldDefine = false;
             }
         }
@@ -235,25 +235,25 @@ void SemanticsChecker::analyzeDefinitions(AST::Exp::Op::Asgn *op) {
             m_symbolTable[id1->id()].define(op->lineNumber());
         }
 
-    } else if (op->exp1()->cast<AST::Node *>()->is(AST::BinaryOpType::Index)) {
+    } else if (op->exp1()->cast<Tree::Node *>()->is(Tree::BinaryOpType::Index)) {
 
-        auto *indexOp = op->exp1()->cast<AST::Exp::Op::Binary *>();
-        if (indexOp->exp1()->is(AST::ExpType::Id)) {
+        auto *indexOp = op->exp1()->cast<Tree::Exp::Op::Binary *>();
+        if (indexOp->exp1()->is(Tree::ExpType::Id)) {
             bool shouldDefine = true;
 
-            auto *id1 = indexOp->exp1()->cast<AST::Exp::Id *>();
+            auto *id1 = indexOp->exp1()->cast<Tree::Exp::Id *>();
             if (m_symbolTable[id1->id()].isDeclared() &&
                 m_symbolTable[id1->id()].decl()->declType() ==
-                    AST::DeclType::Func) {
+                    Tree::DeclType::Func) {
                 shouldDefine = false;
-            } else if (op->exp2()->is(AST::ExpType::Id) &&
-                       op->exp2()->cast<AST::Exp::Id *>()->id() == id1->id()) {
+            } else if (op->exp2()->is(Tree::ExpType::Id) &&
+                       op->exp2()->cast<Tree::Exp::Id *>()->id() == id1->id()) {
                 shouldDefine = false;
-            } else if (op->exp2()->cast<AST::Node *>()->is(
-                           AST::BinaryOpType::Index)) {
-                auto *indexOp = op->exp2()->cast<AST::Exp::Op::Binary *>();
-                if (indexOp->exp1()->is(AST::ExpType::Id) &&
-                    indexOp->exp1()->cast<AST::Exp::Id *>()->id() ==
+            } else if (op->exp2()->cast<Tree::Node *>()->is(
+                           Tree::BinaryOpType::Index)) {
+                auto *indexOp = op->exp2()->cast<Tree::Exp::Op::Binary *>();
+                if (indexOp->exp1()->is(Tree::ExpType::Id) &&
+                    indexOp->exp1()->cast<Tree::Exp::Id *>()->id() ==
                         id1->id()) {
                     shouldDefine = false;
                 }
@@ -266,17 +266,17 @@ void SemanticsChecker::analyzeDefinitions(AST::Exp::Op::Asgn *op) {
     }
 }
 
-void SemanticsChecker::analyzeNode(AST::Decl::Decl *decl) {
+void SemanticsChecker::analyzeNode(Tree::Decl::Decl *decl) {
     // Check to see if it's defining main()
-    if (decl->is(AST::DeclType::Func)) {
+    if (decl->is(Tree::DeclType::Func)) {
         m_scopeName = decl->id();
-        auto *func = decl->cast<AST::Decl::Func *>();
+        auto *func = decl->cast<Tree::Decl::Func *>();
 
         m_parms = func->parms();
 
         if (func->id() == "main") {
             if (!(func->hasParms() &&
-                  func->typeInfo().type.value() == AST::Type::Void)) {
+                  func->typeInfo().type.value() == Tree::Type::Void)) {
                 m_mainIsDefined = true;
             } else {
                 m_mainIsDefined = false;
@@ -285,7 +285,7 @@ void SemanticsChecker::analyzeNode(AST::Decl::Decl *decl) {
     }
 
     // If it's a parameter declaration, that is handled by enterScope()
-    if (!decl->is(AST::DeclType::Parm)) {
+    if (!decl->is(Tree::DeclType::Parm)) {
 
         if (m_symbolTable.containsImmediately(decl->id())) {
             if (m_symbolTable[decl->id()].isDeclared()) {
@@ -303,16 +303,16 @@ void SemanticsChecker::analyzeNode(AST::Decl::Decl *decl) {
         }
     }
 
-    if (decl->is(AST::DeclType::Var)) {
-        auto *var = decl->cast<AST::Decl::Var *>();
+    if (decl->is(Tree::DeclType::Var)) {
+        auto *var = decl->cast<Tree::Decl::Var *>();
 
         if (var->isInitialized()) {
 
             m_symbolTable[decl->id()].define(var->initValue()->lineNumber());
         } else if (decl->parent() != nullptr &&
-                   decl->parent()->is(AST::StmtType::For)) {
+                   decl->parent()->is(Tree::StmtType::For)) {
 
-            auto *forParent = var->parent()->cast<AST::Stmt::For *>();
+            auto *forParent = var->parent()->cast<Tree::Stmt::For *>();
             m_symbolTable[decl->id()].define(
                 forParent->range()->from()->lineNumber());
             m_symbolTable[decl->id()].setIterator(true);
@@ -320,11 +320,11 @@ void SemanticsChecker::analyzeNode(AST::Decl::Decl *decl) {
     }
 }
 
-void SemanticsChecker::analyzeNode(AST::Exp::Exp *exp) {
+void SemanticsChecker::analyzeNode(Tree::Exp::Exp *exp) {
 
     switch (exp->expType()) {
-    case AST::ExpType::Call: {
-        AST::Exp::Call *call = (AST::Exp::Call *)exp;
+    case Tree::ExpType::Call: {
+        Tree::Exp::Call *call = (Tree::Exp::Call *)exp;
 
         if (!m_symbolTable.contains(call->id())) {
 
@@ -336,7 +336,7 @@ void SemanticsChecker::analyzeNode(AST::Exp::Exp *exp) {
             m_symbolTable[call->id()].use(call->lineNumber());
 
             if (m_symbolTable[call->id()].decl()->declType() !=
-                AST::DeclType::Func) {
+                Tree::DeclType::Func) {
 
                 std::string error =
                     "'" + call->id() +
@@ -350,14 +350,14 @@ void SemanticsChecker::analyzeNode(AST::Exp::Exp *exp) {
 
         break;
     }
-    case AST::ExpType::Id: {
-        auto *id = exp->cast<AST::Exp::Id *>();
+    case Tree::ExpType::Id: {
+        auto *id = exp->cast<Tree::Exp::Id *>();
 
         if (m_symbolTable[id->id()].isDeclared()) {
             id->typeInfo() = m_symbolTable[id->id()].decl()->typeInfo();
 
             if (m_symbolTable[id->id()].decl()->declType() ==
-                AST::DeclType::Func) {
+                Tree::DeclType::Func) {
 
                 std::string error =
                     "Cannot use function '" + id->id() + "' as a variable.";
@@ -373,13 +373,13 @@ void SemanticsChecker::analyzeNode(AST::Exp::Exp *exp) {
         }
 
         bool isUsed = true;
-        if (id->hasAncestor<AST::StmtType>(AST::StmtType::Range)) {
+        if (id->hasAncestor<Tree::StmtType>(Tree::StmtType::Range)) {
             auto *range =
-                id->getClosestAncestor<AST::StmtType>(AST::StmtType::Range)
-                    ->cast<AST::Stmt::Range *>();
+                id->getClosestAncestor<Tree::StmtType>(Tree::StmtType::Range)
+                    ->cast<Tree::Stmt::Range *>();
 
             if (range->parent() != nullptr) {
-                auto *forstmt = range->parent()->cast<AST::Stmt::For *>();
+                auto *forstmt = range->parent()->cast<Tree::Stmt::For *>();
 
                 if (forstmt->id()->id() == id->id()) {
                     isUsed = false;
@@ -393,8 +393,8 @@ void SemanticsChecker::analyzeNode(AST::Exp::Exp *exp) {
 
         break;
     }
-    case AST::ExpType::Op: {
-        auto *op = exp->cast<AST::Exp::Op::Op *>();
+    case Tree::ExpType::Op: {
+        auto *op = exp->cast<Tree::Exp::Op::Op *>();
         analyzeNode(op);
         break;
     }
@@ -404,18 +404,18 @@ void SemanticsChecker::analyzeNode(AST::Exp::Exp *exp) {
     }
 }
 
-void SemanticsChecker::analyzeNode(AST::Exp::Op::Op *op) {
+void SemanticsChecker::analyzeNode(Tree::Exp::Op::Op *op) {
     op->deduceType();
 
     switch (op->opType()) {
-    case AST::OpType::Binary: {
-        auto *binary = op->cast<AST::Exp::Op::Binary *>();
+    case Tree::OpType::Binary: {
+        auto *binary = op->cast<Tree::Exp::Op::Binary *>();
 
-        if (binary->is(AST::BinaryOpType::Add) ||
-            binary->is(AST::BinaryOpType::Div) ||
-            binary->is(AST::BinaryOpType::Mod) ||
-            binary->is(AST::BinaryOpType::Mul) ||
-            binary->is(AST::BinaryOpType::Subtract)) {
+        if (binary->is(Tree::BinaryOpType::Add) ||
+            binary->is(Tree::BinaryOpType::Div) ||
+            binary->is(Tree::BinaryOpType::Mod) ||
+            binary->is(Tree::BinaryOpType::Mul) ||
+            binary->is(Tree::BinaryOpType::Subtract)) {
 
             if (binary->exp1()->typeInfo().isArray ||
                 binary->exp2()->typeInfo().isArray &&
@@ -423,29 +423,29 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Op *op) {
                     binary->exp2()->typeInfo().type.has_value()) {
                 std::string error =
                     "The operation '" +
-                    AST::Types::toString(binary->binaryOpType()) +
+                    Tree::Types::toString(binary->binaryOpType()) +
                     "' does not work with arrays.";
 
                 m_messages[binary->lineNumber()].push_back(
                     {Message::Type::Error, error});
             }
 
-            if (binary->exp1()->typeInfo().type != AST::Type::Int &&
+            if (binary->exp1()->typeInfo().type != Tree::Type::Int &&
                 binary->exp1()->typeInfo().type.has_value()) {
                 std::string error =
-                    "'" + AST::Types::toString(binary->binaryOpType()) +
+                    "'" + Tree::Types::toString(binary->binaryOpType()) +
                     "' requires operands of type int but lhs is of type " +
-                    AST::Types::toString(binary->exp1()->typeInfo().type) + ".";
+                    Tree::Types::toString(binary->exp1()->typeInfo().type) + ".";
                 m_messages[binary->lineNumber()].push_back(
                     {Message::Type::Error, error});
             }
 
-            if (binary->exp2()->typeInfo().type != AST::Type::Int &&
+            if (binary->exp2()->typeInfo().type != Tree::Type::Int &&
                 binary->exp2()->typeInfo().type.has_value()) {
                 std::string error =
-                    "'" + AST::Types::toString(binary->binaryOpType()) +
+                    "'" + Tree::Types::toString(binary->binaryOpType()) +
                     "' requires operands of type int but rhs is of type " +
-                    AST::Types::toString(binary->exp2()->typeInfo().type) + ".";
+                    Tree::Types::toString(binary->exp2()->typeInfo().type) + ".";
                 m_messages[binary->lineNumber()].push_back(
                     {Message::Type::Error, error});
             }
@@ -454,23 +454,23 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Op *op) {
 
         else {
             switch (binary->binaryOpType()) {
-            case AST::BinaryOpType::Asgn: {
-                analyzeNode((AST::Exp::Op::Asgn *)binary);
+            case Tree::BinaryOpType::Asgn: {
+                analyzeNode((Tree::Exp::Op::Asgn *)binary);
                 break;
             }
-            case AST::BinaryOpType::Add: {
+            case Tree::BinaryOpType::Add: {
                 break;
             }
-            case AST::BinaryOpType::Bool: {
-                analyzeNode((AST::Exp::Op::Bool *)binary);
+            case Tree::BinaryOpType::Bool: {
+                analyzeNode((Tree::Exp::Op::Bool *)binary);
                 break;
             }
-            case AST::BinaryOpType::Div: {
+            case Tree::BinaryOpType::Div: {
                 break;
             }
-            case AST::BinaryOpType::Index: {
+            case Tree::BinaryOpType::Index: {
 
-                AST::Exp::Id *id = (AST::Exp::Id *)binary->exp1();
+                Tree::Exp::Id *id = (Tree::Exp::Id *)binary->exp1();
                 if (!id->typeInfo().isArray) {
                     std::string error =
                         "Cannot index nonarray '" + id->id() + "'.";
@@ -479,8 +479,8 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Op *op) {
                 }
 
                 auto *index = binary->exp2();
-                if (index->expType() == AST::ExpType::Id) {
-                    auto *indexId = index->cast<AST::Exp::Id *>();
+                if (index->expType() == Tree::ExpType::Id) {
+                    auto *indexId = index->cast<Tree::Exp::Id *>();
 
                     if (m_symbolTable[indexId->id()].isDeclared() &&
                         m_symbolTable[indexId->id()]
@@ -498,12 +498,12 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Op *op) {
                 op->typeInfo() = id->typeInfo();
                 op->typeInfo().isArray = false;
 
-                if (binary->exp2()->typeInfo().type != AST::Type::Int &&
+                if (binary->exp2()->typeInfo().type != Tree::Type::Int &&
                     binary->exp2()->typeInfo().type.has_value()) {
                     std::string error =
                         "Array '" + id->id() +
                         "' should be indexed by type int but got type " +
-                        AST::Types::toString(binary->exp2()->typeInfo().type) +
+                        Tree::Types::toString(binary->exp2()->typeInfo().type) +
                         ".";
                     m_messages[binary->lineNumber()].push_back(
                         {Message::Type::Error, error});
@@ -511,13 +511,13 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Op *op) {
 
                 break;
             }
-            case AST::BinaryOpType::Mod: {
+            case Tree::BinaryOpType::Mod: {
                 break;
             }
-            case AST::BinaryOpType::Mul: {
+            case Tree::BinaryOpType::Mul: {
                 break;
             }
-            case AST::BinaryOpType::Subtract: {
+            case Tree::BinaryOpType::Subtract: {
                 break;
             }
             }
@@ -525,8 +525,8 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Op *op) {
 
         break;
     }
-    case AST::OpType::Unary: {
-        auto *unaryop = op->cast<AST::Exp::Op::Unary *>();
+    case Tree::OpType::Unary: {
+        auto *unaryop = op->cast<Tree::Exp::Op::Unary *>();
         analyzeNode(unaryop);
         break;
     }
@@ -536,27 +536,27 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Op *op) {
     }
 }
 
-void SemanticsChecker::analyzeNode(AST::Exp::Op::Unary *op) {
+void SemanticsChecker::analyzeNode(Tree::Exp::Op::Unary *op) {
     switch (op->unaryOpType()) {
-    case AST::UnaryOpType::Asgn: {
-        auto *unaryasgn = op->cast<AST::Exp::Op::UnaryAsgn *>();
+    case Tree::UnaryOpType::Asgn: {
+        auto *unaryasgn = op->cast<Tree::Exp::Op::UnaryAsgn *>();
 
         if (unaryasgn->operand()->typeInfo().isArray &&
             unaryasgn->operand()->typeInfo().type.has_value()) {
             std::string error =
                 "The operation '" +
-                AST::Types::toString(unaryasgn->unaryAsgnType()) +
+                Tree::Types::toString(unaryasgn->unaryAsgnType()) +
                 "' does not work with arrays.";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
 
-        if (unaryasgn->operand()->typeInfo().type != AST::Type::Int &&
+        if (unaryasgn->operand()->typeInfo().type != Tree::Type::Int &&
             unaryasgn->operand()->typeInfo().type.has_value()) {
             std::string error =
-                "Unary '" + AST::Types::toString(unaryasgn->unaryAsgnType()) +
+                "Unary '" + Tree::Types::toString(unaryasgn->unaryAsgnType()) +
                 "' requires an operand of type int but was given type " +
-                AST::Types::toString(unaryasgn->operand()->typeInfo().type) +
+                Tree::Types::toString(unaryasgn->operand()->typeInfo().type) +
                 ".";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
@@ -564,49 +564,49 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Unary *op) {
 
         break;
     }
-    case AST::UnaryOpType::Chsign: {
+    case Tree::UnaryOpType::Chsign: {
         if (op->operand()->typeInfo().isArray &&
             op->operand()->typeInfo().type.has_value()) {
             std::string error = "The operation '" +
-                                AST::Types::toString(op->unaryOpType()) +
+                                Tree::Types::toString(op->unaryOpType()) +
                                 "' does not work with arrays.";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
 
-        if (op->operand()->typeInfo().type != AST::Type::Int &&
+        if (op->operand()->typeInfo().type != Tree::Type::Int &&
             op->operand()->typeInfo().type.has_value()) {
             std::string error =
-                "Unary '" + AST::Types::toString(op->unaryOpType()) +
+                "Unary '" + Tree::Types::toString(op->unaryOpType()) +
                 "' requires an operand of type int but was given type " +
-                AST::Types::toString(op->operand()->typeInfo().type) + ".";
+                Tree::Types::toString(op->operand()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
         break;
     }
-    case AST::UnaryOpType::Not: {
+    case Tree::UnaryOpType::Not: {
         if (op->operand()->typeInfo().isArray &&
             op->operand()->typeInfo().type.has_value()) {
             std::string error = "The operation '" +
-                                AST::Types::toString(op->unaryOpType()) +
+                                Tree::Types::toString(op->unaryOpType()) +
                                 "' does not work with arrays.";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
 
-        if (op->operand()->typeInfo().type != AST::Type::Bool &&
+        if (op->operand()->typeInfo().type != Tree::Type::Bool &&
             op->operand()->typeInfo().type.has_value()) {
             std::string error =
-                "Unary '" + AST::Types::toString(op->unaryOpType()) +
+                "Unary '" + Tree::Types::toString(op->unaryOpType()) +
                 "' requires an operand of type bool but was given type " +
-                AST::Types::toString(op->operand()->typeInfo().type) + ".";
+                Tree::Types::toString(op->operand()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
         break;
     }
-    case AST::UnaryOpType::Random: {
+    case Tree::UnaryOpType::Random: {
         if (op->operand()->typeInfo().isArray &&
             op->operand()->typeInfo().type.has_value()) {
             std::string error = "The operation '?' does not work with arrays.";
@@ -614,18 +614,18 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Unary *op) {
                 {Message::Type::Error, error});
         }
 
-        if (op->operand()->typeInfo().type != AST::Type::Int &&
+        if (op->operand()->typeInfo().type != Tree::Type::Int &&
             op->operand()->typeInfo().type.has_value()) {
             std::string error =
                 "Unary '?' requires an operand of type int but "
                 "was given type " +
-                AST::Types::toString(op->operand()->typeInfo().type) + ".";
+                Tree::Types::toString(op->operand()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
         break;
     }
-    case AST::UnaryOpType::Sizeof: {
+    case Tree::UnaryOpType::Sizeof: {
         if (!op->operand()->typeInfo().isArray &&
             op->operand()->typeInfo().type.has_value()) {
             std::string error =
@@ -638,32 +638,32 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Unary *op) {
     }
 }
 
-void SemanticsChecker::analyzeNode(AST::Exp::Op::Asgn *op) {
+void SemanticsChecker::analyzeNode(Tree::Exp::Op::Asgn *op) {
 
-    if (!op->is(AST::AsgnType::Asgn)) {
-        if (op->exp1()->typeInfo().type != AST::Type::Int &&
+    if (!op->is(Tree::AsgnType::Asgn)) {
+        if (op->exp1()->typeInfo().type != Tree::Type::Int &&
             op->exp1()->typeInfo().type.has_value()) {
             std::string error =
-                "'" + AST::Types::toString(op->asgnType()) +
+                "'" + Tree::Types::toString(op->asgnType()) +
                 "' requires operands of type int but lhs is of type " +
-                AST::Types::toString(op->exp1()->typeInfo().type) + ".";
+                Tree::Types::toString(op->exp1()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
 
-        if (op->exp2()->typeInfo().type != AST::Type::Int &&
+        if (op->exp2()->typeInfo().type != Tree::Type::Int &&
             op->exp2()->typeInfo().type.has_value()) {
             std::string error =
-                "'" + AST::Types::toString(op->asgnType()) +
+                "'" + Tree::Types::toString(op->asgnType()) +
                 "' requires operands of type int but rhs is of type " +
-                AST::Types::toString(op->exp2()->typeInfo().type) + ".";
+                Tree::Types::toString(op->exp2()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
     }
 
     switch (op->asgnType()) {
-    case AST::AsgnType::Asgn: {
+    case Tree::AsgnType::Asgn: {
 
         if (op->exp1()->typeInfo().isArray != op->exp2()->typeInfo().isArray) {
             auto isArrayToString = [](bool b) {
@@ -687,9 +687,9 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Asgn *op) {
             op->exp2()->typeInfo().type.has_value()) {
             std::string error =
                 "'=' requires operands of the same type but lhs is type " +
-                AST::Types::toString(op->exp1()->typeInfo().type) +
+                Tree::Types::toString(op->exp1()->typeInfo().type) +
                 " and rhs is type " +
-                AST::Types::toString(op->exp2()->typeInfo().type) + ".";
+                Tree::Types::toString(op->exp2()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
@@ -698,37 +698,37 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Asgn *op) {
     }
 }
 
-void SemanticsChecker::analyzeNode(AST::Exp::Op::Bool *op) {
-    if (op->boolOpType() == AST::BoolOpType::And ||
-        op->boolOpType() == AST::BoolOpType::Or) {
+void SemanticsChecker::analyzeNode(Tree::Exp::Op::Bool *op) {
+    if (op->boolOpType() == Tree::BoolOpType::And ||
+        op->boolOpType() == Tree::BoolOpType::Or) {
 
         if (op->exp1()->typeInfo().isArray ||
             op->exp2()->typeInfo().isArray &&
                 op->exp1()->typeInfo().type.has_value() &&
                 op->exp2()->typeInfo().type.has_value()) {
             std::string error = "The operation '" +
-                                AST::Types::toString(op->boolOpType()) +
+                                Tree::Types::toString(op->boolOpType()) +
                                 "' does not work with arrays.";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
 
-        if (op->exp1()->typeInfo().type != AST::Type::Bool &&
+        if (op->exp1()->typeInfo().type != Tree::Type::Bool &&
             op->exp1()->typeInfo().type.has_value()) {
             std::string error =
-                "'" + AST::Types::toString(op->boolOpType()) +
+                "'" + Tree::Types::toString(op->boolOpType()) +
                 "' requires operands of type bool but lhs is of type " +
-                AST::Types::toString(op->exp1()->typeInfo().type) + ".";
+                Tree::Types::toString(op->exp1()->typeInfo().type) + ".";
 
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
 
-        if (op->exp2()->typeInfo().type != AST::Type::Bool) {
+        if (op->exp2()->typeInfo().type != Tree::Type::Bool) {
             std::string error =
-                "'" + AST::Types::toString(op->boolOpType()) +
+                "'" + Tree::Types::toString(op->boolOpType()) +
                 "' requires operands of type bool but rhs is of type " +
-                AST::Types::toString(op->exp2()->typeInfo().type) + ".";
+                Tree::Types::toString(op->exp2()->typeInfo().type) + ".";
 
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
@@ -738,12 +738,12 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Bool *op) {
             op->exp1()->typeInfo().type.has_value() &&
             op->exp2()->typeInfo().type.has_value()) {
             std::string error =
-                "'" + AST::Types::toString(op->boolOpType()) +
+                "'" + Tree::Types::toString(op->boolOpType()) +
                 "' requires operands of the same type but lhs is "
                 "type " +
-                AST::Types::toString(op->exp1()->typeInfo().type) +
+                Tree::Types::toString(op->exp1()->typeInfo().type) +
                 " and rhs is type " +
-                AST::Types::toString(op->exp2()->typeInfo().type) + ".";
+                Tree::Types::toString(op->exp2()->typeInfo().type) + ".";
             m_messages[op->lineNumber()].push_back(
                 {Message::Type::Error, error});
         }
@@ -757,7 +757,7 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Bool *op) {
                 }
             };
             std::string error =
-                "'" + AST::Types::toString(op->boolOpType()) +
+                "'" + Tree::Types::toString(op->boolOpType()) +
                 "' requires both operands be arrays or not but lhs" +
                 isArrayToString(op->exp1()->typeInfo().isArray) + " and rhs" +
                 isArrayToString(op->exp2()->typeInfo().isArray) + ".";
@@ -767,16 +767,16 @@ void SemanticsChecker::analyzeNode(AST::Exp::Op::Bool *op) {
     }
 }
 
-void SemanticsChecker::analyzeNode(AST::Stmt::Stmt *stmt) {
+void SemanticsChecker::analyzeNode(Tree::Stmt::Stmt *stmt) {
     switch (stmt->stmtType()) {
-    case AST::StmtType::Compound: {
+    case Tree::StmtType::Compound: {
         break;
     }
-    case AST::StmtType::For: {
+    case Tree::StmtType::For: {
         break;
     }
-    case AST::StmtType::Return: {
-        auto *returnNode = stmt->cast<AST::Stmt::Return *>();
+    case Tree::StmtType::Return: {
+        auto *returnNode = stmt->cast<Tree::Stmt::Return *>();
         if (returnNode->exp() != nullptr &&
             returnNode->exp()->typeInfo().isArray) {
             std::string error = "Cannot return an array.";

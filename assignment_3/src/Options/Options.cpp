@@ -1,5 +1,5 @@
-#include "Options.hpp"
-#include "ourgetopt/ourgetopt.hpp"
+#include "Options.h"
+#include "ourgetopt/ourgetopt.h"
 
 #include <iostream>
 #include <stdio.h>

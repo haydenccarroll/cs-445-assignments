@@ -6,7 +6,7 @@
 #include <vector>
 #include <memory>
 
-#include "scanType.hpp"  // TokenData Type
+#include "scanType.h"  // TokenData Type
 #include "c-.tab.h"  // token definitions from the bison
 
 int line = 1;
