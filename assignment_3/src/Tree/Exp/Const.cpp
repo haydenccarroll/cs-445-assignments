@@ -1,5 +1,5 @@
 #include "Const.h"
-#include "../../strutil.h"
+#include "../../helpers.h"
 #include "../Node.h"
 #include "Exp.h"
 
@@ -24,11 +24,11 @@ Const::Const(unsigned lineNum, SuperDataType typeInfo, std::string value)
     }
     case DataType::Char: {
         if (m_typeInfo.isArray) {
-            m_value = strutil::remove_quotes(value);
+            m_value = helpers::remove_quotes(value);
             break;
         } else {
             m_value =
-                strutil::make_char(strutil::remove_quotes(value), m_lineNum);
+                helpers::make_char(helpers::remove_quotes(value), m_lineNum);
             break;
         }
     };

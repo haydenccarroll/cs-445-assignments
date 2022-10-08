@@ -12,12 +12,12 @@ SEMCHCK_DIR = .semchck.d
 SEMCHCK_SRCS = Semantics/*.cpp
 SEMCHCK_HDRS = Semantics/*.h
 
-SRCS = $(BIN).y $(BIN).l $(Tree_SRCS) $(OPTIONS_SRCS) $(SYMTBL_SRCS) $(SEMCHCK_SRCS) strutil.cpp
-HDRS = $(Tree_HDRS) $(OPTIONS_HDRS) $(SYMTBL_HDRS) $(SEMCHCK_HDRS) strutil.h scanType.h
+SRCS = $(BIN).y $(BIN).l $(Tree_SRCS) $(OPTIONS_SRCS) $(SYMTBL_SRCS) $(SEMCHCK_SRCS) helpers.cpp
+HDRS = $(Tree_HDRS) $(OPTIONS_HDRS) $(SYMTBL_HDRS) $(SEMCHCK_HDRS) helpers.h scanType.h
 OBJS = lex.yy.o $(BIN).tab.o
 
 $(BIN) : $(OBJS) $(Tree_DIR) $(OPTIONS_DIR) $(SYMTBL_DIR) $(SEMCHCK_DIR)
-	$(CC) strutil.cpp *.o -o $(BIN)
+	$(CC) helpers.cpp *.o -o $(BIN)
 	$(MAKE) cleanJunk
 
 lex.yy.c : $(BIN).l $(BIN).tab.h
