@@ -1,7 +1,7 @@
 #include "Asgn.h"
-#include "../../Node.h"
-#include "../Exp.h"
-#include "../Id.h"
+#include "../Node.h"
+#include "Exp.h"
+#include "Id.h"
 #include "Binary.h"
 
 #include <map>

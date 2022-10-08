@@ -11,6 +11,10 @@ done Tree.h
 done Types.h
 
 
+rename decl to dec
+pull out op into expression
+
+
 DONE:
 c-.l
 c-.y 

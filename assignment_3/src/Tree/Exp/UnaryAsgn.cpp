@@ -1,6 +1,6 @@
 #include "UnaryAsgn.h"
-#include "../../Node.h"
-#include "../Id.h"
+#include "../Node.h"
+#include "Id.h"
 #include "Unary.h"
 
 #include <map>

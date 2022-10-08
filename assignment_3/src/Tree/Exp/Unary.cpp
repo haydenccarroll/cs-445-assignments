@@ -1,6 +1,6 @@
 #include "Unary.h"
-#include "../../Node.h"
-#include "../Exp.h"
+#include "../Node.h"
+#include "Exp.h"
 #include "Op.h"
 
 #include <map>

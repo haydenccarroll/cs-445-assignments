@@ -1,6 +1,6 @@
 #include "Binary.h"
-#include "../../Node.h"
-#include "../Exp.h"
+#include "../Node.h"
+#include "Exp.h"
 
 #include <iostream>
 #include <map>

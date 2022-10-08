@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../Node.h"
-#include "../Exp.h"
+#include "../Node.h"
+#include "Exp.h"
 #include "Op.h"
 
 #include <map>
