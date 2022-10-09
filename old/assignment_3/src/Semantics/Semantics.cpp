@@ -285,41 +285,7 @@ void Semantics::analyzeDefinitions(Tree::Exp::Op::Asgn *op) {
         }
     }
 }
-
-void Semantics::analyzeNode(Tree::Decl::Decl *decl) {
-    // Check to see if it's defining main()
-    if (decl->is(Tree::DeclType::Func)) {
-        m_scopeName = decl->id();
-        auto *func = decl->cast<Tree::Decl::Func *>();
-
-        m_parms = func->parms();
-
-        if (func->id() == "main") {
-            if (!(func->hasParms() &&
-                  func->typeInfo().type.value() == Tree::DataType::Void)) {
-                m_mainIsDefined = true;
-            } else {
-                m_mainIsDefined = false;
-            }
-        }
-    }
-
-    // If it's a parameter declaration, that is handled by enterScope()
-    if (!decl->is(Tree::DeclType::Parm)) {
-
-        if (m_symbolTable.containsImmediately(decl->id())) {
-            if (m_symbolTable[decl->id()].isDeclared()) {
-
-                auto *originalSymbol = m_symbolTable[decl->id()].decl();
-                std::string error =
-                    "Symbol '" + decl->id() + "' is already declared at line " +
-                    std::to_string(originalSymbol->lineNumber()) + ".";
-
-                m_messages[decl->lineNumber()].push_back(
-                    {Msg::MsgType::Error, error});
-            }
-        } else {
-            m_symbolTable.declare(decl->id(), decl);
+lTable.declare(decl->id(), decl);
         }
     }
 
@@ -356,7 +322,41 @@ void Semantics::analyzeNode(Tree::Exp::Exp *exp) {
             m_symbolTable[call->id()].use(call->lineNumber());
 
             if (m_symbolTable[call->id()].decl()->declType() !=
-                Tree::DeclType::Func) {
+                Tree:
+void Semantics::analyzeNode(Tree::Decl::Decl *decl) {
+    // Check to see if it's defining main()
+    if (decl->is(Tree::DeclType::Func)) {
+        m_scopeName = decl->id();
+        auto *func = decl->cast<Tree::Decl::Func *>();
+
+        m_parms = func->parms();
+
+        if (func->id() == "main") {
+            if (!(func->hasParms() &&
+                  func->typeInfo().type.value() == Tree::DataType::Void)) {
+                m_mainIsDefined = true;
+            } else {
+                m_mainIsDefined = false;
+            }
+        }
+    }
+
+    // If it's a parameter declaration, that is handled by enterScope()
+    if (!decl->is(Tree::DeclType::Parm)) {
+
+        if (m_symbolTable.containsImmediately(decl->id())) {
+            if (m_symbolTable[decl->id()].isDeclared()) {
+
+                auto *originalSymbol = m_symbolTable[decl->id()].decl();
+                std::string error =
+                    "Symbol '" + decl->id() + "' is already declared at line " +
+                    std::to_string(originalSymbol->lineNumber()) + ".";
+
+                m_messages[decl->lineNumber()].push_back(
+                    {Msg::MsgType::Error, error});
+            }
+        } else {
+            m_symbo:DeclType::Func) {
 
                 std::string error =
                     "'" + call->id() +

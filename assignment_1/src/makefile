@@ -1,0 +1,25 @@
+CXX = g++
+CXXFLAGS = --std=c++17 #-ly
+
+FLEX = flex
+FLEXFLAGS =
+FLEXCPPS = lex.yy.c
+
+BISON = bison
+BISONFLAGS = -d
+BISONCPPS = $(PRJ).tab.c
+BISONHDRS = $(PRJ).tab.h
+
+PRJ = c-
+
+$(PRJ): $(FLEXCPPS) $(BISONCPPS) $(BISONHDRS)
+	$(CXX) $(FLEXCPPS) $(BISONCPPS) $(CXXFLAGS) -o $(PRJ)
+
+clean:
+	rm $(FLEXCPPS) $(BISONCPPS) $(BISONHDRS) $(PRJ)
+
+$(BISONCPPS): $(PRJ).y
+	$(BISON) $(BISONFLAGS) $(PRJ).y
+
+$(FLEXCPPS): $(PRJ).l $(BISONCPPS) $(BISONHDRS)
+	$(FLEX) $(FLEXFLAGS) $(PRJ).l
