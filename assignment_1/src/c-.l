@@ -68,7 +68,7 @@ int passToken(int tokenClass)
         break;
     case CHARCONST:
         yylval.tokenData->inputStr = yytext;
-        yylval.tokenData->charV = processCharConst(yytext); // placeholder
+        yylval.tokenData->charV = processCharConst(yytext);
         break;
     case STRINGCONST:
         yylval.tokenData->inputStr = yytext;
