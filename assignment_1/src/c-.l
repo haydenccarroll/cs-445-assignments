@@ -15,6 +15,7 @@ extern char* yytext;
 int passToken(int tokenClass);
 std::string processStringConst(std::string str);
 std::string processTokenConst(std::string str);
+std::string processKeyword(std::string str);
 int processBoolConst(std::string str);
 char processCharConst(std::string str);
 std::string toUpper(std::string str);
@@ -24,21 +25,34 @@ static int lineNum = 1;
 %option noyywrap
 
 %%
-    // token specifications
-\/\/[^\n]*           {}
-\n                   { lineNum++;}
-[ \t]                {}
-true|false           { return passToken(BOOLCONST); }
-while|for|if|int|bool|char|static|and|or|to|by|do|then|break|else|return|not         { return passToken(KEYWORD); }
-[A-Za-z][A-Za-z0-9]* { return passToken(ID); }
-[0-9]+               { return passToken(NUMCONST); }
-\'((\\\')|([^\n\']))*\'       { return passToken(CHARCONST); }
-\"([^\\"\n]|\\.)*\"    { return passToken(STRINGCONST); }
-\=\=|\>\=|\<\=|\!\=|\+\+|\-\-|\+\=|\{|\}|\<|\>|\(|\)|\=|\;|\*|\%|\/|\-|\?|\+|\[|\]|\,|\:                { return passToken(TOKEN); }
-.       { std::cout << "ERROR(" << lineNum << "): Invalid or misplaced input character: '" << yytext << "'. Character Ignored.\n"; }
+
+\/\/[^\n]*                        {}
+"\n"                              { lineNum++;}
+[ \t]                             {}
+true|false                        { return passToken(BOOLCONST); }
+
+while|for|if|int|bool|char|static { return passToken(KEYWORD); }
+and|or|to|by|do|then|break|else   { return passToken(KEYWORD); }
+return|not                        { return passToken(KEYWORD); }
+[A-Za-z][A-Za-z0-9]*              { return passToken(ID); }
+
+[0-9]+                            { return passToken(NUMCONST); }
+
+\'((\\\')|([^\n\']))*\'           { return passToken(CHARCONST); }
+
+\"([^\\"\n]|\\.)*\"               { return passToken(STRINGCONST); }
+
+\=\=|\>\=|\<\=|\!\=|\+\+          { return passToken(TOKEN); }
+\-\-|\+\=|\{|\}|\<|\>|\(          { return passToken(TOKEN); }
+\)|\=|\;|\*|\%|\/|\-              { return passToken(TOKEN); }
+\?|\+|\[|\]|\,|\:                 { return passToken(TOKEN); }
+
+.                                 { std::cout << "ERROR(" << lineNum << "): Invalid or misplaced input character: '" << yytext << "'. Character Ignored.\n"; }
 %%
 // C++ functions
 
+///@brief given a token class (ID, NUMCONST, KEYWORD, etc...), pull the data from yytext and put it in yylval.tokenData.
+///@param tokenClass enum type of token (ID, NUMCONST, KEYWORD, etc...)
 int passToken(int tokenClass)
 {
     yylval.tokenData = new TokenData;
@@ -66,7 +80,7 @@ int passToken(int tokenClass)
         break;
     case KEYWORD:
         yylval.tokenData->inputStr = yytext;
-        yylval.tokenData->str = toUpper(yylval.tokenData->inputStr);
+        yylval.tokenData->str = processKeyword(yylval.tokenData->inputStr);
         break;
     case TOKEN:
         yylval.tokenData->inputStr = yytext;
@@ -77,7 +91,9 @@ int passToken(int tokenClass)
     return tokenClass;
 }
 
-std::string toUpper(std::string str)
+///@brief turns a keyword into uppercase for use later down the pipeline
+///@param str - keyword to be turned uppercase
+std::string processKeyword(std::string str)
 {
     std::string cpy = str;
     for (auto & c: cpy) c = toupper(c);
@@ -85,11 +101,13 @@ std::string toUpper(std::string str)
 
 }
 
+///@brief turns a string bool into a int, (0 or 1) to be put in TokenData
 int processBoolConst(std::string str)
 {
     return (str == "true");
 }
 
+///@brief does all string processing such as removing quotes, and escaping characters
 std::string processStringConst(std::string str)
 {
     std::string inputStr = str;
@@ -124,6 +142,7 @@ std::string processStringConst(std::string str)
     return cumStr;
 }
 
+///@brief similar to processStringConst but for chars.
 char processCharConst(std::string str)
 {
     std::string inputStr = str;
@@ -142,6 +161,8 @@ char processCharConst(std::string str)
 
     return processedStr[0];
 }
+
+///@brief turns specific tokens into english codes, such as == -> EQ for use later
 std::string processTokenConst(std::string str)
 {
     std::string original = str;

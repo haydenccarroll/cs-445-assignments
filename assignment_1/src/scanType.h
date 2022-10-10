@@ -10,4 +10,3 @@ struct TokenData
     int num;              // used for numbers as well as bools (0 false 1 true)
     unsigned int lineNum; // line where token found
 };
-
