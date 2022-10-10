@@ -20,20 +20,25 @@ void yyerror(const char *errMsg)
 }
 
     // define tokens
-%token HELLO SEMICOLON NUMBERS OTHER
-%type <tokenData> HELLO SEMICOLON NUMBERS OTHER
+%token ID NUMCONST CHARCONST STRINGCONST BOOLCONST KEYWORD TOKEN
+%type <tokenData> ID NUMCONST CHARCONST STRINGCONST BOOLCONST KEYWORD TOKEN
 
 %%
 program : 
     stmts
 ;
 
-stmts:
-    | stmt SEMICOLON stmts
-stmt: 
-    HELLO {std::cout << "string";}
-    | NUMBERS  {std::cout << "hey we found sum numbers";}
-    ;
+stmts: stmt stmts
+     | stmt
+;
+stmt: ID        {std::cout << "idconst";}
+    | NUMCONST  {std::cout << "numconst";}
+    | CHARCONST {std::cout << "charconst";}
+    | STRINGCONST {std::cout << "stringconst";}
+    | BOOLCONST {std::cout << "boolconst";}
+    | KEYWORD {std::cout << "keyword";}
+    | TOKEN {std::cout << "token";}
+;
 %%
 
 
