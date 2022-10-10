@@ -83,8 +83,8 @@ def test(src_dir, test_dir, flags='', show_diff=True):
         test_out = os.path.join(test_dir, test + '.out')
         expected_out = os.path.join(expected_dir, test + '.out')
         actual_out = os.path.join(actual_dir, test + '.out')
-        os.system(f'sort {test_out} > {expected_out}')
-        os.system(f'sort {tmp_out} > {actual_out}')
+        os.system(f'cat {test_out} > {expected_out}')
+        os.system(f'cat {tmp_out} > {actual_out}')
         os.remove(tmp_out)
 
         if diff(expected_out, actual_out):

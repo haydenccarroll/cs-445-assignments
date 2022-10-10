@@ -2,16 +2,14 @@
 // C++ header stuff
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
 #include "scanType.h" // must be included before tab.h
 #include "c-.tab.h"
 
 extern int yylex();
-void yyerror(const char *errMsg)
-{
-    std::cout << "ERROR(" << "LINE NUMBER" << "): " << errMsg << std::endl;
-}
-
+void yyerror(std::string msg) {std::cout << msg << std::endl;};
+extern FILE* yyin;
 
 %}
 
@@ -31,19 +29,28 @@ program :
 stmts: stmt stmts
      | stmt
 ;
-stmt: ID          {std::cout << "Line " << "1" << " Token: ID Value: " << yylval.tokenData->str << std::endl;}
-    | NUMCONST    {std::cout << "Line " << "1" << " Token: NUMCONST Value: " << yylval.tokenData->num << " Input: " << yylval.tokenData->str << std::endl;}
-    | CHARCONST   {std::cout << "Line " << "1" << " Token: CHARCONST Value: '" << yylval.tokenData->charV << "' Input: " << yylval.tokenData->str << std::endl;}
-    | STRINGCONST {std::cout << "Line " << "1" << " Token: STRINGCONST Value: \"" << yylval.tokenData->str << "\" Len: " << "9" << " Input: " << yylval.tokenData->str << std::endl;}
-    | BOOLCONST   {std::cout << "Line " << "1" << " Token: BOOLCONST Value: " << yylval.tokenData->num << " Input: " << yylval.tokenData->str << std::endl;}
-    | KEYWORD     {std::cout << "Line " << "1" << " Token: " << yylval.tokenData->str << std::endl;}
-    | TOKEN       {std::cout << "Line " << "1" << " Token: " << yylval.tokenData->str << std::endl;}
+stmt: ID          {std::cout << "Line " << yylval.tokenData->lineNum << " Token: ID Value: " << yylval.tokenData->inputStr << std::endl;}
+    | NUMCONST    {std::cout << "Line " << yylval.tokenData->lineNum << " Token: NUMCONST Value: " << yylval.tokenData->num << " Input: " << yylval.tokenData->inputStr << std::endl;}
+    | CHARCONST   {std::cout << "Line " << yylval.tokenData->lineNum << " Token: CHARCONST Value: '" << yylval.tokenData->charV << "' Input: " << yylval.tokenData->inputStr << std::endl;}
+    | STRINGCONST {std::cout << "Line " << yylval.tokenData->lineNum << " Token: STRINGCONST Value: \"" << yylval.tokenData->str << "\"  Len: " << yylval.tokenData->str.length() << " Input: " << yylval.tokenData->inputStr << std::endl;}
+    | BOOLCONST   {std::cout << "Line " << yylval.tokenData->lineNum << " Token: BOOLCONST Value: " << yylval.tokenData->num << " Input: " << yylval.tokenData->inputStr << std::endl;}
+    | KEYWORD     {std::cout << "Line " << yylval.tokenData->lineNum << " Token: " << yylval.tokenData->str << std::endl;}
+    | TOKEN       {std::cout << "Line " << yylval.tokenData->lineNum << " Token: " << yylval.tokenData->inputStr << std::endl;}
 ;
 %%
 
 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc > 1)
+    {
+        yyin = fopen(argv[1], "r");
+        if (!yyin)
+        {
+            throw std::runtime_error("runtime error: could not open input file.");
+        }
+    }
+
     yyparse();
     return 0;
 }

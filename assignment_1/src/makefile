@@ -6,7 +6,7 @@ FLEXFLAGS =
 FLEXCPPS = lex.yy.c
 
 BISON = bison
-BISONFLAGS = -d
+BISONFLAGS = -d -t -v
 BISONCPPS = $(PRJ).tab.c
 BISONHDRS = $(PRJ).tab.h
 
