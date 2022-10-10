@@ -15,20 +15,24 @@ Options::Options(int argc, char **argv)
     extern char *optarg;
     extern int optind;
 
-    bool dFlag, pFlag, errFlag = false;
-    std::optional<std::string> fileName;
+    m_isdFlag = false;
+    m_ispFlag = false; 
+    bool errFlag = false;
 
     while (true) {
         // hunt for a string of options
-        while ((c = ourGetopt(argc, argv, (char *)"dDpP")) != EOF)
+        while ((c = ourGetopt(argc, argv, (char *)"dpDP:")) != EOF)
+        {
+            std::cout << "getopt c: " << c << std::endl;
             switch (c) {
             case 'd':
-                dFlag = true;
+                m_isdFlag = true;
                 break;
             case 'p':
-                pFlag = true;
+                m_ispFlag = true;
                 break;
             }
+        }
 
         // report any errors or usage request
         if (errFlag) {
@@ -38,11 +42,13 @@ Options::Options(int argc, char **argv)
 
         // pick off a nonoption
         if (optind < argc) {
-            fileName = argv[optind];
+            m_fileName = argv[optind];
             optind++;
         }
         else {
             break;
         }
     }
+
+    m_file = fopen(m_fileName.c_str(), "r");
 }

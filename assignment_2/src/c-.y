@@ -4,12 +4,14 @@
 #include <string>
 #include <stdexcept>
 
+#include "options/options.hpp"
 #include "scanType.hpp" // must be included before tab.h
 #include "c-.tab.h"
 
 extern int yylex();
 void yyerror(std::string msg) {std::cout << msg << std::endl;};
 extern FILE* yyin;
+extern int yydebug;
 
 %}
 
@@ -30,248 +32,227 @@ extern FILE* yyin;
 
 
 %%
-program : 
-    declList
-;
+program         : declList
+                ;
 
-declList :
-    declList decl |
-    decl
-;
+declList        : declList decl
+                | decl
+                ;
 
-decl: 
-    varDecl |
-    funDecl
-;
+decl            : varDecl
+                | funDecl
+                ;
 
-varDecl:
-    typeSpec varDeclList SEMICOLON
-;
+varDecl         : typeSpec varDeclList SEMICOLON
+                ;
 
-scopedVarDecl:
-    STATIC typeSpec varDeclList SEMICOLON |
-    typeSpec varDeclList SEMICOLON
-;
+scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
+                | typeSpec varDeclList SEMICOLON
+                ;
 
-varDeclList:
-    varDeclList COMMA varDeclInit |
-    varDeclInit
-;
+varDeclList     : varDeclList COMMA varDeclInit
+                | varDeclInit
+                ;
 
-varDeclInit:
-    varDeclId |
-    varDeclId COLON simpleExp
-;
+varDeclInit     : varDeclId
+                | varDeclId COLON simpleExp
+                ;
 
-varDeclId:
-    ID |
-    ID LBRACK NUMCONST RBRACK
-;
+varDeclId       : ID
+                | ID LBRACK NUMCONST RBRACK
+                ;
 
-typeSpec:
-    BOOL |
-    CHAR |
-    INT
-;
+typeSpec        : BOOL
+                | CHAR
+                | INT
+                ;
 
-funDecl:
-    typeSpec ID LPAREN parms RPAREN compoundStmt |
-    ID LPAREN parms RPAREN compoundStmt
-;
+funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
+                | ID LPAREN parms RPAREN compoundStmt
+                ;
 
-parms:
-    parmList |
-;
+parms           : parmList
+                |
+                ;
 
-parmList:
-    parmList SEMICOLON parmTypeList |
-    parmTypeList
-;
+parmList        : parmList SEMICOLON parmTypeList
+                | parmTypeList
+                ;
 
-parmTypeList:
-    typeSpec parmIdList
-;
+parmTypeList    : typeSpec parmIdList
+                ;
 
-parmIdList:
-    parmIdList COMMA parmId |
-    parmId
-;
+parmIdList      : parmIdList COMMA parmId
+                | parmId
+                ;
 
-parmId:
-    ID |
-    ID LBRACK RBRACK
-;
+parmId          : ID
+                | ID LBRACK RBRACK
+                ;
 
-stmt:
-    expStmt |
-    compoundStmt |
-    selectStmt |
-    iterStmt |
-    returnStmt |
-    breakStmt |
-;
+stmt            : openStmt
+                | closedStmt
+                ;
 
-expStmt:
-    exp SEMICOLON |
-    SEMICOLON
-;
+openStmt        : selectStmtOpen
+                | iterStmtOpen
+                ;
 
-compoundStmt:
-    LCURL localDecls stmtList RCURL
-;
+closedStmt      : selectStmtClosed
+                | iterStmtClosed
+                | expStmt
+                | compoundStmt
+                | returnStmt
+                | breakStmt
+                ;
 
-localDecls:
-    localDecls scopedVarDecl |
-;
+expStmt         : exp SEMICOLON
+                | SEMICOLON
+                ;
 
-stmtList:
-    stmtList stmt |
-;
+compoundStmt    : LCURL localDecls stmtList RCURL
+                ;
 
-selectStmt:
-    IF simpleExp THEN stmt |
-    IF simpleExp THEN stmt ELSE stmt
+localDecls      : localDecls scopedVarDecl
+                |
+                ;
 
-iterStmt:
-    WHILE simpleExp DO stmt |
-    FOR ID ASS iterRange DO stmt
-;
+stmtList        : stmtList stmt
+                |
+                ;
 
-iterRange:
-    simpleExp TO simpleExp |
-    simpleExp TO simpleExp BY simpleExp
-;
+selectStmtOpen  : IF simpleExp THEN stmt
+                | IF simpleExp THEN closedStmt ELSE openStmt
+                ;
 
-returnStmt:
-    RETURN SEMICOLON |
-    RETURN exp SEMICOLON
-;
+selectStmtClosed: IF simpleExp THEN closedStmt ELSE closedStmt
+                ;
 
-breakStmt:
-    BREAK SEMICOLON
-;
+iterStmtOpen    : WHILE simpleExp DO openStmt
+                | FOR ID ASS iterRange DO openStmt
+                ;
 
-exp:
-    mutable assignop exp |
-    mutable INC |
-    mutable DEC |
-    simpleExp
-;
+iterStmtClosed  : WHILE simpleExp DO closedStmt
+                | FOR ID ASS iterRange DO closedStmt
+                ;
 
-assignop:
-    ASS |
-    ADDASS |
-    SUBASS |
-    MULASS |
-    DIVASS
-;
+iterRange       : simpleExp TO simpleExp
+                | simpleExp TO simpleExp BY simpleExp
+                ;
 
-simpleExp:
-    simpleExp OR andExp |
-    andExp
-;
+returnStmt      : RETURN SEMICOLON
+                | RETURN exp SEMICOLON
+                ;
 
-andExp:
-    andExp AND unaryRelExp |
-    unaryRelExp
-;
+breakStmt       : BREAK SEMICOLON
+                ;
 
-unaryRelExp:
-    NOT unaryRelExp |
-    relExp
-;
+exp             : mutable assignop exp
+                | mutable INC
+                | mutable DEC
+                | simpleExp
+                ;
 
-relExp:
-    sumExp relop sumExp |
-    sumExp
-;
+assignop        : ASS
+                | ADDASS
+                | SUBASS
+                | MULASS
+                | DIVASS
+                ;
 
-relop:
-    LT |
-    LEQ |
-    GT |
-    GEQ |
-    EQ |
-    NEQ
-;
+simpleExp       : simpleExp OR andExp
+                | andExp
+                ;
 
-sumExp:
-    sumExp sumop mulExp |
-    mulExp
-;
+andExp          : andExp AND unaryRelExp
+                | unaryRelExp
+                ;
 
-sumop:
-    PLUS |
-    DASH
-;
+unaryRelExp     : NOT unaryRelExp
+                | relExp
+                ;
 
-mulExp:
-    mulExp mulop unaryExp |
-    unaryExp
-;
+relExp          : sumExp relop sumExp
+                | sumExp
+                ;
 
-mulop:
-    ASTERISK |
-    SLASH |
-    PERCENT
-;
+relop           : LT
+                | LEQ
+                | GT
+                | GEQ
+                | EQ
+                | NEQ
+                ;
 
-unaryExp:
-    unaryop unaryExp |
-    factor
-;
+sumExp          : sumExp sumOp mulExp
+                | mulExp
+                ;
 
-unaryop:
-    DASH |
-    ASTERISK |
-    QUESTION
-;
+sumOp           : PLUS
+                | DASH
+                ;
 
-factor:
-    mutable |
-    immutable
-;
+mulExp          : mulExp mulOp unaryExp
+                | unaryExp
+                ;
 
-mutable:
-    ID | ID LBRACK exp RBRACK
-;
+mulOp           : ASTERISK
+                | SLASH
+                | PERCENT
+                ;
 
-immutable:
-    LPAREN exp RPAREN |
-    call |
-    constant
+unaryExp        : unaryOp unaryExp
+                | factor
+                ;
 
-call:
-    ID LPAREN args RPAREN
-;
+unaryOp         : DASH
+                | ASTERISK
+                | QUESTION
+                ;
 
-args: 
-    argList |
-;
+factor          : mutable
+                | immutable
+                ;
 
-argList:
-    argList COMMA exp |
-    exp
-;
+mutable         : ID
+                | ID LBRACK exp RBRACK
+                ;
 
-constant:
-    NUMCONST |
-    CHARCONST |
-    STRINGCONST |
-    BOOLCONST
-;
+immutable       : LPAREN exp RPAREN
+                | call
+                | constant
+
+call            : ID LPAREN args RPAREN
+                ;
+
+args            : argList
+                |
+                ;
+
+argList         : argList COMMA exp
+                | exp
+                ;
+
+constant        : NUMCONST
+                | BOOLCONST
+                | CHARCONST
+                | STRINGCONST
+                ;
 %%
 
 
 int main(int argc, char** argv)
 {
-    if (argc > 1)
+    Options options(argc, argv);
+    yydebug = options.isdFlag();
+    if (options.getFile())
     {
-        yyin = fopen(argv[1], "r");
-        if (!yyin)
-        {
-            throw std::runtime_error("runtime error: could not open input file.");
-        }
+        yyin = options.getFile();
+    }
+
+    if (options.ispFlag())
+    {
+        // print tree
     }
 
     yyparse();
