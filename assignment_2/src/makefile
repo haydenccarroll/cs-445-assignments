@@ -3,19 +3,24 @@ CXXFLAGS = --std=c++17 #-ly
 
 FLEX = flex
 FLEXFLAGS =
+FLEXSRCS = $(PRJ).l
 FLEXCPPS = lex.yy.c
 
 BISON = bison
 BISONFLAGS = -d -t
+BISONSRCS = $(PRJ).y
 BISONCPPS = $(PRJ).tab.c
 BISONHDRS = $(PRJ).tab.h
 
-HDRS = scanType.hpp
-SRCS = $(PRJ).l $(PRJ).y
+OPTIONHDRS = options/*.hpp
+OPTIONSRCS = options/*.cpp
+
+HDRS = scanType.hpp $(OPTIONHDRS)
+SRCS = $(OPTIONSRCS)
 
 PRJ = c-
 
-$(PRJ): $(FLEXCPPS) $(BISONCPPS) $(BISONHDRS)
+$(PRJ): $(FLEXCPPS) $(BISONCPPS) $(BISONHDRS) $(HDRS) $(SRCS)
 	$(CXX) $(FLEXCPPS) $(BISONCPPS) $(CXXFLAGS) -o $(PRJ)
 
 qc: # quick clean, remove everything but binary and .tar
@@ -27,8 +32,8 @@ clean:
 tar: $(SRCS) $(HDRS) makefile
 	tar -cvf $(PRJ).tar $(SRCS) $(HDRS) makefile
 
-$(BISONCPPS): $(PRJ).y
+$(BISONCPPS): $(BISONSRCS)
 	$(BISON) $(BISONFLAGS) $(PRJ).y
 
-$(FLEXCPPS): $(PRJ).l $(BISONCPPS) $(BISONHDRS)
+$(FLEXCPPS): $(FLEXSRCS) $(BISONCPPS) $(BISONHDRS)
 	$(FLEX) $(FLEXFLAGS) $(PRJ).l

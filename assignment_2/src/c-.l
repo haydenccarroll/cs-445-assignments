@@ -26,14 +26,58 @@ static int lineNum = 1;
 
 %%
 
-\/\/[^\n]*                        {}
-"\n"                              { lineNum++;}
-[ \t]                             {}
+\/\/[^\n]*                        {} // ignore comments
+"\n"                              { lineNum++;} // increment line number
+[ \t]                             {} // ignore whitespace
+
 true|false                        { return passToken(BOOLCONST); }
 
-while|for|if|int|bool|char|static { return passToken(KEYWORD); }
-and|or|to|by|do|then|break|else   { return passToken(KEYWORD); }
-return|not                        { return passToken(KEYWORD); }
+"bool" { return passToken(BOOL); }
+"char" { return passToken(CHAR); }
+"int" { return passToken(INT); }
+"if" { return passToken(IF); }
+"then" { return passToken(THEN); }
+"else" { return passToken(ELSE); }
+"while" { return passToken(WHILE); }
+"do" { return passToken(DO); }
+"for" { return passToken(FOR); }
+"to" { return passToken(TO); }
+"by" { return passToken(BY); }
+"return" { return passToken(RETURN); }
+"break" { return passToken(BREAK); }
+"or" { return passToken(OR); }
+"and" { return passToken(AND); }
+"not" { return passToken(NOT); }
+
+";" { return passToken(SEMICOLON); }
+"," { return passToken(COMMA); }
+":" { return passToken(COLON); }
+"[" { return passToken(LBRACK); }
+"]" { return passToken(RBRACK); }
+"(" { return passToken(LPAREN); }
+")" { return passToken(RPAREN); }
+"{" { return passToken(LCURL); }
+"}" { return passToken(RCURL); }
+"++" { return passToken(INC); }
+"--" { return passToken(DEC); }
+"=" { return passToken(ASS); }
+"+=" { return passToken(ADDASS); }
+"-=" { return passToken(SUBASS); }
+"*=" { return passToken(MULASS); }
+"/=" { return passToken(DIVASS); }
+"%" { return passToken(PERCENT); }
+"<" { return passToken(LT); }
+">" { return passToken(GT); }
+">=" { return passToken(GEQ); }
+"<=" { return passToken(LEQ); }
+"==" { return passToken(EQ); }
+"!=" { return passToken(NEQ); }
+"+" { return passToken(PLUS); }
+"-" { return passToken(DASH); }
+"/" { return passToken(SLASH); }
+"*" { return passToken(ASTERISK); }
+"?" { return passToken(QUESTION); }
+
 [A-Za-z][A-Za-z0-9]*              { return passToken(ID); }
 
 [0-9]+                            { return passToken(NUMCONST); }
@@ -41,11 +85,6 @@ return|not                        { return passToken(KEYWORD); }
 \'((\\\')|([^\n\']))*\'           { return passToken(CHARCONST); }
 
 \"([^\\"\n]|\\.)*\"               { return passToken(STRINGCONST); }
-
-\=\=|\>\=|\<\=|\!\=|\+\+          { return passToken(TOKEN); }
-\-\-|\+\=|\{|\}|\<|\>|\(          { return passToken(TOKEN); }
-\)|\=|\;|\*|\%|\/|\-              { return passToken(TOKEN); }
-\?|\+|\[|\]|\,|\:                 { return passToken(TOKEN); }
 
 .                                 { std::cout << "ERROR(" << lineNum << "): Invalid or misplaced input character: '" << yytext << "'. Character Ignored.\n"; }
 %%
@@ -68,7 +107,7 @@ int passToken(int tokenClass)
         break;
     case CHARCONST:
         yylval.tokenData->inputStr = yytext;
-        yylval.tokenData->charV = processCharConst(yytext); // placeholder
+        yylval.tokenData->charV = processCharConst(yytext);
         break;
     case STRINGCONST:
         yylval.tokenData->inputStr = yytext;
@@ -77,14 +116,6 @@ int passToken(int tokenClass)
     case BOOLCONST:
         yylval.tokenData->inputStr = yytext;
         yylval.tokenData->num = processBoolConst(yytext);
-        break;
-    case KEYWORD:
-        yylval.tokenData->inputStr = yytext;
-        yylval.tokenData->str = processKeyword(yylval.tokenData->inputStr);
-        break;
-    case TOKEN:
-        yylval.tokenData->inputStr = yytext;
-        yylval.tokenData->str = processTokenConst(yytext);
         break;
     }
 
