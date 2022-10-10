@@ -2,11 +2,6 @@
 
 #include <string>
 
-enum TokenClass
-{
-
-};
-
 struct TokenData
 {
     std::string str;      // used for identifiers, the string value of a number, etc.

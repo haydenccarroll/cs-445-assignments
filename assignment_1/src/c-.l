@@ -13,8 +13,10 @@
 extern char* yytext;
 
 int passToken(int tokenClass);
-void processStringConst();
-void processTokenConst();
+std::string processStringConst(std::string str);
+std::string processTokenConst(std::string str);
+int processBoolConst(std::string str);
+char processCharConst(std::string str);
 std::string toUpper(std::string str);
 static int lineNum = 1;
 
@@ -23,14 +25,15 @@ static int lineNum = 1;
 
 %%
     // token specifications
+\/\/[^\n]*           {}
 \n                   { lineNum++;}
 [ \t]                {}
 true|false           { return passToken(BOOLCONST); }
 while|for|if|int|bool|char|static|and|or|to|by|do|then|break|else|return|not         { return passToken(KEYWORD); }
 [A-Za-z][A-Za-z0-9]* { return passToken(ID); }
 [0-9]+               { return passToken(NUMCONST); }
-'[^\\']'|'\\.'       { return passToken(CHARCONST); }
-\"([^\\"]|\\.)*\"    { return passToken(STRINGCONST); }
+\'((\\\')|([^\n\']))*\'       { return passToken(CHARCONST); }
+\"([^\\"\n]|\\.)*\"    { return passToken(STRINGCONST); }
 \=\=|\>\=|\<\=|\!\=|\+\+|\-\-|\+\=|\{|\}|\<|\>|\(|\)|\=|\;|\*|\%|\/|\-|\?|\+|\[|\]|\,|\:                { return passToken(TOKEN); }
 .       { std::cout << "ERROR(" << lineNum << "): Invalid or misplaced input character: '" << yytext << "'. Character Ignored.\n"; }
 %%
@@ -51,21 +54,23 @@ int passToken(int tokenClass)
         break;
     case CHARCONST:
         yylval.tokenData->inputStr = yytext;
-        yylval.tokenData->charV = 'c'; // placeholder
+        yylval.tokenData->charV = processCharConst(yytext); // placeholder
         break;
     case STRINGCONST:
-        processStringConst();
+        yylval.tokenData->inputStr = yytext;
+        yylval.tokenData->str = processStringConst(yytext);
         break;
     case BOOLCONST:
         yylval.tokenData->inputStr = yytext;
-        yylval.tokenData->num = (yytext == "true") ? 1 : 0;
+        yylval.tokenData->num = processBoolConst(yytext);
         break;
     case KEYWORD:
         yylval.tokenData->inputStr = yytext;
         yylval.tokenData->str = toUpper(yylval.tokenData->inputStr);
         break;
     case TOKEN:
-        processTokenConst();
+        yylval.tokenData->inputStr = yytext;
+        yylval.tokenData->str = processTokenConst(yytext);
         break;
     }
 
@@ -80,12 +85,16 @@ std::string toUpper(std::string str)
 
 }
 
-void processStringConst()
+int processBoolConst(std::string str)
 {
-    std::string inputStr = yytext;
+    return (str == "true");
+}
+
+std::string processStringConst(std::string str)
+{
+    std::string inputStr = str;
     std::string noQuotes = inputStr.substr(1, inputStr.size() - 2);
     std::string cumStr = "";
-    yylval.tokenData->inputStr = inputStr;
     for (int i=0; i < noQuotes.length(); i++)
     {
         if (noQuotes[i] == '\\')
@@ -112,12 +121,30 @@ void processStringConst()
         }
     }
 
-    yylval.tokenData->str = cumStr;
+    return cumStr;
 }
 
-void processTokenConst()
+char processCharConst(std::string str)
 {
-    std::string original = yytext;
+    std::string inputStr = str;
+    std::string processedStr = processStringConst(inputStr);
+
+    if (processedStr.length() > 1)
+    {
+        std::cout << "WARNING(" << lineNum << "): character is " << processedStr.length() << " characters long and not a single character: '" << inputStr << "'.  The first char will be used." << std::endl;
+    }
+
+    else if (processedStr.length() == 0)
+    {
+        std::cout << "ERROR(" << lineNum << "): a character cannot be of size 0." << std::endl;
+        throw std::runtime_error("runtime error: there shouldnt be a character of length 0.");
+    }
+
+    return processedStr[0];
+}
+std::string processTokenConst(std::string str)
+{
+    std::string original = str;
     std::map<std::string, std::string> tokenToTokenName;
     tokenToTokenName.insert({"==", "EQ"});
     tokenToTokenName.insert({">=", "GEQ"});
@@ -127,14 +154,11 @@ void processTokenConst()
     tokenToTokenName.insert({"--", "DEC"});
     tokenToTokenName.insert({"+=", "ADDASS"});
 
-
-    yylval.tokenData->inputStr = original;
-
     if (tokenToTokenName.count(original) == 1)
     {
-        yylval.tokenData->str = tokenToTokenName.at(original);
+        return tokenToTokenName.at(original);
     } else 
     {
-        yylval.tokenData->str = original;
+        return original;
     }
 }
