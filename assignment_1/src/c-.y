@@ -30,12 +30,12 @@ stmts: stmt stmts
      | stmt
 ;
 stmt: ID          {std::cout << "Line " << yylval.tokenData->lineNum << " Token: ID Value: " << yylval.tokenData->inputStr << std::endl;}
-    | NUMCONST    {std::cout << "Line " << yylval.tokenData->lineNum << " Token: NUMCONST Value: " << yylval.tokenData->num << " Input: " << yylval.tokenData->inputStr << std::endl;}
-    | CHARCONST   {std::cout << "Line " << yylval.tokenData->lineNum << " Token: CHARCONST Value: '" << yylval.tokenData->charV << "' Input: " << yylval.tokenData->inputStr << std::endl;}
-    | STRINGCONST {std::cout << "Line " << yylval.tokenData->lineNum << " Token: STRINGCONST Value: \"" << yylval.tokenData->str << "\"  Len: " << yylval.tokenData->str.length() << " Input: " << yylval.tokenData->inputStr << std::endl;}
-    | BOOLCONST   {std::cout << "Line " << yylval.tokenData->lineNum << " Token: BOOLCONST Value: " << yylval.tokenData->num << " Input: " << yylval.tokenData->inputStr << std::endl;}
+    | NUMCONST    {std::cout << "Line " << yylval.tokenData->lineNum << " Token: NUMCONST Value: " << yylval.tokenData->num << "  Input: " << yylval.tokenData->inputStr << std::endl;}
+    | CHARCONST   {std::cout << "Line " << yylval.tokenData->lineNum << " Token: CHARCONST Value: '" << yylval.tokenData->charV << "'  Input: " << yylval.tokenData->inputStr << std::endl;}
+    | STRINGCONST {std::cout << "Line " << yylval.tokenData->lineNum << " Token: STRINGCONST Value: \"" << yylval.tokenData->str << "\"  Len: " << yylval.tokenData->str.length() << "  Input: " << yylval.tokenData->inputStr << std::endl;}
+    | BOOLCONST   {std::cout << "Line " << yylval.tokenData->lineNum << " Token: BOOLCONST Value: " << yylval.tokenData->num << "  Input: " << yylval.tokenData->inputStr << std::endl;}
     | KEYWORD     {std::cout << "Line " << yylval.tokenData->lineNum << " Token: " << yylval.tokenData->str << std::endl;}
-    | TOKEN       {std::cout << "Line " << yylval.tokenData->lineNum << " Token: " << yylval.tokenData->inputStr << std::endl;}
+    | TOKEN       {std::cout << "Line " << yylval.tokenData->lineNum << " Token: " << yylval.tokenData->str << std::endl;}
 ;
 %%
 
