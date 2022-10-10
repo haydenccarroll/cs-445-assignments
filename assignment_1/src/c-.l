@@ -6,17 +6,16 @@
 #include <string>
 
 #include "c-.tab.h"
+extern void yyerror(const char *errMsg); // defined in c-.y
+
 %}
 %option noyywrap
 
-    // regular expressions
-numbers     ([0-9])+
-
 %%
     // token specifications
-"hello" { std::cout << "found a hello"; yylval.tokenData = new TokenData; yylval.tokenData->str = yytext; return (HELLO);}
-numbers { return (NUMBERS);}
+"hello" { yylval.tokenData = new TokenData; yylval.tokenData->str = yytext; return (HELLO);}
+([0-9])+ { yylval.tokenData = new TokenData; yylval.tokenData->str = yytext; return (NUMBERS);}
 ";"     { return (SEMICOLON);}
-.       { return }
+.       { yyerror("Invalid or misplaced input character: CHARACTER. Character Ignored."); }
 %%
 // C++ functions

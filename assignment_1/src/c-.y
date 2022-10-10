@@ -32,7 +32,7 @@ stmts:
     | stmt SEMICOLON stmts
 stmt: 
     HELLO {std::cout << "string";}
-    | OTHER
+    | NUMBERS  {std::cout << "hey we found sum numbers";}
     ;
 %%
 

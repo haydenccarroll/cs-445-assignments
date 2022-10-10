@@ -465,7 +465,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   6
+#define YYLAST   5
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  7
@@ -559,7 +559,7 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -4,    -4,     1,    -4,    -2,    -4,    -3,    -4
+      -3,    -4,    -4,     1,    -4,    -1,    -4,    -3,    -4
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -573,7 +573,7 @@ static const yytype_int8 yydefact[] =
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -4,    -4,    -1,    -4
+      -4,    -4,    -2,    -4
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
@@ -587,19 +587,19 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       1,     6,     7,     2,     0,     0,     8
+       1,     6,     2,     7,     0,     8
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     0,     4,     6,    -1,    -1,     7
+       3,     0,     5,     4,    -1,     7
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     6,     8,     9,    10,     0,     4,     9
+       0,     3,     5,     8,     9,    10,     0,     4,     9
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
@@ -1312,8 +1312,14 @@ yyreduce:
 #line 1313 "c-.tab.c"
     break;
 
+  case 6:
+#line 35 "c-.y"
+               {std::cout << "hey we found sum numbers";}
+#line 1319 "c-.tab.c"
+    break;
 
-#line 1317 "c-.tab.c"
+
+#line 1323 "c-.tab.c"
 
       default: break;
     }
@@ -1551,7 +1557,6 @@ yyreturn:
 
 int main()
 {
-    std::cout << "PROGRAM STARTING...\n";
     yyparse();
     return 0;
 }
