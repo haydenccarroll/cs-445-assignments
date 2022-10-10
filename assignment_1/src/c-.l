@@ -1,5 +1,5 @@
 %{
-#include "scanType.h" // must be included before c-.tab.h
+#include "scanType.hpp" // must be included before c-.tab.h
 
 // C++ headers and stuff
 #include <iostream>

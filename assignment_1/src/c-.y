@@ -4,7 +4,7 @@
 #include <string>
 #include <stdexcept>
 
-#include "scanType.h" // must be included before tab.h
+#include "scanType.hpp" // must be included before tab.h
 #include "c-.tab.h"
 
 extern int yylex();
