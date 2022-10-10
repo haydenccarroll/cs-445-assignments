@@ -27,23 +27,33 @@ while|for|if         { return passToken(KEYWORD); }
 
 int passToken(int tokenClass)
 {
+    yylval.tokenData = new TokenData;
     switch (tokenClass)
     {
     case ID:
+        yylval.tokenData->str = yytext;
         break;
     case NUMCONST:
+        yylval.tokenData->str = yytext;
+        yylval.tokenData->num = atoi(yytext);
         break;
     case CHARCONST:
+        yylval.tokenData->str = yytext;
+        yylval.tokenData->charV = 'c'; // placeholder
         break;
     case STRINGCONST:
+        yylval.tokenData->str = yytext; // placeholder
         break;
     case BOOLCONST:
+        yylval.tokenData->str = yytext;
+        yylval.tokenData->num = (yytext == "true") ? 1 : 0;
         break;
     case KEYWORD:
+        yylval.tokenData->str = yytext;
         break;
     case TOKEN:
+        yylval.tokenData->str = yytext;
         break;
-
     }
 
     return tokenClass;

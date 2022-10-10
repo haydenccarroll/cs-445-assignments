@@ -31,13 +31,13 @@ program :
 stmts: stmt stmts
      | stmt
 ;
-stmt: ID        {std::cout << "idconst";}
-    | NUMCONST  {std::cout << "numconst";}
-    | CHARCONST {std::cout << "charconst";}
-    | STRINGCONST {std::cout << "stringconst";}
-    | BOOLCONST {std::cout << "boolconst";}
-    | KEYWORD {std::cout << "keyword";}
-    | TOKEN {std::cout << "token";}
+stmt: ID          {std::cout << "Line " << "1" << " Token: ID Value: " << yylval.tokenData->str << std::endl;}
+    | NUMCONST    {std::cout << "Line " << "1" << " Token: NUMCONST Value: " << yylval.tokenData->num << " Input: " << yylval.tokenData->str << std::endl;}
+    | CHARCONST   {std::cout << "Line " << "1" << " Token: CHARCONST Value: '" << yylval.tokenData->charV << "' Input: " << yylval.tokenData->str << std::endl;}
+    | STRINGCONST {std::cout << "Line " << "1" << " Token: STRINGCONST Value: \"" << yylval.tokenData->str << "\" Len: " << "9" << " Input: " << yylval.tokenData->str << std::endl;}
+    | BOOLCONST   {std::cout << "Line " << "1" << " Token: BOOLCONST Value: " << yylval.tokenData->num << " Input: " << yylval.tokenData->str << std::endl;}
+    | KEYWORD     {std::cout << "Line " << "1" << " Token: " << yylval.tokenData->str << std::endl;}
+    | TOKEN       {std::cout << "Line " << "1" << " Token: " << yylval.tokenData->str << std::endl;}
 ;
 %%
 
