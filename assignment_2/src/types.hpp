@@ -1,7 +1,11 @@
 #pragma once
 
+// necessary for .l and .y files
+#include "ast/node.hpp"
+
 #include <string>
 
+// to pass data between l file and y file
 struct TokenData
 {
     std::string str;      // used for identifiers, the string value of a number, etc.
@@ -9,4 +13,13 @@ struct TokenData
     char charV;           // used for characters
     int num;              // used for numbers as well as bools (0 false 1 true)
     unsigned int lineNum; // line where token found
+};
+
+enum class DataType
+{
+Int,
+Bool,
+Char,
+Void,
+None
 };

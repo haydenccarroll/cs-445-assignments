@@ -2,3 +2,7 @@ test.out
 *.tar
 c-
 tmp/
+lex.yy.c
+*.output
+*tab.c
+*tab.h

@@ -1,13 +1,13 @@
 %{
 // C++ header stuff
+#include "options/options.hpp"
+#include "types.hpp" // must be included before tab.h
+
 #include <iostream>
 #include <string>
 #include <stdexcept>
 #include <stdlib.h>
 
-#include "options/options.hpp"
-#include "ast/node.hpp"
-#include "scanType.hpp" // must be included before tab.h
 #include "c-.tab.h"
 
 extern int yylex();
@@ -15,31 +15,43 @@ void yyerror(std::string msg) {std::cout << msg << std::endl;};
 extern FILE* yyin;
 extern int yydebug;
 
-TreeNode root = TreeNode(0);
+TreeNode* root = new TreeNode(0);
 
 %}
 
 %union {
-    struct TokenData* tokenData;
+    TokenData* tokenData;
+    TreeNode* node;
+    DataType* dataType;
 }
+
+%define parse.error verbose
 
     // define tokens
 %token <tokenData> ID NUMCONST CHARCONST STRINGCONST BOOLCONST
-
 %token <tokenData> BOOL CHAR INT IF THEN ELSE STATIC
 %token <tokenData> WHILE DO FOR TO BY RETURN BREAK OR AND NOT 
-
 %token <tokenData> SEMICOLON COMMA COLON LBRACK RBRACK LPAREN RPAREN
 %token <tokenData> LCURL RCURL INC DEC ASS ADDASS SUBASS MULASS DIVASS PERCENT
 %token <tokenData> LT LEQ GT GEQ EQ NEQ PLUS DASH SLASH ASTERISK QUESTION
+
+%type <dataType> typeSpec
+
+%type <node> program declList decl varDecl scopedVarDecl varDeclList
+%type <node> varDeclInit varDeclId  funDecl parms parmList parmTypeList parmIdList
+%type <node> parmId stmt openStmt closedStmt expStmt compoundStmt localDecls
+%type <node> stmtList selectStmtOpen selectStmtClosed iterStmtOpen iterStmtClosed
+%type <node> iterRange returnStmt breakStmt exp assignop simpleExp andExp
+%type <node> unaryRelExp relExp relop sumExp sumOp mulExp mulOp unaryExp unaryOp
+%type <node> factor mutable immutable call args argList constant
 
 
 
 %%
 program         : declList 
                     {
-                        $$ = $1;
-                        root = $$;
+                        // $$ = $1;
+                        // root = $$;
                     }
                 ;
 
@@ -332,12 +344,12 @@ iterRange       : simpleExp TO simpleExp
 
 returnStmt      : RETURN SEMICOLON 
                     {
-                        std::cout << "ADDED A CHILD\n"; root.addChild(new TreeNode(12));
+                        std::cout << "ADDED A CHILD\n"; root->addChild(new TreeNode(12));
                         // $$ = RETURNNODE
                     }
                 | RETURN exp SEMICOLON
                     {
-                        $$ = RETURNNODE
+                        // $$ = RETURNNODE
                         // $$.addChildren($2)
                     }
                 ;
@@ -623,7 +635,7 @@ int main(int argc, char** argv)
 
     if (options.ispFlag())
     {
-        root.printRoot();
+        root->printRoot();
     }
 
     return EXIT_SUCCESS;

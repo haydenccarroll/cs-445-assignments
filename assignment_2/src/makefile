@@ -19,7 +19,7 @@ ASTHDRS = ast/*.hpp
 ASTSRCS = ast/*.cpp
 
 
-HDRS = scanType.hpp $(OPTIONHDRS) $(ASTHDRS)
+HDRS = types.hpp $(OPTIONHDRS) $(ASTHDRS)
 SRCS = $(OPTIONSRCS) $(ASTSRCS)
 
 PRJ = c-
