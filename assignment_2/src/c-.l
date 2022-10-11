@@ -24,7 +24,7 @@ static int lineNum = 1;
 
 %}
 %option noyywrap
-
+%option yylineno
 %%
 
 \/\/[^\n]*                        {} // ignore comments

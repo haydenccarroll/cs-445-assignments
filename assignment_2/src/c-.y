@@ -2,6 +2,7 @@
 // C++ header stuff
 #include "options/options.hpp"
 #include "types.hpp" // must be included before tab.h
+#include "ast/const/const.hpp"
 
 #include <iostream>
 #include <string>
@@ -14,14 +15,15 @@ extern int yylex();
 void yyerror(std::string msg) {std::cout << msg << std::endl;};
 extern FILE* yyin;
 extern int yydebug;
+extern int yylineno;
 
-TreeNode* root = new TreeNode(0);
+ASTNode* root = new ASTNode(0);
 
 %}
 
 %union {
     TokenData* tokenData;
-    TreeNode* node;
+    ASTNode* node;
     DataType* dataType;
 }
 
@@ -57,22 +59,22 @@ program         : declList
 
 declList        : declList decl
                     {
-                        // $$ = $1
+                        // $$ = $1;
                         // $$.addSibling($2)
                     }
                 | decl
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
 decl            : varDecl
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 | funDecl
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
@@ -98,22 +100,22 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
 
 varDeclList     : varDeclList COMMA varDeclInit
                     {
-                        // $$ = $1
+                        // $$ = $1;
                         // $$.addSiblings($3)
                     }
                 | varDeclInit
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
 varDeclInit     : varDeclId
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 | varDeclId COLON simpleExp
                     {
-                        // $$ = $1
+                        // $$ = $1;
                         // $$.addSibling(simpleExp)
                     }
                 ;
@@ -156,11 +158,11 @@ funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
 
 parms           : parmList
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 |
                     {
-                        // $$ = nullptr
+                        $$ = nullptr;
                     }
                 ;
 
@@ -171,7 +173,7 @@ parmList        : parmList SEMICOLON parmTypeList
                     }
                 | parmTypeList
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
@@ -190,7 +192,7 @@ parmIdList      : parmIdList COMMA parmId
                     }
                 | parmId
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
@@ -206,56 +208,57 @@ parmId          : ID
 
 stmt            : openStmt
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 | closedStmt
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
 openStmt        : selectStmtOpen
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 | iterStmtOpen
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
 closedStmt      : selectStmtClosed
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 | iterStmtClosed
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 | expStmt
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 | compoundStmt
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 | returnStmt
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 | breakStmt
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
 expStmt         : exp SEMICOLON
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 | SEMICOLON
                     {
+                        $$ = nullptr;
                         // set to nullptr
                     }
                 ;
@@ -274,6 +277,7 @@ localDecls      : localDecls scopedVarDecl
                     }
                 |
                     {
+                        $$ = nullptr;
                         // do nothing or set to nullptr
                     }
                 ;
@@ -285,6 +289,7 @@ stmtList        : stmtList stmt
                     }
                 |
                     {
+                        $$ = nullptr;
                         // either nothing or set to nullptr
                     }
                 ;
@@ -344,7 +349,7 @@ iterRange       : simpleExp TO simpleExp
 
 returnStmt      : RETURN SEMICOLON 
                     {
-                        std::cout << "ADDED A CHILD\n"; root->addChild(new TreeNode(12));
+                        std::cout << "ADDED A CHILD\n"; root->addChild(new ASTNode(12));
                         // $$ = RETURNNODE
                     }
                 | RETURN exp SEMICOLON
@@ -377,29 +382,29 @@ exp             : mutable assignop exp
                     }
                 | simpleExp
                     {
-                        // $$ = $1;
+                        $$ = $1;
                     }
                 ;
 
 assignop        : ASS
                     {
-                        // $$ = $1;
+                        // assignop(ASS)
                     }
                 | ADDASS
                     {
-                        // $$ = $1;
+                        // assignop(ASS)
                     }
                 | SUBASS
                     {
-                        // $$ = $1;
+                        // assignop(ASS)
                     }
                 | MULASS
                     {
-                        // $$ = $1;
+                       // assignop(ASS)
                     }
                 | DIVASS
                     {
-                        // $$ = $1;
+                        // assignop(ASS)
                     }
                 ;
 
@@ -410,7 +415,7 @@ simpleExp       : simpleExp OR andExp
                     }
                 | andExp
                     {
-                        // $$ = $1;
+                        $$ = $1;
                     }
                 ;
 
@@ -421,7 +426,7 @@ andExp          : andExp AND unaryRelExp
                     }
                 | unaryRelExp
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
@@ -431,7 +436,7 @@ unaryRelExp     : NOT unaryRelExp
                     }
                 | relExp
                     {
-                        // $$ = $1;
+                        $$ = $1;
                     }
                 ;
 
@@ -441,7 +446,7 @@ relExp          : sumExp relop sumExp
                     }
                 | sumExp
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
@@ -477,7 +482,7 @@ sumExp          : sumExp sumOp mulExp
                     }
                 | mulExp
                     {
-                        // $$ = $1;
+                        $$ = $1;
                     }
                 ;
 
@@ -498,7 +503,7 @@ mulExp          : mulExp mulOp unaryExp
                     }
                 | unaryExp
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
@@ -519,11 +524,11 @@ mulOp           : ASTERISK
 unaryExp        : unaryOp unaryExp
                     {
                         // $1.addSibling($2)
-                        // $$ = $1
+                        // $$ = $1;
                     }
                 | factor
                     {
-                        // $$ = $1;
+                        $$ = $1;
                     }
                 ;
 
@@ -543,11 +548,11 @@ unaryOp         : DASH
 
 factor          : mutable 
                     { 
-                        // $$ = $1; 
+                        $$ = $1; 
                     }
                 | immutable 
                     {
-                        // $$ = $1;
+                        $$ = $1;
                     }
                 ;
 
@@ -563,15 +568,15 @@ mutable         : ID
 
 immutable       : LPAREN exp RPAREN
                     {
-                        // $$ = $2;
+                        $$ = $2;
                     }
                 | call
                     {
-                        // $$ = $1;
+                        $$ = $1;
                     }
                 | constant
                     {
-                        // $$ = $1;
+                        $$ = $1;
                     }
                 ;
 
@@ -583,40 +588,41 @@ call            : ID LPAREN args RPAREN
 
 args            : argList
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 |
                     {
-                        // $$ = nullptr, or just leave this blank. not sure.
+                        $$ = nullptr;
                     }
                 ;
 
 argList         : argList COMMA exp
                     {
-                        // a bit complex, not sure
+                        $$ = $1;
+                        $$->addSibling($3);
                     }
                 | exp
                     {
-                        // $$ = $1
+                        $$ = $1;
                     }
                 ;
 
 constant        : NUMCONST
                     {
-                        // $$ = NewConstNode(lineNum, numconst, value)
+                        $$ = new ConstNode(yylineno, ConstType::Int, $1->num);
                     }
                 | BOOLCONST
                     {
-                        // $$ = NewConstNode(lineNum, numconst, value)
+                        $$ = new ConstNode(yylineno, ConstType::Bool, ($1->num == 1));
                     }
                 | CHARCONST
                     {
-                        // $$ = NewConstNode(lineNum, numconst, value)
+                        $$ = new ConstNode(yylineno, ConstType::Char, $1->charV);
                     }
                 
                 | STRINGCONST
                     {
-                        // $$ = NewConstNode(lineNum, numconst, value)
+                        $$ = new ConstNode(yylineno, ConstType::String, $1->str);
                     }
                 ;
 %%

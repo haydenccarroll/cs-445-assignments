@@ -23,3 +23,11 @@ Char,
 Void,
 None
 };
+
+enum class ConstType
+{
+Int,
+Bool,
+Char,
+String
+};

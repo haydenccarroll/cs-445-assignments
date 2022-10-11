@@ -19,8 +19,8 @@ ASTHDRS = ast/*.hpp
 ASTSRCS = ast/*.cpp
 
 
-HDRS = types.hpp $(OPTIONHDRS) $(ASTHDRS)
-SRCS = $(OPTIONSRCS) $(ASTSRCS)
+HDRS = types.hpp $(OPTIONHDRS) $(ASTHDRS) ast/*/*.cpp
+SRCS = $(OPTIONSRCS) $(ASTSRCS) ast/*/*.cpp
 
 PRJ = c-
 

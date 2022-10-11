@@ -5,16 +5,17 @@
 
 #define AST_PRINT_INDENT_STR ".   "
 
-class TreeNode {
+class ASTNode {
 public:
-    TreeNode(unsigned int lineNum);
+    ASTNode(unsigned int lineNum);
     void print(unsigned int indentLevel = 0);
     void printRoot();
-    void addChild(TreeNode* child);
+    void addChild(ASTNode* child);
+    void addSibling(ASTNode* sibling);
 
 private:
-    std::vector<TreeNode*> m_children;
-    TreeNode* m_sibling;
+    std::vector<ASTNode*> m_children;
+    ASTNode* m_sibling;
     std::string m_name;
     unsigned int m_lineNum;
 };

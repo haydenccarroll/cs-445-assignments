@@ -3,13 +3,13 @@
 #include <iostream>
 
 
-TreeNode::TreeNode(unsigned int lineNum)
+ASTNode::ASTNode(unsigned int lineNum)
 {
     m_lineNum = lineNum;
     m_sibling = nullptr;
 }
 
-void TreeNode::printRoot()
+void ASTNode::printRoot()
 {
     // not supposed to print itself, and it doesnt have a sibling.
     for (auto child : m_children)
@@ -18,7 +18,7 @@ void TreeNode::printRoot()
     }
 }
 
-void TreeNode::print(unsigned int indentLevel)
+void ASTNode::print(unsigned int indentLevel)
 {
     std::string localIndentLevel = "";
     for (int i=0; i < indentLevel; i++)
@@ -40,7 +40,19 @@ void TreeNode::print(unsigned int indentLevel)
     }
 }
 
-void TreeNode::addChild(TreeNode* child)
+void ASTNode::addChild(ASTNode* child)
 {
     m_children.push_back(child);
+}
+
+void ASTNode::addSibling(ASTNode* sibling)
+{
+    auto currNode = this;
+    while (currNode->m_sibling != nullptr)
+    {
+        currNode = currNode->m_sibling;
+    }
+
+    currNode->m_sibling = sibling;
+
 }
