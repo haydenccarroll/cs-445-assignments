@@ -3,8 +3,10 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
+#include <stdlib.h>
 
 #include "options/options.hpp"
+#include "ast/node.hpp"
 #include "scanType.hpp" // must be included before tab.h
 #include "c-.tab.h"
 
@@ -12,6 +14,8 @@ extern int yylex();
 void yyerror(std::string msg) {std::cout << msg << std::endl;};
 extern FILE* yyin;
 extern int yydebug;
+
+TreeNode root = TreeNode(0);
 
 %}
 
@@ -140,7 +144,7 @@ iterRange       : simpleExp TO simpleExp
                 | simpleExp TO simpleExp BY simpleExp
                 ;
 
-returnStmt      : RETURN SEMICOLON
+returnStmt      : RETURN SEMICOLON {std::cout << "ADDED A CHILD\n"; root.addChild(new TreeNode(12)); }
                 | RETURN exp SEMICOLON
                 ;
 
@@ -250,11 +254,12 @@ int main(int argc, char** argv)
         yyin = options.getFile();
     }
 
+    yyparse();
+
     if (options.ispFlag())
     {
-        // print tree
+        root.printRoot();
     }
 
-    yyparse();
-    return 0;
+    return EXIT_SUCCESS;
 }

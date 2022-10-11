@@ -11,19 +11,20 @@
 
 Options::Options(int argc, char **argv)
 {
-    int c;
     extern char *optarg;
     extern int optind;
 
     m_isdFlag = false;
-    m_ispFlag = false; 
+    m_ispFlag = false;
+
+    // not used now, but could potentially be used in later assignments.
     bool errFlag = false;
 
     while (true) {
         // hunt for a string of options
+        int c;
         while ((c = ourGetopt(argc, argv, (char *)"dpDP:")) != EOF)
         {
-            std::cout << "getopt c: " << c << std::endl;
             switch (c) {
             case 'd':
                 m_isdFlag = true;
