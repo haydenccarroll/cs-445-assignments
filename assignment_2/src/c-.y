@@ -483,7 +483,8 @@ unaryRelExp     : NOT unaryRelExp
                     {
                         //ctrl+f this is not right! must have some way to negate.
                         //       as shown below.
-                        $$ = $2;
+                        $$ = new UnaryOpNode($1->lineNum, UnaryOpType::Not);
+                        $$->addChild($2);
                         // $$ = $2.negate(true)
                     }
                 | relExp
