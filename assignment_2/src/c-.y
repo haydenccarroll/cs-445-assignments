@@ -125,11 +125,11 @@ varDeclInit     : varDeclId
 
 varDeclId       : ID
                     {
-                        $$ = new IdNode($1->lineNum, $1->str, false);
+                        $$ = new VarDeclNode($1->lineNum, $1->str, DataType::Void);
                     }
                 | ID LBRACK NUMCONST RBRACK
                     {
-                        $$ = new IdNode($1->lineNum, $1->str, true, $3->num);
+                        $$ = new VarDeclNode($1->lineNum, $1->str, DataType::Void);
                     }
                 ;
 
@@ -155,7 +155,7 @@ funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
                     }
                 | ID LPAREN parms RPAREN compoundStmt
                     {
-                        $$ = new FunDeclNode($1->lineNum, $1->str, DataType::None);
+                        $$ = new FunDeclNode($1->lineNum, $1->str, DataType::Void);
                         $$->addChild($3);
                         $$->addChild($5);
                     }
@@ -216,7 +216,7 @@ parmId          : ID
                 | ID LBRACK RBRACK
                     {
                         //ctrl+f not sure if parm needs its own class 
-                        $$ = new IdNode($1->lineNum, $1->str, false);
+                        $$ = new IdNode($1->lineNum, $1->str, true);
                     }
                 ;
 
@@ -619,7 +619,10 @@ mutable         : ID
                     }
                 | ID LBRACK exp RBRACK
                     {
-                        $$ = new IdNode($1->lineNum, $1->str, true);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Index);
+                        ASTNode* id = new IdNode($1->lineNum, $1->str, true);
+                        $$->addChild(id);
+                        $$->addChild($3);
                     }
                 ;
 
@@ -699,7 +702,6 @@ int main(int argc, char** argv)
 
     if (options.ispFlag() && root != nullptr)
     {
-        std::cout << "PRINTING THE ROOT" << std::endl;
         root->print();
     }
 

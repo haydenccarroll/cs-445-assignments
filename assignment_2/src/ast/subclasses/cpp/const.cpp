@@ -44,3 +44,24 @@ m_boolValue(false),
 m_stringValue(value)
 {
 }
+
+void ConstNode::printNode()
+{
+    std::cout << "Const ";
+    std::cout << std::boolalpha;
+    switch(m_constType)
+    {
+    case ConstType::Bool:
+        std::cout << m_boolValue;
+        break;
+    case ConstType::Int:
+        std::cout << m_intValue;
+        break;
+    case ConstType::Char:
+        std::cout << m_charValue;
+        break;
+    case ConstType::String:
+        std::cout << m_stringValue;
+        break;
+    }
+}

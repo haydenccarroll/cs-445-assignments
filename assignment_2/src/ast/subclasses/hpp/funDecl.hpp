@@ -7,6 +7,7 @@ class FunDeclNode : public ASTNode
 {
 public:
     FunDeclNode(unsigned int lineNum, std::string funcName, DataType returnType);
+    void printNode();
 
 private:
     std::string m_funcName;

@@ -8,3 +8,8 @@ AssignOpNode::AssignOpNode(unsigned int lineNum, AssignOpType type)
 m_assignOpType(type)
 {
 }
+
+void AssignOpNode::printNode()
+{
+    std::cout << "Assign: " << assignOpTypeToStr(m_assignOpType);
+}

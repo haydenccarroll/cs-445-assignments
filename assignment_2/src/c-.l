@@ -102,6 +102,7 @@ int passToken(int tokenClass)
     {
     case ID:
         yylval.tokenData->inputStr = yytext;
+        yylval.tokenData->str = yytext;
         break;
     case NUMCONST:
         yylval.tokenData->inputStr = yytext;

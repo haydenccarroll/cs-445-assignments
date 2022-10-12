@@ -17,3 +17,4 @@
 #include "subclasses/hpp/return.hpp"
 #include "subclasses/hpp/unaryOp.hpp"
 #include "subclasses/hpp/while.hpp"
+#include "subclasses/hpp/varDecl.hpp"

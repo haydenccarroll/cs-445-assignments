@@ -41,11 +41,6 @@ void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl)
     }
 }
 
-void ASTNode::printNode()
-{
-    std::cout << "Generic node";
-}
-
 void ASTNode::addChild(ASTNode* child)
 {
     m_children.push_back(child);

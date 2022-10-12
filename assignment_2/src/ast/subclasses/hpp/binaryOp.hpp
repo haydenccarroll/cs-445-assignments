@@ -7,6 +7,7 @@ class BinaryOpNode : public ASTNode
 {
 public:
     BinaryOpNode(unsigned int lineNum, BinaryOpType type);
+    void printNode();
 
 
 

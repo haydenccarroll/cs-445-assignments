@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 #define AST_PRINT_INDENT_STR ".   "
 
@@ -11,12 +12,11 @@ public:
     void print(unsigned int indentLevel=0, int siblingLvl=0, int childLvl=-1);
     void addChild(ASTNode* child);
     void addSibling(ASTNode* sibling);
-    void printNode();
+    virtual void printNode() { std::cout << "base node"; };
     unsigned int getLineNum() { return m_lineNum; };
 
-private:
+protected:
     std::vector<ASTNode*> m_children;
     ASTNode* m_sibling;
-    std::string m_name;
     unsigned int m_lineNum;
 };
