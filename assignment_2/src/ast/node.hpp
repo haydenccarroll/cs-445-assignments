@@ -8,7 +8,7 @@
 class ASTNode {
 public:
     ASTNode(unsigned int lineNum);
-    void print(unsigned int indentLevel = 0);
+    void print(unsigned int indentLevel = 0, std::string startingStr="");
     void printRoot();
     void addChild(ASTNode* child);
     void addSibling(ASTNode* sibling);

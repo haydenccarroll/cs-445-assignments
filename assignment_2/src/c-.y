@@ -411,7 +411,7 @@ exp             : mutable assignop exp
                     {
                         $$ = $2;
                         $$->addChild($1);
-                        $$->addChild($2);
+                        $$->addChild($3);
                     }
                 | mutable INC
                     {
@@ -701,7 +701,8 @@ int main(int argc, char** argv)
 
     if (options.ispFlag() && root != nullptr)
     {
-        root->printRoot();
+        std::cout << "PRINTING THE ROOT" << std::endl;
+        root->print();
     }
 
     return EXIT_SUCCESS;

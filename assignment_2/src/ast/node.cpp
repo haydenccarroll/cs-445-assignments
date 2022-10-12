@@ -22,28 +22,28 @@ void ASTNode::printRoot()
     }
 }
 
-void ASTNode::print(unsigned int indentLevel)
+void ASTNode::print(unsigned int indentLevel, std::string startingStr)
 {
     std::string localIndentLevel = "";
     for (int i=0; i < indentLevel; i++)
     {
-        // localIndentLevel += AST_PRINT_INDENT_STR;
+        localIndentLevel += AST_PRINT_INDENT_STR;
     }
-    std::cout << localIndentLevel << "HERE WE HAVE A NODE at line:" << m_lineNum << std::endl;
+    std::cout << localIndentLevel << startingStr << "node [line: " << m_lineNum << "]\n";
     
     // print children
     for (unsigned int i=0; i < m_children.size(); i++)
     {
         if (m_children[i] != nullptr)
         {
-            m_children[i]->print(indentLevel + 1);
+            m_children[i]->print(indentLevel + 1, "Child: 0  ");
         }
     }
 
     // print siblings
     if (m_sibling != nullptr)
     {
-        m_sibling->print(indentLevel);
+        m_sibling->print(indentLevel, "Sibling: 0  ");
     }
 }
 
@@ -54,12 +54,11 @@ void ASTNode::addChild(ASTNode* child)
 
 void ASTNode::addSibling(ASTNode* sibling)
 {
-    auto currNode = this;
+    ASTNode* currNode = this;
     while (currNode->m_sibling != nullptr)
     {
         currNode = currNode->m_sibling;
     }
 
     currNode->m_sibling = sibling;
-
 }
