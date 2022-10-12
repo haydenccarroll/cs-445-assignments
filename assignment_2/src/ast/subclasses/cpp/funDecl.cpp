@@ -1,7 +1,7 @@
 #include "../hpp/funDecl.hpp"
 
 #include "../../node.hpp"
-#include "../../../types.hpp"
+#include "../../../types/types.hpp"
 
 #include <string>
 #include <iostream>
@@ -15,5 +15,6 @@ m_returnType(returnType)
 
 void FunDeclNode::printNode()
 {
-    std::cout << "Func: " << m_funcName << " returns type " << dataTypeToStr(m_returnType);
+    std::cout << "Func: " << m_funcName << " returns ";
+    m_returnType.print(false);
 }

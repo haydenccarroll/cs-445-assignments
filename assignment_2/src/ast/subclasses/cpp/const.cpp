@@ -1,7 +1,7 @@
 #include "../hpp/const.hpp"
 
 #include "../../node.hpp"
-#include "../../../types.hpp"
+#include "../../../types/types.hpp"
 
 #include <string>
 
@@ -58,10 +58,10 @@ void ConstNode::printNode()
         std::cout << m_intValue;
         break;
     case ConstType::Char:
-        std::cout << m_charValue;
+        std::cout << "'" << m_charValue << "'";
         break;
     case ConstType::String:
-        std::cout << m_stringValue;
+        std::cout << "\"" << m_stringValue << "\"";
         break;
     }
 }

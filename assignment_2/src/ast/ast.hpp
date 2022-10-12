@@ -18,3 +18,4 @@
 #include "subclasses/hpp/unaryOp.hpp"
 #include "subclasses/hpp/while.hpp"
 #include "subclasses/hpp/varDecl.hpp"
+#include "subclasses/hpp/param.hpp"

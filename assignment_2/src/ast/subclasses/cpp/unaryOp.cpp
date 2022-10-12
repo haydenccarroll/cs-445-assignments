@@ -1,7 +1,8 @@
 #include "../hpp/unaryOp.hpp"
 
 #include "../../node.hpp"
-#include "../../../types.hpp"
+#include "../../../types/types.hpp"
+
 #include <string>
 
 UnaryOpNode::UnaryOpNode(unsigned int lineNum, UnaryOpType type) 

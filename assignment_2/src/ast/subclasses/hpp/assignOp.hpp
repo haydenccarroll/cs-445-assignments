@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../node.hpp"
-#include "../../../types.hpp"
+#include "../../../types/types.hpp"
 
 class AssignOpNode : public ASTNode
 {

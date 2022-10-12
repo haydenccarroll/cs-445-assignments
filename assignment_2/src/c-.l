@@ -1,7 +1,7 @@
 %{
 
 // C++ headers and stuff
-#include "types.hpp" // must be included before c-.tab.h
+#include "types/types.hpp" // must be included before c-.tab.h
 #include "ast/ast.hpp"
 
 #include <iostream>
@@ -21,6 +21,7 @@ std::string processKeyword(std::string str);
 int processBoolConst(std::string str);
 char processCharConst(std::string str);
 std::string toUpper(std::string str);
+
 static int lineNum = 1;
 
 %}

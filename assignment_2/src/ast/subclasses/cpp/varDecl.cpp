@@ -1,19 +1,42 @@
 #include "../hpp/varDecl.hpp"
 
 #include "../../node.hpp"
-#include "../../../types.hpp"
+#include "../../../types/types.hpp"
 
 #include <string>
 #include <iostream>
 
-VarDeclNode::VarDeclNode(unsigned int lineNum, std::string varName, DataType type) :
+VarDeclNode::VarDeclNode(unsigned int lineNum, std::string varName, DataType type, bool isStatic) :
 ASTNode::ASTNode(lineNum),
 m_varName(varName),
-m_type(type)
+m_dataType(type),
+m_isStatic(isStatic)
 {
 }
 
 void VarDeclNode::printNode()
 {
-    std::cout << "Var: " << m_varName << " of type " << dataTypeToStr(m_type);
+    std::cout << "Var: " << m_varName << " ";
+    m_dataType.print(true, m_isStatic);
+}
+
+void VarDeclNode::setTypeSpec(DataTypeEnum type)
+{
+    m_dataType.setTypeSpec(type);
+    if (m_sibling != nullptr)
+    {
+        VarDeclNode* varDeclSibling = dynamic_cast<VarDeclNode*>(m_sibling);
+        // std::cout << "PRINTING DECL SIBLING " << varDeclSibling << std::endl;
+        varDeclSibling->setTypeSpec(type);
+    }
+}
+
+void VarDeclNode::setStatic(bool isStatic)
+{
+    m_isStatic = isStatic;
+    if (m_sibling != nullptr)
+    {
+        VarDeclNode* varDeclSibling = dynamic_cast<VarDeclNode*>(m_sibling);
+        varDeclSibling->setStatic(isStatic);
+    }
 }

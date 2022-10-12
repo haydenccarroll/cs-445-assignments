@@ -1,7 +1,7 @@
 %{
 // C++ header stuff
 #include "options/options.hpp"
-#include "types.hpp" // must be included before tab.h
+#include "types/types.hpp" // must be included before tab.h
 #include "ast/ast.hpp"
 
 #include <iostream>
@@ -23,7 +23,7 @@ ASTNode* root = nullptr;
 %union {
     TokenData* tokenData;
     ASTNode* node;
-    DataType dataType;
+    DataTypeEnum simpleDataType;
 }
 
 %define parse.error verbose
@@ -36,7 +36,7 @@ ASTNode* root = nullptr;
 %token <tokenData> LCURL RCURL INC DEC ASS ADDASS SUBASS MULASS DIVASS PERCENT
 %token <tokenData> LT LEQ GT GEQ EQ NEQ PLUS DASH SLASH ASTERISK QUESTION
 
-%type <dataType> typeSpec
+%type <simpleDataType> typeSpec
 
 %type <node> program declList decl varDecl scopedVarDecl varDeclList
 %type <node> varDeclInit varDeclId  funDecl parms parmList parmTypeList parmIdList
@@ -80,7 +80,9 @@ decl            : varDecl
 varDecl         : typeSpec varDeclList SEMICOLON
                     {
                         $$ = $2;
-                        //ctrl+f not done, need to add below
+                        VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($$);
+                        declNode->setTypeSpec($1);                       
+                         //ctrl+f not done, need to add below
                         // $$.addTypeSpec(typeSpec.type) for it and its siblings
                     }
                 ;
@@ -88,16 +90,15 @@ varDecl         : typeSpec varDeclList SEMICOLON
 scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
                     {
                         $$ = $3;
-                        //ctrl+f also need to be able to add static or not
-                        //ctrl+f not done, need to implement below.
-                        // $$.addType(typeSpec.type) for all siblings
-                        // $$.addStatic(true) for all siblings
+                        VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($$);
+                        declNode->setStatic(true);
+                        declNode->setTypeSpec($2); 
                     }
                 | typeSpec varDeclList SEMICOLON
                     {
                         $$ = $2;
-                        //ctrl+f not done, need to implement below.
-                        // $$.addType(typeSpec.type) for all siblings
+                        VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($2);
+                        declNode->setTypeSpec($1);
                     }
                 ;
 
@@ -119,43 +120,48 @@ varDeclInit     : varDeclId
                 | varDeclId COLON simpleExp
                     {
                         $$ = $1;
-                        $$->addSibling($3);
+                        $$->addChild($3);
                     }
                 ;
 
 varDeclId       : ID
                     {
-                        $$ = new VarDeclNode($1->lineNum, $1->str, DataType::Void);
+                        DataType dataType = DataType(DataTypeEnum::Void);
+
+                        $$ = new VarDeclNode($1->lineNum, $1->str, dataType);
                     }
                 | ID LBRACK NUMCONST RBRACK
                     {
-                        $$ = new VarDeclNode($1->lineNum, $1->str, DataType::Void);
+                        DataType dataType = DataType(DataTypeEnum::Void, true);
+                        $$ = new VarDeclNode($1->lineNum, $1->str, dataType);
                     }
                 ;
 
 typeSpec        : BOOL
                     {
-                        $$ = DataType::Bool;
+                        $$ = DataTypeEnum::Bool;
                     }
                 | CHAR
                     {
-                        $$ = DataType::Char;
+                        $$ = DataTypeEnum::Char;
                     }
                 | INT
                     {
-                        $$ = DataType::Int;
+                        $$ = DataTypeEnum::Int;
                     }
                 ;
 
 funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
                     {
-                        $$ = new FunDeclNode($2->lineNum, $2->str, $1);
+                        DataType dataType = DataType($1);
+                        $$ = new FunDeclNode($2->lineNum, $2->str, dataType);
                         $$->addChild($4);
                         $$->addChild($6);
                     }
                 | ID LPAREN parms RPAREN compoundStmt
                     {
-                        $$ = new FunDeclNode($1->lineNum, $1->str, DataType::Void);
+                        DataType dataType = DataType(DataTypeEnum::Void);
+                        $$ = new FunDeclNode($1->lineNum, $1->str, dataType);
                         $$->addChild($3);
                         $$->addChild($5);
                     }
@@ -184,10 +190,9 @@ parmList        : parmList SEMICOLON parmTypeList
 
 parmTypeList    : typeSpec parmIdList
                     {
-                        // this one is different. make a SIMPLE enum for typeSpec,
-                        //ctrl+f not finished! need to be able to set type for this and all siblings.
                         $$ = $2;
-                        // $$.setType(typeSpec.type (enum)) for itself and all siblings.
+                        ParamNode* param = dynamic_cast<ParamNode*>($$);
+                        param->setTypeSpec($1);
                     }
                 ;
 
@@ -210,13 +215,13 @@ parmIdList      : parmIdList COMMA parmId
 
 parmId          : ID
                     {
-                        //ctrl+f not sure if parm needs its own class
-                        $$ = new IdNode($1->lineNum, $1->str, false);
+                        DataType dataType = DataType(DataTypeEnum::Void);
+                        $$ = new ParamNode($1->lineNum, $1->str, dataType);
                     }
                 | ID LBRACK RBRACK
                     {
-                        //ctrl+f not sure if parm needs its own class 
-                        $$ = new IdNode($1->lineNum, $1->str, true);
+                        DataType dataType = DataType(DataTypeEnum::Void, true);
+                        $$ = new ParamNode($1->lineNum, $1->str, dataType);
                     }
                 ;
 
@@ -351,7 +356,8 @@ iterStmtOpen    : WHILE simpleExp DO openStmt
                 | FOR ID ASS iterRange DO openStmt
                     {
                         $$ = new ForNode($1->lineNum);
-                        ASTNode* id = new IdNode($2->lineNum, $2->str, false);
+                        DataType dataType = DataType(DataTypeEnum::Int);
+                        ASTNode* id = new VarDeclNode($2->lineNum, $2->str, dataType);
                         $$->addChild(id);
                         $$->addChild($4);
                         $$->addChild($6);
@@ -367,7 +373,8 @@ iterStmtClosed  : WHILE simpleExp DO closedStmt
                 | FOR ID ASS iterRange DO closedStmt
                     {
                         $$ = new ForNode($1->lineNum);
-                        ASTNode* id = new IdNode($2->lineNum, $2->str, false);
+                        DataType dataType = DataType(DataTypeEnum::Int);
+                        ASTNode* id = new VarDeclNode($2->lineNum, $2->str, dataType);
                         $$->addChild(id);
                         $$->addChild($4);
                         $$->addChild($6);
@@ -481,11 +488,8 @@ andExp          : andExp AND unaryRelExp
 
 unaryRelExp     : NOT unaryRelExp
                     {
-                        //ctrl+f this is not right! must have some way to negate.
-                        //       as shown below.
                         $$ = new UnaryOpNode($1->lineNum, UnaryOpType::Not);
                         $$->addChild($2);
-                        // $$ = $2.negate(true)
                     }
                 | relExp
                     {
@@ -582,7 +586,7 @@ mulOp           : ASTERISK
 unaryExp        : unaryOp unaryExp
                     {
                         $$ = $1;
-                        $$->addSibling($2);
+                        $$->addChild($2);
                     }
                 | factor
                     {

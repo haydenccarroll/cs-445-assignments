@@ -18,9 +18,12 @@ OPTIONSRCS = options/*.cpp
 ASTHDRS = ast/subclasses/hpp/*.hpp ast/ast.hpp ast/node.hpp
 ASTSRCS = ast/node.cpp ast/subclasses/cpp/*.cpp
 
+TYPESHDRS = types/hpp/*.hpp types/types.hpp
+TYPESSRC = types/cpp/*.cpp
 
-HDRS = types.hpp $(OPTIONHDRS) $(ASTHDRS)
-SRCS = $(OPTIONSRCS) $(ASTSRCS)
+
+HDRS = $(OPTIONHDRS) $(ASTHDRS) $(TYPESHDRS)
+SRCS = $(OPTIONSRCS) $(ASTSRCS) $(TYPESSRC)
 
 PRJ = c-
 
@@ -37,7 +40,7 @@ tar: $(SRCS) $(HDRS) makefile
 	tar -cvf $(PRJ).tar $(SRCS) $(HDRS) makefile
 
 $(BISONCPPS): $(BISONSRCS)
-	$(BISON) $(BISONFLAGS) $(PRJ).y
+	$(BISON) $(BISONFLAGS) $(BISONSRCS)
 
 $(FLEXCPPS): $(FLEXSRCS) $(BISONCPPS) $(BISONHDRS)
-	$(FLEX) $(FLEXFLAGS) $(PRJ).l
+	$(FLEX) $(FLEXFLAGS) $(FLEXSRCS)
