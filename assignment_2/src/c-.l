@@ -25,7 +25,6 @@ static int lineNum = 1;
 
 %}
 %option noyywrap
-%option yylineno
 %%
 
 \/\/[^\n]*                        {} // ignore comments
@@ -34,52 +33,52 @@ static int lineNum = 1;
 
 true|false                        { return passToken(BOOLCONST); }
 
-"bool"   { return BOOL; }
-"char"   { return CHAR; }
-"int"    { return INT; }
-"if"     { return IF; }
-"then"   { return THEN; }
-"else"   { return ELSE; }
-"while"  { return WHILE; }
-"do"     { return DO; }
-"for"    { return FOR; }
-"to"     { return TO; }
-"by"     { return BY; }
-"return" { return RETURN; }
-"break"  { return BREAK; }
-"or"     { return OR; }
-"and"    { return AND; }
-"not"    { return NOT; }
-"static" { return STATIC; }
+"bool"   { return passToken(BOOL); }
+"char"   { return passToken(CHAR); }
+"int"    { return passToken(INT); }
+"if"     { return passToken(IF); }
+"then"   { return passToken(THEN); }
+"else"   { return passToken(ELSE); }
+"while"  { return passToken(WHILE); }
+"do"     { return passToken(DO); }
+"for"    { return passToken(FOR); }
+"to"     { return passToken(TO); }
+"by"     { return passToken(BY); }
+"return" { return passToken(RETURN); }
+"break"  { return passToken(BREAK); }
+"or"     { return passToken(OR); }
+"and"    { return passToken(AND); }
+"not"    { return passToken(NOT); }
+"static" { return passToken(STATIC); }
 
-";"  { return SEMICOLON; }
-","  { return COMMA; }
-":"  { return COLON; }
-"["  { return LBRACK; }
-"]"  { return RBRACK; }
-"("  { return LPAREN; }
-")"  { return RPAREN; }
-"{"  { return LCURL; }
-"}"  { return RCURL; }
-"++" { return INC; }
-"--" { return DEC; }
-"="  { return ASS; }
-"+=" { return ADDASS; }
-"-=" { return SUBASS; }
-"*=" { return MULASS; }
-"/=" { return DIVASS; }
-"%"  { return PERCENT; }
-"<"  { return LT; }
-">"  { return GT; }
-">=" { return GEQ; }
-"<=" { return LEQ; }
-"==" { return EQ; }
-"!=" { return NEQ; }
-"+"  { return PLUS; }
-"-"  { return DASH; }
-"/"  { return SLASH; }
-"*"  { return ASTERISK; }
-"?"  { return QUESTION; }
+";"  { return passToken(SEMICOLON); }
+","  { return passToken(COMMA); }
+":"  { return passToken(COLON); }
+"["  { return passToken(LBRACK); }
+"]"  { return passToken(RBRACK); }
+"("  { return passToken(LPAREN); }
+")"  { return passToken(RPAREN); }
+"{"  { return passToken(LCURL); }
+"}"  { return passToken(RCURL); }
+"++" { return passToken(INC); }
+"--" { return passToken(DEC); }
+"="  { return passToken(ASS); }
+"+=" { return passToken(ADDASS); }
+"-=" { return passToken(SUBASS); }
+"*=" { return passToken(MULASS); }
+"/=" { return passToken(DIVASS); }
+"%"  { return passToken(PERCENT); }
+"<"  { return passToken(LT); }
+">"  { return passToken(GT); }
+">=" { return passToken(GEQ); }
+"<=" { return passToken(LEQ); }
+"==" { return passToken(EQ); }
+"!=" { return passToken(NEQ); }
+"+"  { return passToken(PLUS); }
+"-"  { return passToken(DASH); }
+"/"  { return passToken(SLASH); }
+"*"  { return passToken(ASTERISK); }
+"?"  { return passToken(QUESTION); }
 
 [A-Za-z][A-Za-z0-9]*              { return passToken(ID); }
 

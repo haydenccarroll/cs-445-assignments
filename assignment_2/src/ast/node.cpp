@@ -1,7 +1,7 @@
 #include "node.hpp"
 
 #include <iostream>
-
+#include <sstream>
 
 ASTNode::ASTNode(unsigned int lineNum)
 {
@@ -9,42 +9,41 @@ ASTNode::ASTNode(unsigned int lineNum)
     m_sibling = nullptr;
 }
 
-void ASTNode::printRoot()
+void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl)
 {
-    // not supposed to print itself, and it doesnt have a sibling.
-    for (int i = 0; i < m_children.size(); i++)
-    {
-        std::cout << "siez:" << m_children.size() << std::endl;
-        if (m_children[i] != nullptr)
-        {
-            m_children[i]->print();
-        }
-    }
-}
-
-void ASTNode::print(unsigned int indentLevel, std::string startingStr)
-{
-    std::string localIndentLevel = "";
     for (int i=0; i < indentLevel; i++)
     {
-        localIndentLevel += AST_PRINT_INDENT_STR;
+        std::cout << AST_PRINT_INDENT_STR;
     }
-    std::cout << localIndentLevel << startingStr << "node [line: " << m_lineNum << "]\n";
+    if (siblingLvl != 0)
+    {
+        std::cout << "Sibling: " << siblingLvl << "  ";
+    } else if (childLvl != -1)
+    {
+        std::cout << "Child: " << childLvl << "  ";
+    }
+    printNode();
+    std::cout << " [line: " << m_lineNum << "]\n";
     
     // print children
     for (unsigned int i=0; i < m_children.size(); i++)
     {
         if (m_children[i] != nullptr)
         {
-            m_children[i]->print(indentLevel + 1, "Child: 0  ");
+            m_children[i]->print(indentLevel + 1, 0, i);
         }
     }
 
     // print siblings
     if (m_sibling != nullptr)
     {
-        m_sibling->print(indentLevel, "Sibling: 0  ");
+        m_sibling->print(indentLevel, siblingLvl + 1);
     }
+}
+
+void ASTNode::printNode()
+{
+    std::cout << "Generic node";
 }
 
 void ASTNode::addChild(ASTNode* child)

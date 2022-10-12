@@ -15,7 +15,6 @@ extern int yylex();
 void yyerror(std::string msg) {std::cout << msg << std::endl;};
 extern FILE* yyin;
 extern int yydebug;
-extern int yylineno;
 
 ASTNode* root = nullptr;
 
@@ -126,11 +125,11 @@ varDeclInit     : varDeclId
 
 varDeclId       : ID
                     {
-                        $$ = new IdNode(yylineno, $1->str, false);
+                        $$ = new IdNode($1->lineNum, $1->str, false);
                     }
                 | ID LBRACK NUMCONST RBRACK
                     {
-                        $$ = new IdNode(yylineno, $1->str, true, $3->num);
+                        $$ = new IdNode($1->lineNum, $1->str, true, $3->num);
                     }
                 ;
 
@@ -150,13 +149,13 @@ typeSpec        : BOOL
 
 funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
                     {
-                        $$ = new FunDeclNode(yylineno, $2->str, $1);
+                        $$ = new FunDeclNode($2->lineNum, $2->str, $1);
                         $$->addChild($4);
                         $$->addChild($6);
                     }
                 | ID LPAREN parms RPAREN compoundStmt
                     {
-                        $$ = new FunDeclNode(yylineno, $1->str, DataType::None);
+                        $$ = new FunDeclNode($1->lineNum, $1->str, DataType::None);
                         $$->addChild($3);
                         $$->addChild($5);
                     }
@@ -212,12 +211,12 @@ parmIdList      : parmIdList COMMA parmId
 parmId          : ID
                     {
                         //ctrl+f not sure if parm needs its own class
-                        $$ = new IdNode(yylineno, $1->str, false);
+                        $$ = new IdNode($1->lineNum, $1->str, false);
                     }
                 | ID LBRACK RBRACK
                     {
                         //ctrl+f not sure if parm needs its own class 
-                        $$ = new IdNode(yylineno, $1->str, false);
+                        $$ = new IdNode($1->lineNum, $1->str, false);
                     }
                 ;
 
@@ -279,7 +278,7 @@ expStmt         : exp SEMICOLON
 
 compoundStmt    : LCURL localDecls stmtList RCURL
                     {
-                        $$ = new CompoundStmtNode(yylineno);
+                        $$ = new CompoundStmtNode($1->lineNum);
                         $$->addChild($2);
                         $$->addChild($3);
                     }
@@ -321,13 +320,13 @@ stmtList        : stmtList stmt
 
 selectStmtOpen  : IF simpleExp THEN stmt
                     {
-                        $$ = new IfNode(yylineno);
+                        $$ = new IfNode($1->lineNum);
                         $$->addChild($2);
                         $$->addChild($4);
                     }
                 | IF simpleExp THEN closedStmt ELSE openStmt
                     {
-                        $$ = new IfNode(yylineno);
+                        $$ = new IfNode($1->lineNum);
                         $$->addChild($2);
                         $$->addChild($4);
                         $$->addChild($6);
@@ -336,7 +335,7 @@ selectStmtOpen  : IF simpleExp THEN stmt
 
 selectStmtClosed: IF simpleExp THEN closedStmt ELSE closedStmt
                     {
-                        $$ = new IfNode(yylineno);
+                        $$ = new IfNode($1->lineNum);
                         $$->addChild($2);
                         $$->addChild($4);
                         $$->addChild($6);
@@ -345,14 +344,14 @@ selectStmtClosed: IF simpleExp THEN closedStmt ELSE closedStmt
 
 iterStmtOpen    : WHILE simpleExp DO openStmt
                     {
-                        $$ = new WhileNode(yylineno);
+                        $$ = new WhileNode($1->lineNum);
                         $$->addChild($2);
                         $$->addChild($4);
                     }
                 | FOR ID ASS iterRange DO openStmt
                     {
-                        $$ = new ForNode(yylineno);
-                        ASTNode* id = new IdNode(yylineno, $2->str, false);
+                        $$ = new ForNode($1->lineNum);
+                        ASTNode* id = new IdNode($2->lineNum, $2->str, false);
                         $$->addChild(id);
                         $$->addChild($4);
                         $$->addChild($6);
@@ -361,14 +360,14 @@ iterStmtOpen    : WHILE simpleExp DO openStmt
 
 iterStmtClosed  : WHILE simpleExp DO closedStmt
                     {
-                        $$ = new WhileNode(yylineno);
+                        $$ = new WhileNode($1->lineNum);
                         $$->addChild($2);
                         $$->addChild($4);
                     }
                 | FOR ID ASS iterRange DO closedStmt
                     {
-                        $$ = new ForNode(yylineno);
-                        ASTNode* id = new IdNode(yylineno, $2->str, false);
+                        $$ = new ForNode($1->lineNum);
+                        ASTNode* id = new IdNode($2->lineNum, $2->str, false);
                         $$->addChild(id);
                         $$->addChild($4);
                         $$->addChild($6);
@@ -377,13 +376,13 @@ iterStmtClosed  : WHILE simpleExp DO closedStmt
 
 iterRange       : simpleExp TO simpleExp
                     {
-                        $$ = new RangeNode(yylineno);
+                        $$ = new RangeNode($1->getLineNum());
                         $$->addChild($1);
                         $$->addChild($3);
                     }
                 | simpleExp TO simpleExp BY simpleExp
                     {
-                        $$ = new RangeNode(yylineno);
+                        $$ = new RangeNode($1->getLineNum());
                         $$->addChild($1);
                         $$->addChild($3);
                         $$->addChild($5);
@@ -392,18 +391,18 @@ iterRange       : simpleExp TO simpleExp
 
 returnStmt      : RETURN SEMICOLON 
                     {
-                        $$ = new ReturnNode(yylineno);
+                        $$ = new ReturnNode($1->lineNum);
                     }
                 | RETURN exp SEMICOLON
                     {
-                        $$ = new ReturnNode(yylineno);
+                        $$ = new ReturnNode($1->lineNum);
                         $$->addChild($2);
                     }
                 ;
 
 breakStmt       : BREAK SEMICOLON
                     {
-                        $$ = new BreakNode(yylineno);
+                        $$ = new BreakNode($1->lineNum);
                     }
                 ;
 
@@ -416,14 +415,14 @@ exp             : mutable assignop exp
                 | mutable INC
                     {
                         //ctrl+f not sure if this is right
-                        $$ = new AssignOpNode(yylineno, AssignOpType::INC);
+                        $$ = new AssignOpNode($1->getLineNum(), AssignOpType::INC);
                         $$->addChild($1);
 
                     }
                 | mutable DEC
                     {
                         //ctrl+f not sure if this is right
-                        $$ = new AssignOpNode(yylineno, AssignOpType::DEC);
+                        $$ = new AssignOpNode($1->getLineNum(), AssignOpType::DEC);
                         $$->addChild($1);
                     }
                 | simpleExp
@@ -434,30 +433,30 @@ exp             : mutable assignop exp
 
 assignop        : ASS
                     {
-                        $$ = new AssignOpNode(yylineno, AssignOpType::ASS);
+                        $$ = new AssignOpNode($1->lineNum, AssignOpType::ASS);
                     }
                 | ADDASS
                     {
-                        $$ = new AssignOpNode(yylineno, AssignOpType::ADDASS);
+                        $$ = new AssignOpNode($1->lineNum, AssignOpType::ADDASS);
                     }
                 | SUBASS
                     {
-                        $$ = new AssignOpNode(yylineno, AssignOpType::SUBASS);
+                        $$ = new AssignOpNode($1->lineNum, AssignOpType::SUBASS);
                     }
                 | MULASS
                     {
-                        $$ = new AssignOpNode(yylineno, AssignOpType::MULASS);
+                        $$ = new AssignOpNode($1->lineNum, AssignOpType::MULASS);
                     }
                 | DIVASS
                     {
-                        $$ = new AssignOpNode(yylineno, AssignOpType::DIVASS);
+                        $$ = new AssignOpNode($1->lineNum, AssignOpType::DIVASS);
                     }
                 ;
 
 simpleExp       : simpleExp OR andExp
                     {
                         //ctrl+f not sure if this is right, maybe or should be its own node.
-                        $$ = new RelOpNode(yylineno, RelOpType::Or);
+                        $$ = new RelOpNode($1->getLineNum(), RelOpType::Or);
                         $$->addChild($1);
                         $$->addChild($3);
                     }
@@ -470,7 +469,7 @@ simpleExp       : simpleExp OR andExp
 andExp          : andExp AND unaryRelExp
                     {
                         //ctrl+f not sure if this is right, maybe and should be its own node.
-                        $$ = new RelOpNode(yylineno, RelOpType::And);
+                        $$ = new RelOpNode($1->getLineNum(), RelOpType::And);
                         $$->addChild($1);
                         $$->addChild($3);
                     }
@@ -507,27 +506,27 @@ relExp          : sumExp relop sumExp
 
 relop           : LT
                     {
-                        $$ = new RelOpNode(yylineno, RelOpType::LT);
+                        $$ = new RelOpNode($1->lineNum, RelOpType::LT);
                     }
                 | LEQ
                     {
-                        $$ = new RelOpNode(yylineno, RelOpType::LEQ);
+                        $$ = new RelOpNode($1->lineNum, RelOpType::LEQ);
                     }
                 | GT
                     {
-                        $$ = new RelOpNode(yylineno, RelOpType::GT);
+                        $$ = new RelOpNode($1->lineNum, RelOpType::GT);
                     }
                 | GEQ
                     {
-                        $$ = new RelOpNode(yylineno, RelOpType::GEQ);
+                        $$ = new RelOpNode($1->lineNum, RelOpType::GEQ);
                     }
                 | EQ
                     {
-                        $$ = new RelOpNode(yylineno, RelOpType::EQ);
+                        $$ = new RelOpNode($1->lineNum, RelOpType::EQ);
                     }
                 | NEQ
                     {
-                        $$ = new RelOpNode(yylineno, RelOpType::NEQ);
+                        $$ = new RelOpNode($1->lineNum, RelOpType::NEQ);
                     }
                 ;
 
@@ -545,11 +544,11 @@ sumExp          : sumExp sumOp mulExp
 
 sumOp           : PLUS
                     {
-                        $$ = new BinaryOpNode(yylineno, BinaryOpType::Add);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Add);
                     }
                 | DASH
                     {
-                        $$ = new BinaryOpNode(yylineno, BinaryOpType::Sub);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Sub);
                     }
                 ;
 
@@ -567,15 +566,15 @@ mulExp          : mulExp mulOp unaryExp
 
 mulOp           : ASTERISK
                     {
-                        $$ = new BinaryOpNode(yylineno, BinaryOpType::Mul);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Mul);
                     }
                 | SLASH
                     {
-                        $$ = new BinaryOpNode(yylineno, BinaryOpType::Div);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Div);
                     }
                 | PERCENT
                     {
-                        $$ = new BinaryOpNode(yylineno, BinaryOpType::Mod);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Mod);
                     }
                 ;
 
@@ -592,15 +591,15 @@ unaryExp        : unaryOp unaryExp
 
 unaryOp         : DASH 
                     {
-                        $$ = new UnaryOpNode(yylineno, UnaryOpType::Chsign);
+                        $$ = new UnaryOpNode($1->lineNum, UnaryOpType::Chsign);
                     }
                 | ASTERISK
                     {
-                        $$ = new UnaryOpNode(yylineno, UnaryOpType::SizeOf);
+                        $$ = new UnaryOpNode($1->lineNum, UnaryOpType::SizeOf);
                     }
                 | QUESTION
                     {
-                        $$ = new UnaryOpNode(yylineno, UnaryOpType::Question);
+                        $$ = new UnaryOpNode($1->lineNum, UnaryOpType::Question);
                     }
                 ;
 
@@ -616,11 +615,11 @@ factor          : mutable
 
 mutable         : ID
                     {
-                        $$ = new IdNode(yylineno, $1->str, false);
+                        $$ = new IdNode($1->lineNum, $1->str, false);
                     }
                 | ID LBRACK exp RBRACK
                     {
-                        $$ = new IdNode(yylineno, $1->str, true);
+                        $$ = new IdNode($1->lineNum, $1->str, true);
                     }
                 ;
 
@@ -640,9 +639,8 @@ immutable       : LPAREN exp RPAREN
 
 call            : ID LPAREN args RPAREN
                     {
-                        $$ = new CallNode(yylineno, $1->str);
+                        $$ = new CallNode($1->lineNum, $1->str);
                         $$->addChild($3);
-                        // a bit more complex i think, not sure
                     }
                 ;
 
@@ -669,20 +667,20 @@ argList         : argList COMMA exp
 
 constant        : NUMCONST
                     {
-                        $$ = new ConstNode(yylineno, ConstType::Int, $1->num);
+                        $$ = new ConstNode($1->lineNum, ConstType::Int, $1->num);
                     }
                 | BOOLCONST
                     {
-                        $$ = new ConstNode(yylineno, ConstType::Bool, ($1->num == 1));
+                        $$ = new ConstNode($1->lineNum, ConstType::Bool, ($1->num == 1));
                     }
                 | CHARCONST
                     {
-                        $$ = new ConstNode(yylineno, ConstType::Char, $1->charV);
+                        $$ = new ConstNode($1->lineNum, ConstType::Char, $1->charV);
                     }
                 
                 | STRINGCONST
                     {
-                        $$ = new ConstNode(yylineno, ConstType::String, $1->str);
+                        $$ = new ConstNode($1->lineNum, ConstType::String, $1->str);
                     }
                 ;
 %%
