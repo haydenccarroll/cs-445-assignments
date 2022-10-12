@@ -15,12 +15,12 @@ BISONHDRS = $(PRJ).tab.h
 OPTIONHDRS = options/*.hpp
 OPTIONSRCS = options/*.cpp
 
-ASTHDRS = ast/*.hpp
-ASTSRCS = ast/*.cpp
+ASTHDRS = ast/subclasses/hpp/*.hpp ast/ast.hpp ast/node.hpp
+ASTSRCS = ast/node.cpp ast/subclasses/cpp/*.cpp
 
 
-HDRS = types.hpp $(OPTIONHDRS) $(ASTHDRS) ast/*/*.cpp
-SRCS = $(OPTIONSRCS) $(ASTSRCS) ast/*/*.cpp
+HDRS = types.hpp $(OPTIONHDRS) $(ASTHDRS)
+SRCS = $(OPTIONSRCS) $(ASTSRCS)
 
 PRJ = c-
 

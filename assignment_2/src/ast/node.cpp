@@ -12,9 +12,13 @@ ASTNode::ASTNode(unsigned int lineNum)
 void ASTNode::printRoot()
 {
     // not supposed to print itself, and it doesnt have a sibling.
-    for (auto child : m_children)
+    for (int i = 0; i < m_children.size(); i++)
     {
-        child->print();
+        std::cout << "siez:" << m_children.size() << std::endl;
+        if (m_children[i] != nullptr)
+        {
+            m_children[i]->print();
+        }
     }
 }
 
@@ -23,14 +27,17 @@ void ASTNode::print(unsigned int indentLevel)
     std::string localIndentLevel = "";
     for (int i=0; i < indentLevel; i++)
     {
-        localIndentLevel += AST_PRINT_INDENT_STR;
+        // localIndentLevel += AST_PRINT_INDENT_STR;
     }
-    std::cout << localIndentLevel << "HERE WE HAVE A NODE\n";
+    std::cout << localIndentLevel << "HERE WE HAVE A NODE at line:" << m_lineNum << std::endl;
     
     // print children
-    for (auto child : m_children)
+    for (unsigned int i=0; i < m_children.size(); i++)
     {
-        child->print(indentLevel + 1);
+        if (m_children[i] != nullptr)
+        {
+            m_children[i]->print(indentLevel + 1);
+        }
     }
 
     // print siblings

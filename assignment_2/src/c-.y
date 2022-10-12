@@ -2,7 +2,7 @@
 // C++ header stuff
 #include "options/options.hpp"
 #include "types.hpp" // must be included before tab.h
-#include "ast/const/const.hpp"
+#include "ast/ast.hpp"
 
 #include <iostream>
 #include <string>
@@ -17,14 +17,14 @@ extern FILE* yyin;
 extern int yydebug;
 extern int yylineno;
 
-ASTNode* root = new ASTNode(0);
+ASTNode* root = nullptr;
 
 %}
 
 %union {
     TokenData* tokenData;
     ASTNode* node;
-    DataType* dataType;
+    DataType dataType;
 }
 
 %define parse.error verbose
@@ -52,15 +52,15 @@ ASTNode* root = new ASTNode(0);
 %%
 program         : declList 
                     {
-                        // $$ = $1;
-                        // root = $$;
+                        $$ = $1;
+                        root = $$;
                     }
                 ;
 
 declList        : declList decl
                     {
-                        // $$ = $1;
-                        // $$.addSibling($2)
+                        $$ = $1;
+                        $$->addSibling($2);
                     }
                 | decl
                     {
@@ -80,28 +80,32 @@ decl            : varDecl
 
 varDecl         : typeSpec varDeclList SEMICOLON
                     {
-                        // $$ = $2
+                        $$ = $2;
+                        //ctrl+f not done, need to add below
                         // $$.addTypeSpec(typeSpec.type) for it and its siblings
                     }
                 ;
 
 scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
                     {
-                        // $$ = $2
+                        $$ = $3;
+                        //ctrl+f also need to be able to add static or not
+                        //ctrl+f not done, need to implement below.
                         // $$.addType(typeSpec.type) for all siblings
                         // $$.addStatic(true) for all siblings
                     }
                 | typeSpec varDeclList SEMICOLON
                     {
-                        // $$ = $2
+                        $$ = $2;
+                        //ctrl+f not done, need to implement below.
                         // $$.addType(typeSpec.type) for all siblings
                     }
                 ;
 
 varDeclList     : varDeclList COMMA varDeclInit
                     {
-                        // $$ = $1;
-                        // $$.addSiblings($3)
+                        $$ = $1;
+                        $$->addSibling($3);
                     }
                 | varDeclInit
                     {
@@ -115,44 +119,46 @@ varDeclInit     : varDeclId
                     }
                 | varDeclId COLON simpleExp
                     {
-                        // $$ = $1;
-                        // $$.addSibling(simpleExp)
+                        $$ = $1;
+                        $$->addSibling($3);
                     }
                 ;
 
 varDeclId       : ID
                     {
-                        // $$ = new var node ($1.str)
+                        $$ = new IdNode(yylineno, $1->str, false);
                     }
                 | ID LBRACK NUMCONST RBRACK
                     {
-                        // new var node($1.str, isArray, $3)
+                        $$ = new IdNode(yylineno, $1->str, true, $3->num);
                     }
                 ;
 
 typeSpec        : BOOL
                     {
-                        // $$ = enum::bool
+                        $$ = DataType::Bool;
                     }
                 | CHAR
                     {
-                        // $$ = enum::char
+                        $$ = DataType::Char;
                     }
                 | INT
                     {
-                        // $$ = enum::int
+                        $$ = DataType::Int;
                     }
                 ;
 
 funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
                     {
-                        // newFunDeclNode($1.value, $2.str)
-                        // $$.addChildren(parms, compoundStmt)
+                        $$ = new FunDeclNode(yylineno, $2->str, $1);
+                        $$->addChild($4);
+                        $$->addChild($6);
                     }
                 | ID LPAREN parms RPAREN compoundStmt
                     {
-                        // newFunDeclNode(None (no primitive type), $1.str)
-                        // $$.addChildren(parms, compoundStmt)
+                        $$ = new FunDeclNode(yylineno, $1->str, DataType::None);
+                        $$->addChild($3);
+                        $$->addChild($5);
                     }
                 ;
 
@@ -168,8 +174,8 @@ parms           : parmList
 
 parmList        : parmList SEMICOLON parmTypeList
                     {
-                        // $$ = $1;
-                        // $$.addSiblings(// parmTypeList and all its siblings)
+                        $$ = $1;
+                        $$->addSibling($3);
                     }
                 | parmTypeList
                     {
@@ -180,15 +186,22 @@ parmList        : parmList SEMICOLON parmTypeList
 parmTypeList    : typeSpec parmIdList
                     {
                         // this one is different. make a SIMPLE enum for typeSpec,
-                        // $$ = $2
+                        //ctrl+f not finished! need to be able to set type for this and all siblings.
+                        $$ = $2;
                         // $$.setType(typeSpec.type (enum)) for itself and all siblings.
                     }
                 ;
 
 parmIdList      : parmIdList COMMA parmId
                     {
-                        // $$ = $1 if not null
-                        // $$.addsibling($3)
+                        if ($1 == nullptr)
+                        {
+                            $$ = $3;
+                        }
+                        else {
+                            $$ = $1;
+                            $$->addSibling($3);
+                        }
                     }
                 | parmId
                     {
@@ -198,11 +211,13 @@ parmIdList      : parmIdList COMMA parmId
 
 parmId          : ID
                     {
-                        // $$ = newParm(isArray = false, $$.str)
+                        //ctrl+f not sure if parm needs its own class
+                        $$ = new IdNode(yylineno, $1->str, false);
                     }
                 | ID LBRACK RBRACK
                     {
-                        // $$ = newParm(isArray = true, $$.str)
+                        //ctrl+f not sure if parm needs its own class 
+                        $$ = new IdNode(yylineno, $1->str, false);
                     }
                 ;
 
@@ -259,126 +274,157 @@ expStmt         : exp SEMICOLON
                 | SEMICOLON
                     {
                         $$ = nullptr;
-                        // set to nullptr
                     }
                 ;
 
 compoundStmt    : LCURL localDecls stmtList RCURL
                     {
-                        // $$ = newCompoundStmt()
-                        // $$.addChildren(2, 3)
+                        $$ = new CompoundStmtNode(yylineno);
+                        $$->addChild($2);
+                        $$->addChild($3);
                     }
                 ;
 
 localDecls      : localDecls scopedVarDecl
                     {
-                        // $$ = $1 if not nullptr
-                        // $$.addSibling($2)
+                        if ($1 == nullptr)
+                        {
+                            $$ = $2;
+                        }
+                        else {
+                            $$ = $1;
+                            $$->addSibling($2);
+                        }
                     }
                 |
                     {
                         $$ = nullptr;
-                        // do nothing or set to nullptr
                     }
                 ;
 
 stmtList        : stmtList stmt
                     {
-                        // $$ = $1 if not nullptr
-                        // $$.addSibling($2)
+                        if ($1 == nullptr)
+                        {
+                            $$ = $2;
+                        }
+                        else {
+                            $$ = $1;
+                            $$->addSibling($2);
+                        }
                     }
                 |
                     {
                         $$ = nullptr;
-                        // either nothing or set to nullptr
                     }
                 ;
 
 selectStmtOpen  : IF simpleExp THEN stmt
                     {
-                        // $$ = new if node (lineNum)
-                        // $$.addChildren($2, 4)
+                        $$ = new IfNode(yylineno);
+                        $$->addChild($2);
+                        $$->addChild($4);
                     }
                 | IF simpleExp THEN closedStmt ELSE openStmt
                     {
-                        // $$ = new if node (lineNum)
-                        // $$.addChildren($2, 4,6)
+                        $$ = new IfNode(yylineno);
+                        $$->addChild($2);
+                        $$->addChild($4);
+                        $$->addChild($6);
                     }
                 ;
 
 selectStmtClosed: IF simpleExp THEN closedStmt ELSE closedStmt
                     {
-                        // $$ = new if node (lineNum)
-                        // $$.addChildren($2, 4, 6)
+                        $$ = new IfNode(yylineno);
+                        $$->addChild($2);
+                        $$->addChild($4);
+                        $$->addChild($6);
                     }
                 ;
 
 iterStmtOpen    : WHILE simpleExp DO openStmt
                     {
-                        // $$ = NewWHILENode(lineNum)
-                        // $$.addChildren($2, 4)
+                        $$ = new WhileNode(yylineno);
+                        $$->addChild($2);
+                        $$->addChild($4);
                     }
                 | FOR ID ASS iterRange DO openStmt
                     {
-                        // $$ = NewForNode(lineNum)
-                        // $$.addChildren($2, 4, 6)
+                        $$ = new ForNode(yylineno);
+                        ASTNode* id = new IdNode(yylineno, $2->str, false);
+                        $$->addChild(id);
+                        $$->addChild($4);
+                        $$->addChild($6);
                     }
                 ;
 
 iterStmtClosed  : WHILE simpleExp DO closedStmt
                     {
-                        // $$ = NewWHILENode(lineNum)
-                        // $$.addChildren($2, 4)
+                        $$ = new WhileNode(yylineno);
+                        $$->addChild($2);
+                        $$->addChild($4);
                     }
                 | FOR ID ASS iterRange DO closedStmt
                     {
-                        // $$ = NewForNode(lineNum)
-                        // $$.addChildren($2, 4, 6)
+                        $$ = new ForNode(yylineno);
+                        ASTNode* id = new IdNode(yylineno, $2->str, false);
+                        $$->addChild(id);
+                        $$->addChild($4);
+                        $$->addChild($6);
                     }
                 ;
 
 iterRange       : simpleExp TO simpleExp
                     {
-                        // $$ = NewRangeNode(lineNum, $1, $3)
+                        $$ = new RangeNode(yylineno);
+                        $$->addChild($1);
+                        $$->addChild($3);
                     }
                 | simpleExp TO simpleExp BY simpleExp
                     {
-                        // $$ = NewRangeNode(lineNum, $1, $3, $5)
+                        $$ = new RangeNode(yylineno);
+                        $$->addChild($1);
+                        $$->addChild($3);
+                        $$->addChild($5);
                     }
                 ;
 
 returnStmt      : RETURN SEMICOLON 
                     {
-                        std::cout << "ADDED A CHILD\n"; root->addChild(new ASTNode(12));
-                        // $$ = RETURNNODE
+                        $$ = new ReturnNode(yylineno);
                     }
                 | RETURN exp SEMICOLON
                     {
-                        // $$ = RETURNNODE
-                        // $$.addChildren($2)
+                        $$ = new ReturnNode(yylineno);
+                        $$->addChild($2);
                     }
                 ;
 
 breakStmt       : BREAK SEMICOLON
                     {
-                        // $$ = BREAKNODE
+                        $$ = new BreakNode(yylineno);
                     }
                 ;
 
 exp             : mutable assignop exp
                     {
-                        // $$ = $2
-                        // $$.addChildren($1, $3)
+                        $$ = $2;
+                        $$->addChild($1);
+                        $$->addChild($2);
                     }
                 | mutable INC
                     {
-                        // $$ = IncrementNode
-                        // $$.addChildren($1)
+                        //ctrl+f not sure if this is right
+                        $$ = new AssignOpNode(yylineno, AssignOpType::INC);
+                        $$->addChild($1);
+
                     }
                 | mutable DEC
                     {
-                        // $$ = DecrementNode
-                        // $$.addChildren($1)
+                        //ctrl+f not sure if this is right
+                        $$ = new AssignOpNode(yylineno, AssignOpType::DEC);
+                        $$->addChild($1);
                     }
                 | simpleExp
                     {
@@ -388,30 +434,32 @@ exp             : mutable assignop exp
 
 assignop        : ASS
                     {
-                        // assignop(ASS)
+                        $$ = new AssignOpNode(yylineno, AssignOpType::ASS);
                     }
                 | ADDASS
                     {
-                        // assignop(ASS)
+                        $$ = new AssignOpNode(yylineno, AssignOpType::ADDASS);
                     }
                 | SUBASS
                     {
-                        // assignop(ASS)
+                        $$ = new AssignOpNode(yylineno, AssignOpType::SUBASS);
                     }
                 | MULASS
                     {
-                       // assignop(ASS)
+                        $$ = new AssignOpNode(yylineno, AssignOpType::MULASS);
                     }
                 | DIVASS
                     {
-                        // assignop(ASS)
+                        $$ = new AssignOpNode(yylineno, AssignOpType::DIVASS);
                     }
                 ;
 
 simpleExp       : simpleExp OR andExp
                     {
-                        // $$ = newsimpleOrExp
-                        // $$.addChlidren(1, 3)
+                        //ctrl+f not sure if this is right, maybe or should be its own node.
+                        $$ = new RelOpNode(yylineno, RelOpType::Or);
+                        $$->addChild($1);
+                        $$->addChild($3);
                     }
                 | andExp
                     {
@@ -421,8 +469,10 @@ simpleExp       : simpleExp OR andExp
 
 andExp          : andExp AND unaryRelExp
                     {
-                        // $$ = newNode
-                        // $1, $3 = newNode.children()
+                        //ctrl+f not sure if this is right, maybe and should be its own node.
+                        $$ = new RelOpNode(yylineno, RelOpType::And);
+                        $$->addChild($1);
+                        $$->addChild($3);
                     }
                 | unaryRelExp
                     {
@@ -432,6 +482,9 @@ andExp          : andExp AND unaryRelExp
 
 unaryRelExp     : NOT unaryRelExp
                     {
+                        //ctrl+f this is not right! must have some way to negate.
+                        //       as shown below.
+                        $$ = $2;
                         // $$ = $2.negate(true)
                     }
                 | relExp
@@ -442,7 +495,9 @@ unaryRelExp     : NOT unaryRelExp
 
 relExp          : sumExp relop sumExp
                     {
-                        // $$ = $2.addchlidren($1, $3)
+                        $$ = $2;
+                        $$->addChild($1);
+                        $$->addChild($3);
                     }
                 | sumExp
                     {
@@ -452,33 +507,35 @@ relExp          : sumExp relop sumExp
 
 relop           : LT
                     {
-                        // $$ = newRelopNode(LT)
+                        $$ = new RelOpNode(yylineno, RelOpType::LT);
                     }
                 | LEQ
                     {
-                        // $$ = newRelopNode(LEQ)
+                        $$ = new RelOpNode(yylineno, RelOpType::LEQ);
                     }
                 | GT
                     {
-                        // $$ = newRelopNode(GT)
+                        $$ = new RelOpNode(yylineno, RelOpType::GT);
                     }
                 | GEQ
                     {
-                        // $$ = newRelopNode(GEQ)
+                        $$ = new RelOpNode(yylineno, RelOpType::GEQ);
                     }
                 | EQ
                     {
-                        // $$ = newRelopNode(EQ)
+                        $$ = new RelOpNode(yylineno, RelOpType::EQ);
                     }
                 | NEQ
                     {
-                        // $$ = newRelopNode(NEQ)
+                        $$ = new RelOpNode(yylineno, RelOpType::NEQ);
                     }
                 ;
 
 sumExp          : sumExp sumOp mulExp
                     {
-                        // $$ = $2.addchildren($1, $3)
+                        $$ = $2;
+                        $$->addChild($1);
+                        $$->addChild($3);
                     }
                 | mulExp
                     {
@@ -488,18 +545,19 @@ sumExp          : sumExp sumOp mulExp
 
 sumOp           : PLUS
                     {
-                        // $$ = newBoolOpNode(plus)
+                        $$ = new BinaryOpNode(yylineno, BinaryOpType::Add);
                     }
                 | DASH
                     {
-                        // $$ = newBoolOpNode(minus)
+                        $$ = new BinaryOpNode(yylineno, BinaryOpType::Sub);
                     }
                 ;
 
 mulExp          : mulExp mulOp unaryExp
                     {
-                        // $2.addChild($1, $3)
-                        // $$ = $2;
+                        $$ = $2;
+                        $$->addChild($1);
+                        $$->addChild($3);
                     }
                 | unaryExp
                     {
@@ -509,22 +567,22 @@ mulExp          : mulExp mulOp unaryExp
 
 mulOp           : ASTERISK
                     {
-                        // $$ = newBinaryOpNode()
+                        $$ = new BinaryOpNode(yylineno, BinaryOpType::Mul);
                     }
                 | SLASH
                     {
-                        // $$ = newBinaryOpNode()
+                        $$ = new BinaryOpNode(yylineno, BinaryOpType::Div);
                     }
                 | PERCENT
                     {
-                        // $$ = newBinaryOpNode()
+                        $$ = new BinaryOpNode(yylineno, BinaryOpType::Mod);
                     }
                 ;
 
 unaryExp        : unaryOp unaryExp
                     {
-                        // $1.addSibling($2)
-                        // $$ = $1;
+                        $$ = $1;
+                        $$->addSibling($2);
                     }
                 | factor
                     {
@@ -534,15 +592,15 @@ unaryExp        : unaryOp unaryExp
 
 unaryOp         : DASH 
                     {
-                        // $1 = new unary node(-)
+                        $$ = new UnaryOpNode(yylineno, UnaryOpType::Chsign);
                     }
                 | ASTERISK
                     {
-                        // $1 = new unary node(-)
+                        $$ = new UnaryOpNode(yylineno, UnaryOpType::SizeOf);
                     }
                 | QUESTION
                     {
-                        // $1 = new unary node(-)
+                        $$ = new UnaryOpNode(yylineno, UnaryOpType::Question);
                     }
                 ;
 
@@ -558,11 +616,11 @@ factor          : mutable
 
 mutable         : ID
                     {
-                        // $$ = new ID node(linenum, idname)
+                        $$ = new IdNode(yylineno, $1->str, false);
                     }
                 | ID LBRACK exp RBRACK
                     {
-                        // $$ = new ID node(linenum, idname, isArray=true)
+                        $$ = new IdNode(yylineno, $1->str, true);
                     }
                 ;
 
@@ -582,6 +640,8 @@ immutable       : LPAREN exp RPAREN
 
 call            : ID LPAREN args RPAREN
                     {
+                        $$ = new CallNode(yylineno, $1->str);
+                        $$->addChild($3);
                         // a bit more complex i think, not sure
                     }
                 ;
@@ -639,7 +699,7 @@ int main(int argc, char** argv)
 
     yyparse();
 
-    if (options.ispFlag())
+    if (options.ispFlag() && root != nullptr)
     {
         root->printRoot();
     }

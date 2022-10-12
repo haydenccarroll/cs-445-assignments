@@ -1,7 +1,9 @@
-#include "const.hpp"
+#include "../hpp/const.hpp"
+
+#include "../../node.hpp"
+#include "../../../types.hpp"
 
 #include <string>
-#include "../node.hpp"
 
 ConstNode::ConstNode(unsigned int lineNum, ConstType type, int value) 
 : ASTNode::ASTNode(lineNum),

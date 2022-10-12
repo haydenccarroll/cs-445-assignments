@@ -2,6 +2,7 @@
 
 // C++ headers and stuff
 #include "types.hpp" // must be included before c-.tab.h
+#include "ast/ast.hpp"
 
 #include <iostream>
 #include <string>

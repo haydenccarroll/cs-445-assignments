@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../node.hpp"
-#include "../../types.hpp"
+#include "../../node.hpp"
+#include "../../../types.hpp"
 
 class ConstNode : public ASTNode
 {

@@ -17,17 +17,56 @@ struct TokenData
 
 enum class DataType
 {
-Int,
-Bool,
-Char,
-Void,
-None
+    Int,
+    Bool,
+    Char,
+    Void,
+    None
 };
 
 enum class ConstType
 {
-Int,
-Bool,
-Char,
-String
+    Int,
+    Bool,
+    Char,
+    String
+};
+
+enum class UnaryOpType
+{
+    Chsign,
+    SizeOf,
+    Question
+};
+
+enum class BinaryOpType
+{
+    Mul,
+    Div,
+    Mod,
+    Add,
+    Sub
+};
+
+enum class RelOpType
+{
+    LT,
+    LEQ,
+    GT,
+    GEQ,
+    EQ,
+    NEQ,
+    And,
+    Or
+};
+
+enum class AssignOpType
+{
+    ASS,
+    MULASS,
+    DIVASS,
+    ADDASS,
+    SUBASS,
+    INC,
+    DEC
 };
