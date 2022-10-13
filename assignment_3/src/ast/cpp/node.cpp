@@ -10,6 +10,17 @@ ASTNode::ASTNode(unsigned int lineNum)
     m_sibling = nullptr;
 }
 
+ASTNode::~ASTNode()
+{
+    for (int i=0; i < m_children.size(); i++)
+    {
+        delete m_children[i];
+        m_children[i] = nullptr;
+    }
+    delete m_sibling;
+    m_sibling = nullptr;
+}
+
 void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl)
 {
     for (int i=0; i < indentLevel; i++)

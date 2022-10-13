@@ -15,7 +15,7 @@ public:
      */
     FunDeclNode(unsigned int lineNum, std::string funcName, DataType returnType);
     void printNode();
-
+    NodeType getNodeType() { return NodeType::FunDeclNode; }
 private:
     std::string m_funcName;
     DataType m_returnType;

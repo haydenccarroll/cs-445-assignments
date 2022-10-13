@@ -131,7 +131,7 @@ std::string processStringConst(std::string str)
         {
             if (i+1 == noQuotes.length())
             {
-                Error(lineNum, "escape character found at last char in string.");
+                Error::error(lineNum, "escape character found at last char in string.");
             }
             switch(noQuotes[i+1])
             {
@@ -165,14 +165,14 @@ char processCharConst(std::string str)
         ss << "character is " << processedStr.length() 
            << " characters long and not a single character: '" 
            << str << "'.  The first char will be used.";
-        Warning(lineNum, ss.str());
+        Error::warning(lineNum, ss.str());
     }
 
     else if (processedStr.length() == 0)
     {
         std::stringstream ss;
         ss << "a character cannot be of size 0.";
-        Error(lineNum, ss.str());
+        Error::error(lineNum, ss.str());
     }
 
     return processedStr[0];

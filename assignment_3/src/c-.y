@@ -82,7 +82,7 @@ varDecl         : typeSpec varDeclList SEMICOLON
                         VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($$);
                         if (declNode == nullptr)
                         {
-                            Error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is of the wrong type.");
+                            Error::error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is of the wrong type.");
                         }
                         declNode->setTypeSpec($1);
                     }
@@ -94,7 +94,7 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
                         VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($$);
                         if (declNode == nullptr)
                         {
-                            Error($3->getLineNum(), "dynamic_cast<VarDeclNode*> failed. Node is wrong type.");
+                            Error::error($3->getLineNum(), "dynamic_cast<VarDeclNode*> failed. Node is wrong type.");
                         }
                         declNode->setStatic(true);
                         declNode->setTypeSpec($2); 
@@ -105,7 +105,7 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
                         VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($2);
                         if (declNode == nullptr)
                         {
-                            Error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is wrong type.");
+                            Error::error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is wrong type.");
                         }
                         declNode->setTypeSpec($1);
                     }
@@ -203,7 +203,7 @@ parmTypeList    : typeSpec parmIdList
                         ParamNode* param = dynamic_cast<ParamNode*>($$);
                         if (param == nullptr)
                         {
-                            Error($2->getLineNum(), "dynamic_cast<ParamNode*> failed. Node is wrong type.");
+                            Error::error($2->getLineNum(), "dynamic_cast<ParamNode*> failed. Node is wrong type.");
                         }
                         param->setTypeSpec($1);
                     }
@@ -701,12 +701,20 @@ constant        : NUMCONST
                     }
                 ;
 %%
-
-
 int main(int argc, char** argv)
 {
     Options options(argc, argv);
+    // create symbol table and stuff
+
+    if (options.ishFlag())
+    {
+        options.printHelpScreen();
+        delete root;
+        return EXIT_SUCCESS;
+    }
+
     yydebug = options.isdFlag();
+
     if (options.getFile())
     {
         yyin = options.getFile();
@@ -720,5 +728,18 @@ int main(int argc, char** argv)
         root->print();
     }
 
+    // create symbol table, with options.isDFlag() as an argument
+    // do semantic analysis
+
+    // if AST print annotated flag is set and tree not null
+    if (options.isPFlag() && root != nullptr)
+    {
+        // print root with type info stuff
+    }
+
+    std::cout << "Number of errors: " << Error::getErrorCount() << std::endl;
+    std::cout << "Number of warnings: " << Error::getWarningCount() << std::endl;
+
+    delete root;
     return EXIT_SUCCESS;
 }

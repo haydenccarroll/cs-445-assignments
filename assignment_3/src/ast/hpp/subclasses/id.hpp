@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../node.hpp"
+#include "../../../types/types.hpp"
 
 #include <iostream>
 
@@ -25,6 +26,7 @@ public:
      */
     IdNode(unsigned int lineNum, std::string idName, bool isArray, int arraySize);
     void printNode() { std::cout << "Id: " << m_idName; }
+    NodeType getNodeType() { return NodeType::IdNode; }
 
 private:
     std::string m_idName;

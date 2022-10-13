@@ -7,3 +7,4 @@
 #include "hpp/relOpType.hpp"
 #include "hpp/tokenData.hpp"
 #include "hpp/unaryOpType.hpp"
+#include "hpp/nodeType.hpp"

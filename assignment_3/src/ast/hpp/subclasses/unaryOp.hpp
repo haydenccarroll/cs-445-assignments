@@ -16,7 +16,7 @@ public:
      */
     UnaryOpNode(unsigned int lineNum, UnaryOpType type);
     void printNode() { std::cout << "Op: " << unaryOpTypeToStr(m_unaryOpType); }
-
+    NodeType getNodeType() { return NodeType::UnaryOpNode; }
 
 
 private:

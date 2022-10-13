@@ -18,6 +18,8 @@ public:
     ConstNode(unsigned int lineNum, ConstType type, std::string value);
     ConstNode(unsigned int lineNum, ConstType type, bool value);
 
+    NodeType getNodeType() { return NodeType::ConstNode; }
+
     void printNode();
 
 

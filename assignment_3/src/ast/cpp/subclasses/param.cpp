@@ -29,7 +29,7 @@ void ParamNode::setTypeSpec(DataTypeEnum type)
         ParamNode* paramSibling = dynamic_cast<ParamNode*>(m_sibling);
         if (paramSibling == nullptr)
         {
-            Warning(m_sibling->getLineNum(), "dynamic_cast<ParamNode*> failed in TypeSpec(). Node is wrong type.");
+            Error::error(m_sibling->getLineNum(), "dynamic_cast<ParamNode*> failed in TypeSpec(). Node is wrong type.");
         }
         paramSibling->setTypeSpec(type);
     }

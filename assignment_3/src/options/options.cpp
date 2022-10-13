@@ -16,6 +16,9 @@ Options::Options(int argc, char **argv)
 
     m_isdFlag = false;
     m_ispFlag = false;
+    m_isPFlag = false;
+    m_isDFlag = false;
+    m_ishFlag = false;
 
     // not used now, but could potentially be used in later assignments.
     bool errFlag = false;
@@ -31,6 +34,15 @@ Options::Options(int argc, char **argv)
                 break;
             case 'p':
                 m_ispFlag = true;
+                break;
+            case 'h':
+                m_ishFlag = true;
+                break;
+            case 'P':
+                m_isPFlag = true;
+                break;
+            case 'D':
+                m_isDFlag = true;
                 break;
             }
         }
@@ -52,6 +64,17 @@ Options::Options(int argc, char **argv)
     }
 
     m_file = fopen(m_fileName.c_str(), "r");
+}
+
+void Options::printHelpScreen()
+{
+    std::cout << "usage: -c [options] [sourcefile]\n"
+              << "options:\n"
+              << "-d - turn on parser debugging\n"
+              << "-D - turn on symbol table debugging\n"
+              << "-h - print this usage message\n"
+              << "-p - print the abstract syntax tree\n"
+              << "-P - print the abstract syntax tree plus type information\n";
 }
 
 Options::~Options()

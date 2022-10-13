@@ -15,8 +15,10 @@ public:
      * @param isStatic if variable is static, defaults to false
      */
     VarDeclNode(unsigned int lineNum, std::string varName, DataType type, bool isStatic=false);
+    
     void printNode();
 
+    NodeType getNodeType() { return NodeType::VarDeclNode; }
     /**
      * @brief sets the concrete type of itself and all siblings
      * 

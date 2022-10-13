@@ -16,6 +16,7 @@ public:
      */
     ParamNode(unsigned int lineNum, std::string paramName, DataType dataType);
     void printNode();
+    NodeType getNodeType() { return NodeType::ParamNode; }
 
     /**
      * @brief sets the concrete type (int bool char string) of a parameter

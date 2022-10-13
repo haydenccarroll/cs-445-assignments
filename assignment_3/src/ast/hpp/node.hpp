@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../types/types.hpp"
+
 #include <vector>
 
 #define AST_PRINT_INDENT_STR ".   "
@@ -16,6 +18,14 @@ public:
      * @param lineNum line num node found on
      */
     ASTNode(unsigned int lineNum);
+
+
+    /**
+     * @brief Destroy the ASTNode object
+     * 
+     */
+    ~ASTNode();
+    virtual NodeType getNodeType() = 0;
 
     /**
      * @brief prints node and its siblings + children recursively

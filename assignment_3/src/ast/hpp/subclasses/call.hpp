@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../node.hpp"
+#include "../../../types/types.hpp"
+
 #include <string>
 #include <iostream>
 
@@ -15,6 +17,7 @@ public:
      */
     CallNode(unsigned int lineNum, std::string functionName);
     void printNode() { std::cout << "Call: " << m_functionName; }
+    NodeType getNodeType() { return NodeType::CallNode; }
 
 private:
     std::string m_functionName;

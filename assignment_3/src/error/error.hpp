@@ -3,12 +3,27 @@
 #include <string>
 #include <iostream>
 
-inline void Error(unsigned int lineNum, std::string msg)
+class Error
 {
-    std::cout << "ERROR(" << lineNum << "): " << msg << std::endl;
-}
+public:
+    Error(){};
+    static void error(unsigned int lineNum, std::string msg)
+    {
+        std::cout << "ERROR(" << lineNum << "): " << msg << std::endl;
+        s_errorCount++;
+    }
 
-inline void Warning(unsigned int lineNum, std::string msg)
-{
-    std::cout << "WARNING(" << lineNum << "): " << msg << std::endl;
-}
+    static void warning(unsigned int lineNum, std::string msg)
+    {
+        std::cout << "WARNING(" << lineNum << "): " << msg << std::endl;
+        s_warningCount++;
+    }
+
+    static unsigned int getErrorCount() { return s_errorCount; }
+
+    static unsigned int getWarningCount() { return s_warningCount; }
+
+private:
+    inline static unsigned int s_errorCount = 0;
+    inline static unsigned int s_warningCount = 0;
+};

@@ -14,6 +14,7 @@ public:
      */
     AssignOpNode(unsigned int lineNum, AssignOpType type);
     void printNode();
+    NodeType getNodeType() { return NodeType::AssignOpNode; }
 
 private:
     const AssignOpType m_assignOpType;

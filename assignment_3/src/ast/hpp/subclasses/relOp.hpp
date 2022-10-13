@@ -16,6 +16,7 @@ public:
      */
     RelOpNode(unsigned int lineNum, RelOpType type);
     void printNode() { std::cout << "Op: " << relOpTypeToStr(m_relOpType); }
+    NodeType getNodeType() { return NodeType::RelOpNode; }
 
 
 private:
