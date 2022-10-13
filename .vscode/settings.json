@@ -69,6 +69,7 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "const.hpp": "c",
-        "call.hpp": "c"
+        "call.hpp": "c",
+        "node.hpp": "c"
     }
 }

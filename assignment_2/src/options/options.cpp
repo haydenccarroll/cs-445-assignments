@@ -53,3 +53,8 @@ Options::Options(int argc, char **argv)
 
     m_file = fopen(m_fileName.c_str(), "r");
 }
+
+Options::~Options()
+{
+    fclose(m_file);
+}

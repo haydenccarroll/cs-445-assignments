@@ -1,8 +1,9 @@
 %{
 // C++ header stuff
 #include "options/options.hpp"
+#include "error/error.hpp"
 #include "types/types.hpp" // must be included before tab.h
-#include "ast/ast.hpp"
+#include "ast/ast.hpp" // must be included before tab.h
 
 #include <iostream>
 #include <string>
@@ -12,7 +13,7 @@
 #include "c-.tab.h"
 
 extern int yylex();
-void yyerror(std::string msg) {std::cout << msg << std::endl;};
+void yyerror(std::string msg) { std::cout << msg << std::endl; };
 extern FILE* yyin;
 extern int yydebug;
 
@@ -23,7 +24,7 @@ ASTNode* root = nullptr;
 %union {
     TokenData* tokenData;
     ASTNode* node;
-    DataTypeEnum simpleDataType;
+    DataTypeEnum dataTypeEnum;
 }
 
 %define parse.error verbose
@@ -36,7 +37,7 @@ ASTNode* root = nullptr;
 %token <tokenData> LCURL RCURL INC DEC ASS ADDASS SUBASS MULASS DIVASS PERCENT
 %token <tokenData> LT LEQ GT GEQ EQ NEQ PLUS DASH SLASH ASTERISK QUESTION
 
-%type <simpleDataType> typeSpec
+%type <dataTypeEnum> typeSpec
 
 %type <node> program declList decl varDecl scopedVarDecl varDeclList
 %type <node> varDeclInit varDeclId  funDecl parms parmList parmTypeList parmIdList
@@ -45,8 +46,6 @@ ASTNode* root = nullptr;
 %type <node> iterRange returnStmt breakStmt exp assignop simpleExp andExp
 %type <node> unaryRelExp relExp relop sumExp sumOp mulExp mulOp unaryExp unaryOp
 %type <node> factor mutable immutable call args argList constant
-
-
 
 %%
 program         : declList 
@@ -81,9 +80,11 @@ varDecl         : typeSpec varDeclList SEMICOLON
                     {
                         $$ = $2;
                         VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($$);
-                        declNode->setTypeSpec($1);                       
-                         //ctrl+f not done, need to add below
-                        // $$.addTypeSpec(typeSpec.type) for it and its siblings
+                        if (declNode == nullptr)
+                        {
+                            Error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is of the wrong type.");
+                        }
+                        declNode->setTypeSpec($1);
                     }
                 ;
 
@@ -91,6 +92,10 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
                     {
                         $$ = $3;
                         VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($$);
+                        if (declNode == nullptr)
+                        {
+                            Error($3->getLineNum(), "dynamic_cast<VarDeclNode*> failed. Node is wrong type.");
+                        }
                         declNode->setStatic(true);
                         declNode->setTypeSpec($2); 
                     }
@@ -98,6 +103,10 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
                     {
                         $$ = $2;
                         VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($2);
+                        if (declNode == nullptr)
+                        {
+                            Error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is wrong type.");
+                        }
                         declNode->setTypeSpec($1);
                     }
                 ;
@@ -192,6 +201,10 @@ parmTypeList    : typeSpec parmIdList
                     {
                         $$ = $2;
                         ParamNode* param = dynamic_cast<ParamNode*>($$);
+                        if (param == nullptr)
+                        {
+                            Error($2->getLineNum(), "dynamic_cast<ParamNode*> failed. Node is wrong type.");
+                        }
                         param->setTypeSpec($1);
                     }
                 ;
@@ -421,14 +434,12 @@ exp             : mutable assignop exp
                     }
                 | mutable INC
                     {
-                        //ctrl+f not sure if this is right
                         $$ = new AssignOpNode($1->getLineNum(), AssignOpType::INC);
                         $$->addChild($1);
 
                     }
                 | mutable DEC
                     {
-                        //ctrl+f not sure if this is right
                         $$ = new AssignOpNode($1->getLineNum(), AssignOpType::DEC);
                         $$->addChild($1);
                     }
@@ -462,7 +473,6 @@ assignop        : ASS
 
 simpleExp       : simpleExp OR andExp
                     {
-                        //ctrl+f not sure if this is right, maybe or should be its own node.
                         $$ = new RelOpNode($1->getLineNum(), RelOpType::Or);
                         $$->addChild($1);
                         $$->addChild($3);
@@ -475,7 +485,6 @@ simpleExp       : simpleExp OR andExp
 
 andExp          : andExp AND unaryRelExp
                     {
-                        //ctrl+f not sure if this is right, maybe and should be its own node.
                         $$ = new RelOpNode($1->getLineNum(), RelOpType::And);
                         $$->addChild($1);
                         $$->addChild($3);
@@ -679,7 +688,7 @@ constant        : NUMCONST
                     }
                 | BOOLCONST
                     {
-                        $$ = new ConstNode($1->lineNum, ConstType::Bool, ($1->num == 1));
+                        $$ = new ConstNode($1->lineNum, ConstType::Bool, $1->boolV);
                     }
                 | CHARCONST
                     {
@@ -705,6 +714,7 @@ int main(int argc, char** argv)
 
     yyparse();
 
+    // if AST print flag (-p) is on and tree is not null
     if (options.ispFlag() && root != nullptr)
     {
         root->print();

@@ -6,6 +6,7 @@ class Options
 {
 public:
     Options(int argc, char** argv);
+    ~Options();
     FILE* getFile() { return m_file; };
     std::string getFileName() { return m_fileName; }
     bool isdFlag() { return m_isdFlag; }
