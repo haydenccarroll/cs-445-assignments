@@ -2,6 +2,8 @@
 // C++ header stuff
 #include "options/options.hpp"
 #include "error/error.hpp"
+#include "symTable/symTable.hpp"
+#include "semantics/semantics.hpp"
 #include "types/types.hpp" // must be included before tab.h
 #include "ast/ast.hpp" // must be included before tab.h
 
@@ -704,7 +706,8 @@ constant        : NUMCONST
 int main(int argc, char** argv)
 {
     Options options(argc, argv);
-    // create symbol table and stuff
+    SymbolTable symTable = SymbolTable();
+    symTable.debug(options.isDFlag());
 
     if (options.ishFlag())
     {
@@ -728,12 +731,20 @@ int main(int argc, char** argv)
         root->print();
     }
 
-    // create symbol table, with options.isDFlag() as an argument
+    if (root == nullptr)
+    {
+        std::cout << "root is nullptr\n";
+    }
+
+    SemanticAnalyzer semantics = SemanticAnalyzer(root, &symTable);
+    semantics.analyze();
+
     // do semantic analysis
 
     // if AST print annotated flag is set and tree not null
     if (options.isPFlag() && root != nullptr)
     {
+        root->print(); // PRINT WITH TYPE INFO THOUGH
         // print root with type info stuff
     }
 

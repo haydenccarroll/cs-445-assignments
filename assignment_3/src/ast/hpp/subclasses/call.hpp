@@ -18,6 +18,7 @@ public:
     CallNode(unsigned int lineNum, std::string functionName);
     void printNode() { std::cout << "Call: " << m_functionName; }
     NodeType getNodeType() { return NodeType::CallNode; }
+    std::string getFunName() { return m_functionName; }
 
 private:
     std::string m_functionName;

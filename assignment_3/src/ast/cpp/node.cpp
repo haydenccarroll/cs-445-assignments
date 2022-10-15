@@ -56,11 +56,19 @@ void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl)
 
 void ASTNode::addChild(ASTNode* child)
 {
+    if (child == nullptr)
+    {
+        return;
+    }
     m_children.push_back(child);
 }
 
 void ASTNode::addSibling(ASTNode* sibling)
 {
+    if (sibling == nullptr)
+    {
+        return;
+    }
     ASTNode* currNode = this;
     while (currNode->m_sibling != nullptr)
     {
@@ -68,4 +76,28 @@ void ASTNode::addSibling(ASTNode* sibling)
     }
 
     currNode->m_sibling = sibling;
+}
+
+ASTNode* ASTNode::getChild(unsigned int index)
+{
+    if (index >= m_children.size())
+    {
+        return nullptr;
+    }
+
+    return m_children[index];
+}
+
+ASTNode* ASTNode::getSibling(unsigned int index)
+{
+    if (m_sibling == nullptr)
+    {
+        return nullptr;
+    }
+    if (index == 0)
+    {
+        return m_sibling;
+    }
+
+    return getSibling(index - 1);
 }

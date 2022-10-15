@@ -26,7 +26,7 @@ Options::Options(int argc, char **argv)
     while (true) {
         // hunt for a string of options
         int c;
-        while ((c = ourGetopt(argc, argv, (char *)"dpDP:")) != EOF)
+        while ((c = ourGetopt(argc, argv, (char *)"dpDPh")) != EOF)
         {
             switch (c) {
             case 'd':

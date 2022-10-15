@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
 
 class Error
 {
@@ -17,6 +18,20 @@ public:
     {
         std::cout << "WARNING(" << lineNum << "): " << msg << std::endl;
         s_warningCount++;
+    }
+
+    static void critical(unsigned int lineNum, std::string msg)
+    {
+        std::stringstream ss;
+        ss << "CRITICAL(" << lineNum << "): " << msg << std::endl;
+        throw std::runtime_error(ss.str());
+
+    }
+
+    static void linker(std::string msg)
+    {
+        std::cout << "ERROR(LINKER): " << msg << std::endl;
+        s_errorCount++;
     }
 
     static unsigned int getErrorCount() { return s_errorCount; }

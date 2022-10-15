@@ -51,6 +51,22 @@ public:
     void addSibling(ASTNode* sibling);
 
     /**
+     * @brief gets the ith sibling of the node. 0 is sibling to right
+     * 
+     * @param index 
+     * @return ASTNode* child, nullptr if not found
+     */
+    ASTNode* getSibling(unsigned int index);
+
+    /**
+     * @brief gets a child from m_children at given index
+     * 
+     * @param index 
+     * @return ASTNode* child node, nullptr if not found 
+     */
+    ASTNode* getChild(unsigned int index);
+
+    /**
      * @brief gets the line num where node was first found.
      * 
      * @return unsigned int 
