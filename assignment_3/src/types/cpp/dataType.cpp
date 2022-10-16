@@ -37,6 +37,11 @@ void DataType::print(bool printOf, bool isStatic)
     }
     enumType = tmpPtr->m_enumType;
 
+    if (count != 0)
+    {
+        std::cout << "is array ";
+        count--;
+    }
     for (int i=0; i < count; i++)
     {
         std::cout << "of array ";

@@ -15,7 +15,7 @@ m_isStatic(isStatic)
 void VarDeclNode::printNode()
 {
     std::cout << "Var: " << m_name << " ";
-    m_dataType.print(true, m_isStatic);
+    m_dataType.print(true);
 }
 
 void VarDeclNode::setTypeSpec(DataTypeEnum type)

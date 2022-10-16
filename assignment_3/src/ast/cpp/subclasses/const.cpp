@@ -62,7 +62,7 @@ void ConstNode::printNode()
         std::cout << "'" << m_charValue << "'";
         break;
     case ConstType::String:
-        std::cout << "\"" << m_stringValue << "\"";
+        std::cout << "is array \"" << m_stringValue << "\"";
         break;
     }
 }
