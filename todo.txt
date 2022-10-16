@@ -1,3 +1,4 @@
-make a type for all nodes, and have a getter for each node so we can know what type it is easily.
+make an expression node type for all stuff that would return a value immediately
+operators would be epxressions
 
-simplify constNode stuff at one poitn. constructor is hell here.
+make range loops have their own scope

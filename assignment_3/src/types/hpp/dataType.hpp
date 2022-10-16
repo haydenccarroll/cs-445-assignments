@@ -16,6 +16,7 @@ public:
     DataType(DataTypeEnum type, bool isArray=false);
     void print(bool printOf=true, bool isStatic=false);
     void setTypeSpec(DataTypeEnum typeSpec);
+    bool isArray() { return (m_nextType != nullptr); }
 private:
     DataType* m_nextType;
     DataTypeEnum m_enumType;

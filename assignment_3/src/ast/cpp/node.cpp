@@ -2,7 +2,8 @@
 
 #include <iostream>
 #include <sstream>
-#include <cstdarg>
+
+#include "../../error/error.hpp"
 
 ASTNode::ASTNode(unsigned int lineNum)
 {
@@ -101,3 +102,4 @@ ASTNode* ASTNode::getSibling(unsigned int index)
 
     return getSibling(index - 1);
 }
+

@@ -167,6 +167,13 @@ funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
                         DataType dataType = DataType($1);
                         $$ = new FunDeclNode($2->lineNum, $2->str, dataType);
                         $$->addChild($4);
+
+                        auto compStmt = dynamic_cast<CompoundStmtNode*>($6);
+                        if (compStmt == nullptr)
+                        {
+                            Error::critical($6->getLineNum(), "Failed converting node to compstmt");
+                        }
+                        compStmt->setIsFromFunction(true);
                         $$->addChild($6);
                     }
                 | ID LPAREN parms RPAREN compoundStmt

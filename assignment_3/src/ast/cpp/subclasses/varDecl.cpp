@@ -7,16 +7,14 @@
 #include <iostream>
 
 VarDeclNode::VarDeclNode(unsigned int lineNum, std::string varName, DataType type, bool isStatic) :
-ASTNode::ASTNode(lineNum),
-m_varName(varName),
-m_dataType(type),
+DeclNode::DeclNode(lineNum, varName, type),
 m_isStatic(isStatic)
 {
 }
 
 void VarDeclNode::printNode()
 {
-    std::cout << "Var: " << m_varName << " ";
+    std::cout << "Var: " << m_name << " ";
     m_dataType.print(true, m_isStatic);
 }
 

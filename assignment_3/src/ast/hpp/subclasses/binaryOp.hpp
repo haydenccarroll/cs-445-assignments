@@ -15,6 +15,7 @@ public:
     BinaryOpNode(unsigned int lineNum, BinaryOpType type);
     void printNode();
     NodeType getNodeType() { return NodeType::BinaryOpNode; }
+    BinaryOpType getOperatorType() { return m_binaryOpType; }
 
 private:
     const BinaryOpType m_binaryOpType;

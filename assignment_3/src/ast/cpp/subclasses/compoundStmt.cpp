@@ -3,7 +3,8 @@
 #include "../../hpp/node.hpp"
 
 
-CompoundStmtNode::CompoundStmtNode(unsigned int lineNum) :
-ASTNode::ASTNode(lineNum)
+CompoundStmtNode::CompoundStmtNode(unsigned int lineNum, bool isFromFunction) :
+ASTNode::ASTNode(lineNum),
+m_isFromFunction(isFromFunction)
 {
 }

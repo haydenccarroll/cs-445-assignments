@@ -7,14 +7,12 @@
 #include <iostream>
 
 FunDeclNode::FunDeclNode(unsigned int lineNum, std::string funcName, DataType returnType) :
-ASTNode::ASTNode(lineNum),
-m_funcName(funcName),
-m_returnType(returnType)
+DeclNode::DeclNode(lineNum, funcName, returnType)
 {
 }
 
 void FunDeclNode::printNode()
 {
-    std::cout << "Func: " << m_funcName << " returns ";
-    m_returnType.print(false);
+    std::cout << "Func: " << m_name << " returns ";
+    m_dataType.print(false);
 }

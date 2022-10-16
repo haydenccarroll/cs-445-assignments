@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../node.hpp"
+#include "decl.hpp"
 #include "../../../types/types.hpp"
 
-class ParamNode : public ASTNode
+class ParamNode : public DeclNode
 {
 public:
     /**
@@ -24,8 +24,4 @@ public:
      * @param type type to set
      */
     void setTypeSpec(DataTypeEnum type);
-
-private:
-    std::string m_paramName;
-    DataType m_dataType;
 };

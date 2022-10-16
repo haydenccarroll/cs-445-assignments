@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../node.hpp"
+#include "decl.hpp"
 #include "../../../types/types.hpp"
 
-class VarDeclNode : public ASTNode
+class VarDeclNode : public DeclNode
 {
 public:
     /**
@@ -33,15 +33,7 @@ public:
      */
     void setStatic(bool isStatic);
 
-    /**
-     * @brief gets the variable name
-     * 
-     * @return std::string m_varName member
-     */
-    std::string getVarName() { return m_varName; }
 
 private:
-    std::string m_varName;
-    DataType m_dataType;
     bool m_isStatic;
 };

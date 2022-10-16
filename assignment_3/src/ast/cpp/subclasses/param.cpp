@@ -1,6 +1,6 @@
 #include "../../hpp/subclasses/param.hpp"
 
-#include "../../hpp/node.hpp"
+#include "../../hpp/subclasses/decl.hpp"
 #include "../../../types/types.hpp"
 
 #include "../../../error/error.hpp"
@@ -9,15 +9,13 @@
 #include <iostream>
 
 ParamNode::ParamNode(unsigned int lineNum, std::string paramName, DataType dataType) :
-ASTNode::ASTNode(lineNum),
-m_paramName(paramName),
-m_dataType(dataType)
+DeclNode::DeclNode(lineNum, paramName, dataType)
 {
 }
 
 void ParamNode::printNode()
 {
-    std::cout << "Parm: " << m_paramName << " ";
+    std::cout << "Parm: " << m_name << " ";
     m_dataType.print();
 }
 
