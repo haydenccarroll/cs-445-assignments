@@ -174,14 +174,21 @@ funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
                             Error::critical($6->getLineNum(), "Failed converting node to compstmt");
                         }
                         compStmt->setIsFromFunction(true);
-                        $$->addChild($6);
+                        $$->addChild(compStmt);
                     }
                 | ID LPAREN parms RPAREN compoundStmt
                     {
                         DataType dataType = DataType(DataTypeEnum::Void);
                         $$ = new FunDeclNode($1->lineNum, $1->str, dataType);
                         $$->addChild($3);
-                        $$->addChild($5);
+
+                        auto compStmt = dynamic_cast<CompoundStmtNode*>($5);
+                        if (compStmt == nullptr)
+                        {
+                            Error::critical($5->getLineNum(), "Failed converting node to compstmt");
+                        }
+                        compStmt->setIsFromFunction(true);
+                        $$->addChild(compStmt);
                     }
                 ;
 
@@ -755,8 +762,8 @@ int main(int argc, char** argv)
         // print root with type info stuff
     }
 
-    std::cout << "Number of errors: " << Error::getErrorCount() << std::endl;
     std::cout << "Number of warnings: " << Error::getWarningCount() << std::endl;
+    std::cout << "Number of errors: " << Error::getErrorCount() << std::endl;
 
     delete root;
     return EXIT_SUCCESS;

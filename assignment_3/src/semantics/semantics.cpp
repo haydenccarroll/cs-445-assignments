@@ -52,24 +52,21 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
     }
 
     int i=0;
-    while (true)
+    for (int i=0; i < node->getNumChildren(); i++)
     {
         auto child = node->getChild(i);
-        if (child == nullptr)
+        if (child != nullptr)
         {
-            break;
+            analyzeNode(child);
         }
-        analyzeNode(child);
-        i++;
     }
-    analyzeNode(node->getSibling(0));
-
-
 
     if (node->getNodeType() == NodeType::CompoundStmtNode)
     {
         m_symTable->leave();
     }
+
+    analyzeNode(node->getSibling(0));
 }
 
 void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
@@ -79,24 +76,15 @@ void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
         return;
     }
     auto typedNode = cast<VarDeclNode*>(node);
-    
-    bool ok = m_symTable->insert(typedNode->getName(), node);
-    if (!ok)
-    {
-        ASTNode* originalDecl = (ASTNode*) m_symTable->lookup(typedNode->getName());
 
-        std::stringstream ss;
-        ss << "Symbol '" << typedNode->getName() << "' is already declared at line "
-           << originalDecl->getLineNum();
+    bool ok = insertToSymTable(typedNode->getName(), node);
 
-        Error::error(typedNode->getLineNum(), ss.str());
-    }
 }
 
 void SemanticAnalyzer::analyzeCompoundStmt(ASTNode* node)
 {
     auto typedNode = cast<CompoundStmtNode*>(node);
-    if (typedNode->getIsFromFunction())
+    if (typedNode->getIsFromFunction() == true)
     {
         return;
     }
@@ -115,16 +103,7 @@ void SemanticAnalyzer::analyzeFunDecl(ASTNode* node)
     auto funDeclNode = cast<FunDeclNode*>(node);
     std::string funName = funDeclNode->getName();
 
-    bool ok = m_symTable->insert(funName, node);
-    if (!ok)
-    {
-        auto originalDecl = (ASTNode*) m_symTable->lookup(funName);
-        std::stringstream ss;
-        ss << "Symbol '" << funName << "' is already declared at line "
-           << originalDecl->getLineNum() << "\n";
-        Error::error(funDeclNode->getLineNum(), ss.str());
-    }
-
+    insertToSymTable(funName, node);
 
     if (funName == "main" && m_symTable->depth() == 1)
     {
@@ -135,11 +114,11 @@ void SemanticAnalyzer::analyzeFunDecl(ASTNode* node)
     ss << "Function: " << funName << " at line: " << node->getLineNum();
     m_symTable->enter(ss.str());
 
-    auto params = tryCast<DeclNode*>(node->getChild(0));
+    auto params = cast<DeclNode*>(node->getChild(0));
     while (params != nullptr)
     {
-        m_symTable->insert(params->getName(), params);
-        params = tryCast<DeclNode*>(params->getSibling(0));
+        bool ok = insertToSymTable(params->getName(), params);
+        params = cast<DeclNode*>(params->getSibling(0));
     }
 }
 
@@ -161,7 +140,7 @@ void SemanticAnalyzer::analyzeCall(ASTNode* node)
     } else if (entry->getNodeType() != NodeType::FunDeclNode)
     {
         std::stringstream ss;
-        ss << funName << " is a simple variable and cannot be called.";
+        ss << "'" << funName << "' is a simple variable and cannot be called.";
         Error::error(node->getLineNum(), ss.str());
     }
 }
@@ -309,4 +288,19 @@ template <typename T> T SemanticAnalyzer::cast(ASTNode* node)
 template <typename T> T SemanticAnalyzer::tryCast(ASTNode* node)
 {
     return dynamic_cast<T>(node);
+}
+
+bool SemanticAnalyzer::insertToSymTable(std::string str, ASTNode* node)
+{
+    bool ok = m_symTable->insert(str, node);
+    if (!ok)
+    {
+        auto originalDecl = (ASTNode*) m_symTable->lookup(str);
+        std::stringstream ss;
+        ss << "Symbol '" << str << "' is already declared at line "
+           << originalDecl->getLineNum();
+        Error::error(node->getLineNum(), ss.str());
+    }
+
+    return ok;
 }

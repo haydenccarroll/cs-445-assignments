@@ -73,6 +73,8 @@ public:
      */
     unsigned int getLineNum() { return m_lineNum; };
 
+    unsigned int getNumChildren() { return m_children.size(); }
+
 protected:
     /// @brief vector of child nodes
     std::vector<ASTNode*> m_children;
