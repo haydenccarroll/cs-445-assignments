@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../ast/ast.hpp"
+
 // // // // // // // // // // // // // // // // // // // // 
 //
 // Some sample void * printing routines.   User should supply their own.
@@ -60,14 +62,16 @@ public:
     void print(void (*printData)(void *));           // print all scopes using data printing function
     void enter(std::string name);                    // enter a scope with given name
     void leave();                                    // leave a scope (not allowed to leave global)
-    void *lookup(std::string sym);                   // returns ptr associated with sym anywhere in symbol table
+    DeclNode* lookup(std::string sym);                   // returns ptr associated with sym anywhere in symbol table
                                                      // returns NULL if symbol not found
-    void *lookupGlobal(std::string sym);             // returns ptr associated with sym in globals
+    DeclNode *lookupGlobal(std::string sym);             // returns ptr associated with sym in globals
                                                      // returns NULL if symbol not found
-    bool insert(std::string sym, void *ptr);         // inserts new ptr associated with symbol sym in current scope
+    bool insert(std::string sym, DeclNode* ptr);         // inserts new ptr associated with symbol sym in current scope
                                                      // returns false if already defined
-    bool insertGlobal(std::string sym, void *ptr);   // inserts a new ptr associated with symbol sym 
+    bool insertGlobal(std::string sym, DeclNode* ptr);   // inserts a new ptr associated with symbol sym 
                                                      // returns false if already defined
     void applyToAll(void (*action)(std::string , void *));        // apply func to all symbol/data pairs in local scope
     void applyToAllGlobal(void (*action)(std::string , void *));  // apply func to all symbol/data pairs in global scope
+    std::map<std::string, DeclNode*> getCurrScopeSymbols();
+
 };

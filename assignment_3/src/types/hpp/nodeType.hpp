@@ -21,6 +21,5 @@ enum class NodeType
     UnaryOpNode,
     VarDeclNode,
     WhileNode,
-    DeclNode,
     ExpNode
 };

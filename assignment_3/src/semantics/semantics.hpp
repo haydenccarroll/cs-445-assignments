@@ -27,7 +27,8 @@ private:
     void analyzeDiv(BinaryOpNode* node);
     void analyzeMod(BinaryOpNode* node);
 
-    bool insertToSymTable(std::string, ASTNode* );
+    bool insertToSymTable(std::string, DeclNode* );
+    void leaveScope();
 
     /**
      * @brief casts this object to a child class T

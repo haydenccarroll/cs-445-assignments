@@ -18,7 +18,7 @@ public:
     
     void printNode();
 
-    NodeType getNodeType() { return NodeType::VarDeclNode; }
+    virtual NodeType getNodeType() { return NodeType::VarDeclNode; }
     /**
      * @brief sets the concrete type of itself and all siblings
      * 

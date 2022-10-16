@@ -63,7 +63,7 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
 
     if (node->getNodeType() == NodeType::CompoundStmtNode)
     {
-        m_symTable->leave();
+        leaveScope();
     }
 
     analyzeNode(node->getSibling(0));
@@ -77,7 +77,7 @@ void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
     }
     auto typedNode = cast<VarDeclNode*>(node);
 
-    bool ok = insertToSymTable(typedNode->getName(), node);
+    bool ok = insertToSymTable(typedNode->getName(), typedNode);
 
 }
 
@@ -103,7 +103,7 @@ void SemanticAnalyzer::analyzeFunDecl(ASTNode* node)
     auto funDeclNode = cast<FunDeclNode*>(node);
     std::string funName = funDeclNode->getName();
 
-    insertToSymTable(funName, node);
+    insertToSymTable(funName, funDeclNode);
 
     if (funName == "main" && m_symTable->depth() == 1)
     {
@@ -131,18 +131,21 @@ void SemanticAnalyzer::analyzeCall(ASTNode* node)
     auto callNode = cast<CallNode*>(node);
 
     std::string funName = callNode->getFunName();
-    auto entry = (ASTNode*) m_symTable->lookup(funName);
+    auto entry = m_symTable->lookup(funName);
     if (entry == nullptr)
     {
         std::stringstream ss;
         ss << "Symbol '" << funName << "' is not declared."; 
         Error::error(node->getLineNum(), ss.str());
+        return;
     } else if (entry->getNodeType() != NodeType::FunDeclNode)
     {
         std::stringstream ss;
         ss << "'" << funName << "' is a simple variable and cannot be called.";
         Error::error(node->getLineNum(), ss.str());
     }
+
+    entry->use();
 }
 
 void SemanticAnalyzer::analyzeId(ASTNode* node)
@@ -155,13 +158,16 @@ void SemanticAnalyzer::analyzeId(ASTNode* node)
     auto typedNode = cast<IdNode*>(node);
     std::string idName = typedNode->getIdName();
 
-    auto entry = (ASTNode*) m_symTable->lookup(idName);
+    auto entry = m_symTable->lookup(idName);
     if (entry == nullptr)
     {
         std::stringstream ss;
         ss << "Symbol '" << idName << "' is not declared.";
         Error::error(node->getLineNum(), ss.str());
         return;
+    } else 
+    {
+        entry->use();
     }
 
     if (entry->getNodeType() == NodeType::FunDeclNode)
@@ -290,7 +296,7 @@ template <typename T> T SemanticAnalyzer::tryCast(ASTNode* node)
     return dynamic_cast<T>(node);
 }
 
-bool SemanticAnalyzer::insertToSymTable(std::string str, ASTNode* node)
+bool SemanticAnalyzer::insertToSymTable(std::string str, DeclNode* node)
 {
     bool ok = m_symTable->insert(str, node);
     if (!ok)
@@ -303,4 +309,20 @@ bool SemanticAnalyzer::insertToSymTable(std::string str, ASTNode* node)
     }
 
     return ok;
+}
+
+void SemanticAnalyzer::leaveScope()
+{
+    // check for unused warnings
+    auto map = m_symTable->getCurrScopeSymbols();
+    for (auto const& [key, val] : map)
+    {
+        if (val->getUsage() == 0 && val->getNodeType() != NodeType::FunDeclNode)
+        {
+            std::stringstream ss;
+            ss << "The variable '" << key << "' seems not to be used.";
+            Error::warning(val->getLineNum(), ss.str());
+        }
+    }
+    m_symTable->leave();
 }
