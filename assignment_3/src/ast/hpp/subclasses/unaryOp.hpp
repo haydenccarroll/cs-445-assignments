@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../node.hpp"
+#include "exp.hpp"
 #include "../../../types/types.hpp"
 
 #include <iostream>
 
-class UnaryOpNode : public ASTNode
+class UnaryOpNode : public ExpNode
 {
 public:
     /**
@@ -15,7 +15,7 @@ public:
      * @param type type of unary operator used
      */
     UnaryOpNode(unsigned int lineNum, UnaryOpType type);
-    void printNode() { std::cout << "Op: " << unaryOpTypeToStr(m_unaryOpType); }
+    void printNode();
     NodeType getNodeType() { return NodeType::UnaryOpNode; }
 
 

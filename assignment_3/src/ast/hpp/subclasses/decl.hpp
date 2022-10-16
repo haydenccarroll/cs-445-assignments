@@ -8,7 +8,7 @@ class DeclNode : public ASTNode
 public:
     DeclNode(unsigned int lineNum, std::string name, DataType dataType);
     virtual void printNode() = 0;
-    NodeType getNodeType() { return NodeType::FunDeclNode; }
+    NodeType getNodeType() { return NodeType::DeclNode; }
 
     /**
      * @brief returns name of function

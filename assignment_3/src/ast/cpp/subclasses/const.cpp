@@ -1,14 +1,14 @@
 #include "../../hpp/subclasses/const.hpp"
 
-#include "../../hpp/node.hpp"
+#include "../../hpp/subclasses/exp.hpp"
 #include "../../../types/types.hpp"
 
 #include <string>
 #include <iostream>
 
-ConstNode::ConstNode(unsigned int lineNum, ConstType type, int value) 
-: ASTNode::ASTNode(lineNum),
-m_constType(type),
+ConstNode::ConstNode(unsigned int lineNum, int value) 
+: ExpNode::ExpNode(lineNum, DataTypeEnum::Int),
+m_constType(ConstType::Int),
 m_intValue(value),
 m_charValue(0),
 m_boolValue(false),
@@ -16,9 +16,9 @@ m_stringValue("")
 {
 }
 
-ConstNode::ConstNode(unsigned int lineNum, ConstType type, char value) 
-: ASTNode::ASTNode(lineNum),
-m_constType(type),
+ConstNode::ConstNode(unsigned int lineNum, char value) 
+: ExpNode::ExpNode(lineNum, DataTypeEnum::Char),
+m_constType(ConstType::Char),
 m_intValue(0),
 m_charValue(value),
 m_boolValue(false),
@@ -26,9 +26,9 @@ m_stringValue("")
 {
 }
 
-ConstNode::ConstNode(unsigned int lineNum, ConstType type, bool value) 
-: ASTNode::ASTNode(lineNum),
-m_constType(type),
+ConstNode::ConstNode(unsigned int lineNum, bool value) 
+: ExpNode::ExpNode(lineNum, DataTypeEnum::Bool),
+m_constType(ConstType::Bool),
 m_intValue(0),
 m_charValue(0),
 m_boolValue(value),
@@ -36,9 +36,9 @@ m_stringValue("")
 {
 }
 
-ConstNode::ConstNode(unsigned int lineNum, ConstType type, std::string value) 
-: ASTNode::ASTNode(lineNum),
-m_constType(type),
+ConstNode::ConstNode(unsigned int lineNum, std::string value) 
+: ExpNode::ExpNode(lineNum, DataTypeEnum::String),
+m_constType(ConstType::String),
 m_intValue(0),
 m_charValue(0),
 m_boolValue(false),

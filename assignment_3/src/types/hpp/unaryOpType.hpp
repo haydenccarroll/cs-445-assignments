@@ -7,7 +7,9 @@ enum class UnaryOpType
     Chsign,
     SizeOf,
     Question,
-    Not
+    Not,
+    Inc,
+    Dec
 };
 
 inline std::string unaryOpTypeToStr(UnaryOpType type)
@@ -22,6 +24,10 @@ inline std::string unaryOpTypeToStr(UnaryOpType type)
         return "?";
     case UnaryOpType::Not:
         return "not";
+    case UnaryOpType::Inc:
+        return "++";
+    case UnaryOpType::Dec:
+        return "--";
     }
 
     // shouldnt reach here ever

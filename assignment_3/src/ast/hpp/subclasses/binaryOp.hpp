@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../node.hpp"
+#include "exp.hpp"
 #include "../../../types/types.hpp"
 
-class BinaryOpNode : public ASTNode
+class BinaryOpNode : public ExpNode
 {
 public:
     /**

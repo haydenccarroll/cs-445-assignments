@@ -20,5 +20,7 @@ enum class NodeType
     ReturnNode,
     UnaryOpNode,
     VarDeclNode,
-    WhileNode 
+    WhileNode,
+    DeclNode,
+    ExpNode
 };

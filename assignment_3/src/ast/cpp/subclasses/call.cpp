@@ -1,10 +1,10 @@
 #include "../../hpp/subclasses/call.hpp"
 
-#include "../../hpp/node.hpp"
+#include "../../hpp/subclasses/exp.hpp"
 #include <string>
 
-CallNode::CallNode(unsigned int lineNum, std::string functionName) :
-ASTNode::ASTNode(lineNum),
-m_functionName(functionName)
+CallNode::CallNode(unsigned int lineNum, std::string funName) : 
+ExpNode::ExpNode(lineNum, DataTypeEnum::Void),
+m_functionName(funName)
 {
 }

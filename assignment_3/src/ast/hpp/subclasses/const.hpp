@@ -1,22 +1,21 @@
 #pragma once
 
-#include "../node.hpp"
+#include "exp.hpp"
 #include "../../../types/types.hpp"
 
-class ConstNode : public ASTNode
+class ConstNode : public ExpNode
 {
 public:
     /**
      * @brief Construct a new Const Node object
      * 
      * @param lineNum 
-     * @param type type of const
      * @param value value of respective data type
      */
-    ConstNode(unsigned int lineNum, ConstType type, int value);
-    ConstNode(unsigned int lineNum, ConstType type, char value);
-    ConstNode(unsigned int lineNum, ConstType type, std::string value);
-    ConstNode(unsigned int lineNum, ConstType type, bool value);
+    ConstNode(unsigned int lineNum, int value);
+    ConstNode(unsigned int lineNum, char value);
+    ConstNode(unsigned int lineNum, std::string value);
+    ConstNode(unsigned int lineNum, bool value);
 
     NodeType getNodeType() { return NodeType::ConstNode; }
 

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../node.hpp"
+#include "exp.hpp"
 #include "../../../types/types.hpp"
 
 #include <string>
 #include <iostream>
 
-class CallNode : public ASTNode
+class CallNode : public ExpNode
 {
 public:
     /**

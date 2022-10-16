@@ -1,21 +1,11 @@
 #include "../../hpp/subclasses/id.hpp"
 
-#include "../../hpp/node.hpp"
+#include "../../hpp/subclasses/exp.hpp"
 
 #include <string>
 
-IdNode::IdNode(unsigned int lineNum, std::string idName, bool isArray) :
-ASTNode::ASTNode(lineNum),
-m_idName(idName),
-m_isArray(isArray),
-m_arraySize(0)
-{
-}
-
-IdNode::IdNode(unsigned int lineNum, std::string idName, bool isArray, int arraySize) :
-ASTNode::ASTNode(lineNum),
-m_idName(idName),
-m_isArray(isArray),
-m_arraySize(arraySize)
+IdNode::IdNode(unsigned int lineNum, std::string idName) :
+ExpNode::ExpNode(lineNum, DataTypeEnum::Void),
+m_idName(idName)
 {
 }

@@ -443,13 +443,13 @@ exp             : mutable assignop exp
                     }
                 | mutable INC
                     {
-                        $$ = new AssignOpNode($1->getLineNum(), AssignOpType::INC);
+                        $$ = new UnaryOpNode($1->getLineNum(), UnaryOpType::Inc);
                         $$->addChild($1);
 
                     }
                 | mutable DEC
                     {
-                        $$ = new AssignOpNode($1->getLineNum(), AssignOpType::DEC);
+                        $$ = new UnaryOpNode($1->getLineNum(), UnaryOpType::Dec);
                         $$->addChild($1);
                     }
                 | simpleExp
@@ -460,29 +460,29 @@ exp             : mutable assignop exp
 
 assignop        : ASS
                     {
-                        $$ = new AssignOpNode($1->lineNum, AssignOpType::ASS);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Ass);
                     }
                 | ADDASS
                     {
-                        $$ = new AssignOpNode($1->lineNum, AssignOpType::ADDASS);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::AddAss);
                     }
                 | SUBASS
                     {
-                        $$ = new AssignOpNode($1->lineNum, AssignOpType::SUBASS);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::SubAss);
                     }
                 | MULASS
                     {
-                        $$ = new AssignOpNode($1->lineNum, AssignOpType::MULASS);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::MulAss);
                     }
                 | DIVASS
                     {
-                        $$ = new AssignOpNode($1->lineNum, AssignOpType::DIVASS);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::DivAss);
                     }
                 ;
 
 simpleExp       : simpleExp OR andExp
                     {
-                        $$ = new RelOpNode($1->getLineNum(), RelOpType::Or);
+                        $$ = new BinaryOpNode($1->getLineNum(), BinaryOpType::Or);
                         $$->addChild($1);
                         $$->addChild($3);
                     }
@@ -494,7 +494,7 @@ simpleExp       : simpleExp OR andExp
 
 andExp          : andExp AND unaryRelExp
                     {
-                        $$ = new RelOpNode($1->getLineNum(), RelOpType::And);
+                        $$ = new BinaryOpNode($1->getLineNum(), BinaryOpType::And);
                         $$->addChild($1);
                         $$->addChild($3);
                     }
@@ -529,27 +529,27 @@ relExp          : sumExp relop sumExp
 
 relop           : LT
                     {
-                        $$ = new RelOpNode($1->lineNum, RelOpType::LT);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::LT);
                     }
                 | LEQ
                     {
-                        $$ = new RelOpNode($1->lineNum, RelOpType::LEQ);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::LEQ);
                     }
                 | GT
                     {
-                        $$ = new RelOpNode($1->lineNum, RelOpType::GT);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::GT);
                     }
                 | GEQ
                     {
-                        $$ = new RelOpNode($1->lineNum, RelOpType::GEQ);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::GEQ);
                     }
                 | EQ
                     {
-                        $$ = new RelOpNode($1->lineNum, RelOpType::EQ);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::EQ);
                     }
                 | NEQ
                     {
-                        $$ = new RelOpNode($1->lineNum, RelOpType::NEQ);
+                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::NEQ);
                     }
                 ;
 
@@ -638,12 +638,12 @@ factor          : mutable
 
 mutable         : ID
                     {
-                        $$ = new IdNode($1->lineNum, $1->str, false);
+                        $$ = new IdNode($1->lineNum, $1->str);
                     }
                 | ID LBRACK exp RBRACK
                     {
                         $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Index);
-                        ASTNode* id = new IdNode($1->lineNum, $1->str, true);
+                        ASTNode* id = new IdNode($1->lineNum, $1->str);
                         $$->addChild(id);
                         $$->addChild($3);
                     }
@@ -693,20 +693,20 @@ argList         : argList COMMA exp
 
 constant        : NUMCONST
                     {
-                        $$ = new ConstNode($1->lineNum, ConstType::Int, $1->num);
+                        $$ = new ConstNode($1->lineNum, $1->num);
                     }
                 | BOOLCONST
                     {
-                        $$ = new ConstNode($1->lineNum, ConstType::Bool, $1->boolV);
+                        $$ = new ConstNode($1->lineNum, $1->boolV);
                     }
                 | CHARCONST
                     {
-                        $$ = new ConstNode($1->lineNum, ConstType::Char, $1->charV);
+                        $$ = new ConstNode($1->lineNum, $1->charV);
                     }
                 
                 | STRINGCONST
                     {
-                        $$ = new ConstNode($1->lineNum, ConstType::String, $1->str);
+                        $$ = new ConstNode($1->lineNum, $1->str);
                     }
                 ;
 %%
