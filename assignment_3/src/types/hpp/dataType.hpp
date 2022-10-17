@@ -7,7 +7,6 @@ enum class DataTypeEnum
     Int,
     Bool,
     Char,
-    String,
     Void,
     None
 };

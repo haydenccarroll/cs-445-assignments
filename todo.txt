@@ -1,4 +1,8 @@
-make an expression node type for all stuff that would return a value immediately
-operators would be epxressions
-
 make range loops have their own scope
+
+cleanup (obviously)
+
+ass (=) isnt right i dont think for initialization purposes
+    , especially with arrays.
+
+make the python tester sort the bottom of the input

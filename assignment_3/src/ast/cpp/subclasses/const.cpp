@@ -37,7 +37,7 @@ m_stringValue("")
 }
 
 ConstNode::ConstNode(unsigned int lineNum, std::string value) 
-: ExpNode::ExpNode(lineNum, DataTypeEnum::String),
+: ExpNode::ExpNode(lineNum, DataType(DataTypeEnum::Char, true)),
 m_constType(ConstType::String),
 m_intValue(0),
 m_charValue(0),

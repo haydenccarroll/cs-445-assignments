@@ -34,55 +34,7 @@ DataType::DataType(DataTypeEnum type, bool isArray)
 
 void DataType::print(bool printOf, bool isStatic)
 {
-    int count = 0;
-    DataType* tmpPtr = this;
-    DataTypeEnum enumType;
-    while (tmpPtr->m_nextType != nullptr)
-    {
-        tmpPtr = tmpPtr->m_nextType;
-        count++;
-    }
-    enumType = tmpPtr->m_enumType;
-
-    if (count != 0)
-    {
-        std::cout << "is array ";
-        count--;
-    }
-    for (int i=0; i < count; i++)
-    {
-        std::cout << "of array ";
-    }
-
-    if (printOf)
-    {
-        std::cout << "of ";
-    }
-
-    if (isStatic)
-    {
-        std::cout << "static ";
-    }
-
-    std::cout << "type ";
-    switch (enumType)
-    {
-    case DataTypeEnum::Bool:
-        std::cout << "bool";
-        break;
-    case DataTypeEnum::Char:
-        std::cout << "char";
-        break;
-    case DataTypeEnum::Int:
-        std::cout << "int";
-        break;
-    case DataTypeEnum::String:
-        std::cout << "string";
-        break;
-    case DataTypeEnum::Void:
-        std::cout << "void";
-        break;
-    }
+    std::cout << toString(printOf, isStatic);
 }
 
 std::string DataType::toString(bool printOf, bool isStatic) const
@@ -129,9 +81,6 @@ std::string DataType::toString(bool printOf, bool isStatic) const
         break;
     case DataTypeEnum::Int:
         ss << "int";
-        break;
-    case DataTypeEnum::String:
-        ss << "string";
         break;
     case DataTypeEnum::Void:
         ss << "void";
