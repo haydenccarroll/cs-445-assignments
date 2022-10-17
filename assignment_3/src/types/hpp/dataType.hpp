@@ -8,7 +8,8 @@ enum class DataTypeEnum
     Bool,
     Char,
     String,
-    Void
+    Void,
+    None
 };
 
 class DataType
@@ -20,6 +21,15 @@ public:
     std::string toString(bool printOf=true, bool isStatic=false) const;
     void setTypeSpec(DataTypeEnum typeSpec);
     bool isArray() { return (m_nextType != nullptr); }
+    DataTypeEnum getBasicType()
+    {
+        if (m_nextType == nullptr)
+        {
+            return m_enumType;
+        }
+
+        return m_nextType->getBasicType();
+    }
     bool operator==(const DataType &right) const;
     bool operator!=(const DataType &right) const;
 

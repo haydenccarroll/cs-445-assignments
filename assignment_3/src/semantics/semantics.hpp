@@ -25,12 +25,9 @@ private:
 
     void analyzeCompoundStmt(ASTNode* node);
     void analyzeLBrack(BinaryOpNode* node);
-    void analyzeAdd(BinaryOpNode* node);
-    void analyzeSub(BinaryOpNode* node);
-    void analyzeMul(BinaryOpNode* node);
-    void analyzeDiv(BinaryOpNode* node);
-    void analyzeMod(BinaryOpNode* node);
     void analyzeAss(BinaryOpNode* node);
+    DataType getExpType(ExpNode* node);
+
 
     // void populateIdTypes(ASTNode* node);
 

@@ -22,6 +22,59 @@ void SemanticAnalyzer::analyze()
     }
 }
 
+DataType SemanticAnalyzer::getExpType(ExpNode* node)
+{
+    if (node == nullptr) { return DataTypeEnum::None; }
+
+    unsigned int lineNum = node->getLineNum();
+    std::string name;
+
+    if (node->getNodeType() == NodeType::IdNode)
+    {
+        name = cast<IdNode*>(node)->getIdName();
+        auto declNode = lookupSymTable(name, lineNum, false);
+        if (declNode && declNode->getNodeType() == NodeType::VarDeclNode)
+        {
+            node->setExpType(declNode->getDataType());
+            return declNode->getDataType();
+        }
+        return DataTypeEnum::None;
+
+    } else if (node->getNodeType() == NodeType::CallNode)
+    {
+        name = cast<CallNode*>(node)->getFunName();
+        auto declNode = lookupSymTable(name, lineNum, false);
+        if (declNode && declNode->getNodeType() == NodeType::FunDeclNode)
+        {
+            node->setExpType(declNode->getDataType());
+            return declNode->getDataType();
+        }
+        return DataTypeEnum::None;
+
+    } else if (node->getNodeType() == NodeType::BinaryOpNode)
+    {
+        auto binaryOpNode = cast<BinaryOpNode*>(node);
+        if (binaryOpNode->getOperatorType() == BinaryOpType::Index)
+        {
+            auto arr = cast<IdNode*>(binaryOpNode->getChild(0));
+            auto declNode = lookupSymTable(arr->getIdName(), lineNum, false);
+            if (declNode && declNode->getNodeType() == NodeType::VarDeclNode)
+            {
+                node->setExpType(DataType(declNode->getDataType().getBasicType()));
+                return node->getExpType();
+            }
+            return DataTypeEnum::None;
+        } else if (binaryOpNode->getOperatorType() == BinaryOpType::Ass)
+        {
+            auto lval = cast<ExpNode*>(binaryOpNode->getChild(0));
+            node->setExpType(getExpType(lval));
+            return node->getExpType();
+        }
+    }
+
+    return node->getExpType();
+}
+
 void SemanticAnalyzer::analyzeNode(ASTNode* node)
 {
     if (node == nullptr)
@@ -183,7 +236,7 @@ void SemanticAnalyzer::analyzeReturn(ASTNode* node)
     auto returnVal = tryCast<ExpNode*>(node->getChild(0));
     if (returnVal)
     {
-        if (returnVal->getExpType().isArray())
+        if (getExpType(returnVal).isArray())
         {
             Error::error(node->getLineNum(), "Cannot return an array.");
         }
@@ -215,14 +268,18 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
     case BinaryOpType::GT:
     case BinaryOpType::GEQ:
     case BinaryOpType::Ass:
-        if (lval->getExpType().isArray() && !rval->getExpType().isArray())
+        if (getExpType(lval).isArray() && !getExpType(rval).isArray() &&
+            getExpType(lval) != DataTypeEnum::None &&
+            getExpType(rval) != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
                << "' requires both operands be arrays or not but lhs is an array"
                << " and rhs is not an array.";
             Error::error(node->getLineNum(), ss.str());
-        } else if (!lval->getExpType().isArray() && rval->getExpType().isArray())
+        } else if (!getExpType(lval).isArray() && getExpType(rval).isArray() &&
+                    getExpType(lval) != DataTypeEnum::None &&
+                    getExpType(rval) != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
@@ -231,13 +288,15 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
             Error::error(node->getLineNum(), ss.str());
         }
    
-        if (lval->getExpType() != rval->getExpType())
+        if (getExpType(lval) != getExpType(rval) &&
+            getExpType(lval) != DataTypeEnum::None &&
+            getExpType(rval) != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of the same type but lhs is "
-            << lval->getExpType().toString()
-            <<  " and rhs is " << rval->getExpType().toString() << ".";
+            << getExpType(lval).toString()
+            <<  " and rhs is " << getExpType(rval).toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -247,21 +306,23 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
     {
     case BinaryOpType::And:
     case BinaryOpType::Or:
-        if (lval->getExpType() != DataType(DataTypeEnum::Bool))
+        if (getExpType(lval) != DataTypeEnum::Bool &&
+            getExpType(lval) != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type bool "
-            <<  "but lhs is " << lval->getExpType().toString();
+            <<  "but lhs is " << getExpType(lval).toString();
             Error::error(node->getLineNum(), ss.str());
         }
 
-        if (rval->getExpType() != DataType(DataTypeEnum::Int))
+        if (getExpType(rval) != DataTypeEnum::Bool &&
+            getExpType(rval) != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type bool "
-            <<  "but rhs is " << rval->getExpType().toString();
+            <<  "but rhs is " << getExpType(rval).toString();
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -278,21 +339,23 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
     case BinaryOpType::Mul:
     case BinaryOpType::Div:
     case BinaryOpType::Mod:
-        if (lval->getExpType() != DataType(DataTypeEnum::Int))
+        if (getExpType(lval) != DataTypeEnum::Int &&
+            getExpType(lval) != DataTypeEnum::None) // if is none, it errored above. dont cascade errors.
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type int "
-            <<  "but lhs is " << lval->getExpType().toString();
+            <<  "but lhs is " << getExpType(lval).toString();
             Error::error(node->getLineNum(), ss.str());
         }
 
-        if (rval->getExpType() != DataType(DataTypeEnum::Int))
+        if (getExpType(rval) != DataTypeEnum::Int &&
+            getExpType(rval) != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type int "
-            <<  "but rhs is " << rval->getExpType().toString();
+            <<  "but rhs is " << getExpType(rval).toString();
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -311,7 +374,7 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
     case BinaryOpType::Mul:
     case BinaryOpType::Div:
     case BinaryOpType::Mod:
-        if (lval->getExpType().isArray() || rval->getExpType().isArray())
+        if (getExpType(lval).isArray() || getExpType(rval).isArray())
         {
             std::stringstream ss;
             ss << "The operation '" 
@@ -337,12 +400,12 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
     case UnaryOpType::Inc:
     case UnaryOpType::Chsign:
     case UnaryOpType::Random:
-        if (rval->getExpType() != DataType(DataTypeEnum::Int))
+        if (getExpType(rval) != DataType(DataTypeEnum::Int))
         {
             std::stringstream ss;
             ss << "Unary '" << unaryOpTypeToStr(unaryOpNode->getOperatorType())
                << "' requires an operand of type int but was given "
-               << rval->getExpType().toString() << ".";
+               << getExpType(rval).toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -351,12 +414,12 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
     switch (unaryOpNode->getOperatorType())
     {
     case UnaryOpType::Not:
-        if (rval->getExpType() != DataType(DataTypeEnum::Bool))
+        if (getExpType(rval) != DataType(DataTypeEnum::Bool))
         {
             std::stringstream ss;
             ss << "Unary '" << unaryOpTypeToStr(unaryOpNode->getOperatorType())
                << "' requires an operand of type bool but was given "
-               << rval->getExpType().toString() << ".";
+               << getExpType(rval).toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -365,7 +428,7 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
     switch (unaryOpNode->getOperatorType())
     {
     case UnaryOpType::SizeOf:
-        if (!rval->getExpType().isArray())
+        if (!getExpType(rval).isArray())
         {
             std::stringstream ss;
             ss << "The operation '" << unaryOpTypeToStr(unaryOpNode->getOperatorType())
@@ -416,11 +479,11 @@ void SemanticAnalyzer::analyzeLBrack(BinaryOpNode* node)
     }
 
     auto rightExp = cast<ExpNode*>(node->getChild(1));
-    if (rightExp->getExpType() != DataType(DataTypeEnum::Int))
+    if (getExpType(rightExp) != DataType(DataTypeEnum::Int))
     {
         std::stringstream ss;
         ss << "Array '" << left->getIdName() << "' should be indexed by type int but got "
-           << rightExp->getExpType().toString() << ".";
+           << getExpType(rightExp).toString() << ".";
         Error::error(node->getLineNum(), ss.str());
     }
     // convert to expression type.
@@ -457,8 +520,6 @@ void SemanticAnalyzer::analyzeAss(BinaryOpNode* node)
 
     ASTNode* rval = node->getChild(1);
 }
-
-
 
 template <typename T> T SemanticAnalyzer::cast(ASTNode* node)
 {
