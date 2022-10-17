@@ -1,17 +1,6 @@
-fix a variety of printing issues (should be fairly simple)
-    1. I print but got of type bool, etc. i dont want this. there is a flag to remove of.
-add the uninitialized warning checks
+some mysteries:
+    1. why is arrayops saying Array is unindexed array on line 22 but not 21.
+    2. what is the deal with main being defined. what is the exact logic? seems like 
+        strange and emptyline contradict. I have working solution though.
 
-some specifics
-in cover.c-:
-    the cannot index nonarray have a diff, but i dont know why.
-    they seem identical, maybe the python sort isnt working as intended.
-in allbad.c:
-    the operation ? does not work with arrays (i do not print this, i should)
-
-    ln 65 = (i erroneuopsulyt print out = reuquires operands of the same type but lhs is is array of type int)
-    ln 55 = i have some printing issues (nothing major)
-    ln 52 and 53 symbol z is already declared (they dont have this)
-    ln 44 array 'ca' should be indexed by type int but got is array of type bool (should just be type bool)
-
-
+add in variable initialization

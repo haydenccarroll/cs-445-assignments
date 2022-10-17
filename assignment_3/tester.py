@@ -28,7 +28,7 @@ def sortA3(fileName):
     secondPart = []
     with open(fileName, "r") as file:
         for line in file:
-            if line.startswith("Error") or line.startswith("Warning") or line.startswith("Number of "):
+            if line.startswith("ERROR") or line.startswith("WARNING") or line.startswith("Number of "):
                 hasSplit = True
             if hasSplit:
                 secondPart.append(line)
