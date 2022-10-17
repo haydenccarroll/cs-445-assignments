@@ -187,7 +187,8 @@ void SemanticAnalyzer::analyzeFunDecl(ASTNode* node)
 
     insertToSymTable(funName, funDeclNode);
 
-    if (funName == "main" && m_symTable->depth() == 1)
+    if (funName == "main" && m_symTable->depth() == 1 &&
+        funDeclNode->getChild(0) == nullptr)
     {
         m_isMainDefined = true;
     }
