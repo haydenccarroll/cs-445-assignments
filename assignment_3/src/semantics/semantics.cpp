@@ -92,6 +92,7 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
         break;
     case NodeType::ForNode:
         analyzeForNode(node);
+        break;
     case NodeType::CompoundStmtNode:
         analyzeCompoundStmt(node);
         break;
@@ -149,13 +150,6 @@ void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
     if (node == nullptr) { return; }
 
     auto typedNode = cast<VarDeclNode*>(node);
-     
-    // already handled by FuncDecl
-    if (typedNode->isParam())
-    {
-        return;
-    }
-
     insertToSymTable(typedNode->getName(), typedNode);
 
 }
@@ -174,6 +168,7 @@ void SemanticAnalyzer::analyzeCompoundStmt(ASTNode* node)
     switch (parentType)
     {
         case NodeType::FunDeclNode:
+            return;
         case NodeType::ForNode:
             return;
     }
@@ -200,13 +195,6 @@ void SemanticAnalyzer::analyzeFunDecl(ASTNode* node)
     std::stringstream ss;
     ss << "Function: " << funName << " at line: " << node->getLineNum();
     m_symTable->enter(ss.str());
-
-    auto params = cast<VarDeclNode*>(node->getChild(0));
-    while (params != nullptr)
-    {
-        bool ok = insertToSymTable(params->getName(), params);
-        params = cast<VarDeclNode*>(params->getSibling(0));
-    }
 }
 
 void SemanticAnalyzer::analyzeForNode(ASTNode* node)
@@ -219,9 +207,6 @@ void SemanticAnalyzer::analyzeForNode(ASTNode* node)
     std::stringstream ss;
     ss << "For at line: " << node->getLineNum();
     m_symTable->enter(ss.str());
-
-    auto iterator = cast<VarDeclNode*>(node->getChild(0));
-    insertToSymTable(iterator->getName(), iterator);
 }
 
 void SemanticAnalyzer::analyzeCall(ASTNode* node)
