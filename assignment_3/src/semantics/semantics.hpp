@@ -31,12 +31,15 @@ private:
     void analyzeAss(BinaryOpNode* node);
     DataType getExpType(ExpNode* node);
 
+    bool isIdAnIndex(ASTNode* node);
+    bool isIdInLval(ASTNode* node);
+
 
     // void populateIdTypes(ASTNode* node);
 
 
     bool insertToSymTable(std::string, DeclNode* );
-    DeclNode* lookupSymTable(std::string name, unsigned int lineNum, bool use=true);
+    DeclNode* lookupSymTable(std::string name, unsigned int lineNum, bool use=true, bool warnUninit=true);
     void leaveScope();
 
     /**

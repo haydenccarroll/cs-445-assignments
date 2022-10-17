@@ -9,6 +9,7 @@ ASTNode::ASTNode(unsigned int lineNum)
 {
     m_lineNum = lineNum;
     m_sibling = nullptr;
+    m_hasBeenAnalyzed = false;
 }
 
 ASTNode::~ASTNode()
@@ -53,6 +54,36 @@ void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl)
     {
         m_sibling->print(indentLevel, siblingLvl + 1);
     }
+}
+
+ASTNode* ASTNode::getAncestor(NodeType type)
+{
+    if (m_parent == nullptr)
+    {
+        return nullptr;
+    }
+
+    if (m_parent->getNodeType() == type)
+    {
+        return m_parent;
+    }
+
+    return m_parent->getAncestor(type);
+}
+
+bool ASTNode::isAncestor(ASTNode* node)
+{
+    if (this == node)
+    {
+        return true;
+    }
+
+    if (m_parent == nullptr)
+    {
+        return false;
+    }
+
+    return m_parent->isAncestor(node);
 }
 
 void ASTNode::addChild(ASTNode* child)

@@ -28,9 +28,12 @@ public:
      */
     void setTypeSpec(DataTypeEnum type);
 
-    void setInitialized(bool isInitialized) { m_isInitialized = isInitialized; }
+    void setInitialized(bool isInitialized)
+    {
+        m_isInitialized = isInitialized;
+    }
     bool isInitialized() { return m_isInitialized; }
-    void use(unsigned int lineNum);
+    void use(unsigned int lineNum, bool warnUninit=true);
     unsigned int getUsage() { return m_uses; }
 
     /**

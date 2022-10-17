@@ -44,6 +44,7 @@ void VarDeclNode::setTypeSpec(DataTypeEnum type)
 void VarDeclNode::setStatic(bool isStatic)
 {
     m_isStatic = isStatic;
+    m_isInitialized = (isStatic | m_isInitialized);
     if (m_sibling != nullptr)
     {
         VarDeclNode* varDeclSibling = dynamic_cast<VarDeclNode*>(m_sibling);
@@ -51,9 +52,9 @@ void VarDeclNode::setStatic(bool isStatic)
     }
 }
 
-void VarDeclNode::use(unsigned int lineNum)
+void VarDeclNode::use(unsigned int lineNum, bool warnUninit)
 {
-    if (m_isInitialized == false && m_uses == 0)
+    if (m_isInitialized == false && m_uses == 0 && warnUninit)
     {
         std::stringstream ss;
         ss << "Variable '" << m_name << "' may be uninitialized when used here.";

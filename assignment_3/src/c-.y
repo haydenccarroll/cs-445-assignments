@@ -99,6 +99,7 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
                             Error::error($3->getLineNum(), "dynamic_cast<VarDeclNode*> failed. Node is wrong type.");
                         }
                         declNode->setStatic(true);
+                        declNode->setInitialized(true);
                         declNode->setTypeSpec($2); 
                     }
                 | typeSpec varDeclList SEMICOLON

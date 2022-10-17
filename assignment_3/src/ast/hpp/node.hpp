@@ -53,6 +53,9 @@ public:
     ASTNode* getParent() { return m_parent; }
     void setParent(ASTNode* parent) { m_parent = parent; }
 
+    ASTNode* getAncestor(NodeType type);
+    bool isAncestor(ASTNode* node);
+
     /**
      * @brief gets the ith sibling of the node. 0 is sibling to right
      * 
@@ -61,6 +64,8 @@ public:
      */
     ASTNode* getSibling(unsigned int index);
 
+    bool getHasBeenAnalyzed() { return m_hasBeenAnalyzed; }
+    void setHasBeenAnalyzed(bool isAnalyzed) { m_hasBeenAnalyzed = isAnalyzed; }
 
     /**
      * @brief gets a child from m_children at given index
@@ -85,6 +90,8 @@ protected:
     /// @brief linked list of sibling nodes
     ASTNode* m_sibling;
     ASTNode* m_parent;
+
+    bool m_hasBeenAnalyzed;
     /// @brief line number node first appeared on
     unsigned int m_lineNum;
 

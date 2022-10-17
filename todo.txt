@@ -2,6 +2,4 @@ some mysteries:
     1. why is arrayops saying Array is unindexed array on line 22 but not 21.
     2. what is the deal with main being defined. what is the exact logic? seems like 
         strange and emptyline contradict. I have working solution though.
-    3. why is rabbit and were initialized correctly in f22? is it because they are static?
-    4. why is wrong initialized correctly in f22? is it because it uses +=? although += really does require lval to be rval so it doesnt make sense...
-    
+    3. why is variable c uninitialized for arrayops ln 45

@@ -81,6 +81,14 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
     {
         return;
     }
+
+    if (node->getHasBeenAnalyzed())
+    {
+        return;
+    }
+
+    node->setHasBeenAnalyzed(true);
+
     std::stringstream ss;
     switch (node->getNodeType())
     {
@@ -152,6 +160,10 @@ void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
     if (node == nullptr) { return; }
 
     auto typedNode = cast<VarDeclNode*>(node);
+    if (m_symTable->depth() == 1) // its a global variable, so already initialized.
+    {
+        typedNode->setInitialized(true);
+    }
     insertToSymTable(typedNode->getName(), typedNode);
 
 }
@@ -232,7 +244,7 @@ void SemanticAnalyzer::analyzeCall(ASTNode* node)
 
     auto callNode = cast<CallNode*>(node);
     std::string funName = callNode->getFunName();
-    auto entry = lookupSymTable(funName, node->getLineNum());
+    auto entry = lookupSymTable(funName, node->getLineNum(), false);
     if (entry == nullptr)
     {
         std::stringstream ss;
@@ -246,17 +258,21 @@ void SemanticAnalyzer::analyzeCall(ASTNode* node)
         std::stringstream ss;
         ss << "'" << funName << "' is a simple variable and cannot be called.";
         Error::error(node->getLineNum(), ss.str());
+
+        auto varDecl = cast<VarDeclNode*>(entry);
+        varDecl->use(node->getLineNum());
     }
 }
 
 void SemanticAnalyzer::analyzeId(ASTNode* node)
 {
     if (node == nullptr) { return; }
+    bool warnUninit = !isIdInLval(node);
 
     auto typedNode = cast<IdNode*>(node);
     std::string idName = typedNode->getIdName();
 
-    auto entry = lookupSymTable(idName, node->getLineNum());
+    auto entry = lookupSymTable(idName, node->getLineNum(), true, warnUninit);
     if (entry == nullptr)
     {
         std::stringstream ss;
@@ -275,6 +291,52 @@ void SemanticAnalyzer::analyzeId(ASTNode* node)
         auto varDecl = cast<VarDeclNode*>(entry);
     }
 }
+
+bool SemanticAnalyzer::isIdInLval(ASTNode* node)
+{
+    if (node == nullptr) { return false; }
+
+    auto ancestor = cast<BinaryOpNode*>(node->getAncestor(NodeType::BinaryOpNode));
+    while (ancestor != nullptr)
+    {
+        switch (ancestor->getOperatorType())
+        {
+        case BinaryOpType::Ass:
+        case BinaryOpType::AddAss:
+        case BinaryOpType::MulAss:
+        case BinaryOpType::DivAss:
+            if (node->isAncestor(ancestor->getChild(0)))
+            {
+                return true;
+            }
+        }
+        ancestor = cast<BinaryOpNode*>(ancestor->getAncestor(NodeType::BinaryOpNode));
+    }
+
+    return false;
+}
+
+bool SemanticAnalyzer::isIdAnIndex(ASTNode* node)
+{
+    if (node == nullptr) { return false; }
+
+    auto ancestor = cast<BinaryOpNode*>(node->getAncestor(NodeType::BinaryOpNode));
+    while (ancestor != nullptr)
+    {
+        if (ancestor->getOperatorType() == BinaryOpType::Index)
+        {
+            if (ancestor->getChild(0) != node)
+            {
+                return true;
+            }
+            return false;
+        }
+        ancestor = cast<BinaryOpNode*>(ancestor->getAncestor(NodeType::BinaryOpNode));
+    }
+
+    return false;
+}
+
 
 void SemanticAnalyzer::analyzeReturn(ASTNode* node)
 {
@@ -303,8 +365,15 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
     {
         analyzeLBrack(binaryOpNode);
         return;
-    } else if (binaryOpNode->getOperatorType() == BinaryOpType::Ass)
+    }
+
+    switch(binaryOpNode->getOperatorType())
     {
+    case BinaryOpType::AddAss:
+    case BinaryOpType::SubAss:
+    case BinaryOpType::MulAss:
+    case BinaryOpType::DivAss:
+    case BinaryOpType::Ass:
         analyzeAss(binaryOpNode);
     }
 
@@ -564,6 +633,9 @@ void SemanticAnalyzer::analyzeAss(BinaryOpNode* node)
         return;
     }
 
+    // analyze right side first
+    analyzeNode(node->getChild(1));
+
     auto lvalId = tryCast<IdNode*>(node->getChild(0));
     if (lvalId)
     {
@@ -632,7 +704,7 @@ bool SemanticAnalyzer::insertToSymTable(std::string str, DeclNode* node)
     return ok;
 }
 
-DeclNode* SemanticAnalyzer::lookupSymTable(std::string name, unsigned int lineNum, bool use)
+DeclNode* SemanticAnalyzer::lookupSymTable(std::string name, unsigned int lineNum, bool use, bool warnUninit)
 {
     DeclNode* node = m_symTable->lookup(name);
     if (node == nullptr)
@@ -643,7 +715,7 @@ DeclNode* SemanticAnalyzer::lookupSymTable(std::string name, unsigned int lineNu
     auto varDecl = tryCast<VarDeclNode*>(node);
     if (varDecl && use == true)
     {
-        varDecl->use(lineNum);
+        varDecl->use(lineNum, warnUninit);
     }
     return node;
 }
