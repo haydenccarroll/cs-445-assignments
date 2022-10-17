@@ -57,6 +57,10 @@ void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl)
 
 void ASTNode::addChild(ASTNode* child)
 {
+    if (child != nullptr)
+    {
+        child->setParent(this);
+    }
     m_children.push_back(child);
 }
 

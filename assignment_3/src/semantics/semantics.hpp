@@ -20,6 +20,9 @@ private:
     void analyzeId(ASTNode* node);
     void analyzeBinaryOp(ASTNode* node);
     void analyzeUnaryOp(ASTNode* node);
+    void analyzeForNode(ASTNode* node);
+
+    void calculateLeaveScope(ASTNode* node);
 
     void analyzeReturn(ASTNode* node);
 

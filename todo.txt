@@ -1,8 +1,15 @@
-make range loops have their own scope
-
 cleanup (obviously)
 
 ass (=) isnt right i dont think for initialization purposes
     , especially with arrays.
 
-make the python tester sort the bottom of the input
+
+ERROR(LINKER) in strange.c- that i dont have. i think because it shouldnt have args.
+
+in allbad.c:
+    the operation ? does not work with arrays (i do not print this, i should)
+
+    ln 65 = (i erroneuopsulyt print out = reuquires operands of the same type but lhs is is array of type int)
+    ln 55 = i have some printing issues (nothing major)
+    ln 52 and 53 symbol z is already declared (they dont have this)
+    ln 44 array 'ca' should be indexed by type int but got is array of type bool (should just be type bool)

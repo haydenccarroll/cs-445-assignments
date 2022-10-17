@@ -90,6 +90,8 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
     case NodeType::FunDeclNode:
         analyzeFunDecl(node);
         break;
+    case NodeType::ForNode:
+        analyzeForNode(node);
     case NodeType::CompoundStmtNode:
         analyzeCompoundStmt(node);
         break;
@@ -120,12 +122,26 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
         }
     }
 
-    if (node->getNodeType() == NodeType::CompoundStmtNode)
+    calculateLeaveScope(node);
+
+    analyzeNode(node->getSibling(0));
+}
+
+void SemanticAnalyzer::calculateLeaveScope(ASTNode* node)
+{
+    auto parentType = NodeType::CompoundStmtNode;
+    if (node->getParent() != nullptr)
+    {
+        parentType = node->getParent()->getNodeType();
+    }
+
+    // if a compound statement that isnt child of a fornode, or if it is a fornode
+    if ((node->getNodeType() == NodeType::CompoundStmtNode &&
+        parentType != NodeType::ForNode) ||
+        node->getNodeType() == NodeType::ForNode)
     {
         leaveScope();
     }
-
-    analyzeNode(node->getSibling(0));
 }
 
 void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
@@ -148,10 +164,18 @@ void SemanticAnalyzer::analyzeCompoundStmt(ASTNode* node)
 {
     if (node == nullptr) { return; }
 
-    auto typedNode = cast<CompoundStmtNode*>(node);
-    if (typedNode->getIsFromFunction() == true)
+    auto parentType = NodeType::CompoundStmtNode;
+    if (node->getParent() != nullptr)
     {
-        return;
+        parentType = node->getParent()->getNodeType();
+    }
+
+    // if fun decl or for node is parent, dont do anything, they handle it.
+    switch (parentType)
+    {
+        case NodeType::FunDeclNode:
+        case NodeType::ForNode:
+            return;
     }
 
     std::stringstream ss;
@@ -183,6 +207,21 @@ void SemanticAnalyzer::analyzeFunDecl(ASTNode* node)
         bool ok = insertToSymTable(params->getName(), params);
         params = cast<VarDeclNode*>(params->getSibling(0));
     }
+}
+
+void SemanticAnalyzer::analyzeForNode(ASTNode* node)
+{
+    if (node == nullptr) { return; }
+
+    auto funDeclNode = cast<ForNode*>(node);
+
+
+    std::stringstream ss;
+    ss << "For at line: " << node->getLineNum();
+    m_symTable->enter(ss.str());
+
+    auto iterator = cast<VarDeclNode*>(node->getChild(0));
+    insertToSymTable(iterator->getName(), iterator);
 }
 
 void SemanticAnalyzer::analyzeCall(ASTNode* node)
@@ -312,7 +351,7 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type bool "
-            <<  "but lhs is " << getExpType(lval).toString();
+            <<  "but lhs is " << getExpType(lval).toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
 
@@ -322,7 +361,7 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type bool "
-            <<  "but rhs is " << getExpType(rval).toString();
+            <<  "but rhs is " << getExpType(rval).toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -345,7 +384,7 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type int "
-            <<  "but lhs is " << getExpType(lval).toString();
+            <<  "but lhs is " << getExpType(lval).toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
 
@@ -355,7 +394,7 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type int "
-            <<  "but rhs is " << getExpType(rval).toString();
+            <<  "but rhs is " << getExpType(rval).toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -463,7 +502,7 @@ void SemanticAnalyzer::analyzeLBrack(BinaryOpNode* node)
     if (!isArr)
     {
         std::stringstream ss;
-        ss << "Cannot index nonarray '" << leftName << "'";
+        ss << "Cannot index nonarray '" << leftName << "'.";
         Error::error(node->getLineNum(), ss.str());
     }
 
@@ -558,7 +597,7 @@ bool SemanticAnalyzer::insertToSymTable(std::string str, DeclNode* node)
         }
         std::stringstream ss;
         ss << "Symbol '" << str << "' is already declared at line "
-           << originalDecl->getLineNum();
+           << originalDecl->getLineNum() << ".";
         Error::error(node->getLineNum(), ss.str());
     }
 

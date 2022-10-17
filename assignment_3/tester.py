@@ -22,6 +22,24 @@ def execute(dir, cmd):
     os.system(cmd)
     os.chdir(cwd)
 
+def sortA3(fileName):
+    hasSplit = False
+    firstPart = ""
+    secondPart = []
+    with open(fileName, "r") as file:
+        for line in file:
+            if line.startswith("Error") or line.startswith("Warning") or line.startswith("Number of "):
+                hasSplit = True
+            if hasSplit:
+                secondPart.append(line)
+            else:
+                firstPart += line
+    
+    secondPart.sort()
+    secondPart = ''.join(secondPart)
+    with open(fileName, "w") as file:
+        file.write(firstPart + secondPart)
+
 
 def make(src_dir):
     execute(src_dir, 'make')
@@ -85,6 +103,8 @@ def test(src_dir, test_dir, flags='', show_diff=True):
         actual_out = os.path.join(actual_dir, test + '.out')
         os.system(f'cat {test_out} > {expected_out}')
         os.system(f'cat {tmp_out} > {actual_out}')
+        sortA3(expected_out)
+        sortA3(actual_out)
         os.remove(tmp_out)
 
         if diff(expected_out, actual_out):

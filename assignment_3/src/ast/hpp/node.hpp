@@ -50,6 +50,9 @@ public:
      */
     void addSibling(ASTNode* sibling);
 
+    ASTNode* getParent() { return m_parent; }
+    void setParent(ASTNode* parent) { m_parent = parent; }
+
     /**
      * @brief gets the ith sibling of the node. 0 is sibling to right
      * 
@@ -57,6 +60,7 @@ public:
      * @return ASTNode* child, nullptr if not found
      */
     ASTNode* getSibling(unsigned int index);
+
 
     /**
      * @brief gets a child from m_children at given index
@@ -80,6 +84,7 @@ protected:
     std::vector<ASTNode*> m_children;
     /// @brief linked list of sibling nodes
     ASTNode* m_sibling;
+    ASTNode* m_parent;
     /// @brief line number node first appeared on
     unsigned int m_lineNum;
 
