@@ -303,6 +303,9 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
     {
         analyzeLBrack(binaryOpNode);
         return;
+    } else if (binaryOpNode->getOperatorType() == BinaryOpType::Ass)
+    {
+        analyzeAss(binaryOpNode);
     }
 
     // requires both operands be arrays.... analysis
@@ -638,7 +641,7 @@ DeclNode* SemanticAnalyzer::lookupSymTable(std::string name, unsigned int lineNu
     }
 
     auto varDecl = tryCast<VarDeclNode*>(node);
-    if (varDecl && use)
+    if (varDecl && use == true)
     {
         varDecl->use(lineNum);
     }
