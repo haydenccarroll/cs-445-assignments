@@ -1,11 +1,11 @@
-cleanup (obviously)
+fix a variety of printing issues (should be fairly simple)
+    1. I print but got of type bool, etc. i dont want this. there is a flag to remove of.
+add the uninitialized warning checks
 
-ass (=) isnt right i dont think for initialization purposes
-    , especially with arrays.
-
-
-ERROR(LINKER) in strange.c- that i dont have. i think because it shouldnt have args.
-
+some specifics
+in cover.c-:
+    the cannot index nonarray have a diff, but i dont know why.
+    they seem identical, maybe the python sort isnt working as intended.
 in allbad.c:
     the operation ? does not work with arrays (i do not print this, i should)
 
@@ -13,3 +13,5 @@ in allbad.c:
     ln 55 = i have some printing issues (nothing major)
     ln 52 and 53 symbol z is already declared (they dont have this)
     ln 44 array 'ca' should be indexed by type int but got is array of type bool (should just be type bool)
+
+

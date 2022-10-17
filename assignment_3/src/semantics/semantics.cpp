@@ -320,8 +320,8 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of the same type but lhs is "
-            << getExpType(lval).toString()
-            <<  " and rhs is " << getExpType(rval).toString() << ".";
+            << getExpType(lval).getBasicType().toString(false)
+            <<  " and rhs is " << getExpType(rval).getBasicType().toString(false) << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -337,7 +337,7 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type bool "
-            <<  "but lhs is " << getExpType(lval).toString() << ".";
+            <<  "but lhs is " << getExpType(lval).getBasicType().toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
 
@@ -347,7 +347,7 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type bool "
-            <<  "but rhs is " << getExpType(rval).toString() << ".";
+            <<  "but rhs is " << getExpType(rval).getBasicType().toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -370,7 +370,7 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type int "
-            <<  "but lhs is " << getExpType(lval).toString() << ".";
+            <<  "but lhs is " << getExpType(lval).getBasicType().toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
 
@@ -380,7 +380,7 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type int "
-            <<  "but rhs is " << getExpType(rval).toString() << ".";
+            <<  "but rhs is " << getExpType(rval).getBasicType().toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -418,6 +418,23 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
     auto unaryOpNode = cast<UnaryOpNode*>(node);
     auto rval = cast<ExpNode*>(node->getChild(0));
 
+    // The operation ... does not work with arrays.
+    switch (unaryOpNode->getOperatorType())
+    {
+    case UnaryOpType::Dec:
+    case UnaryOpType::Inc:
+    case UnaryOpType::Chsign:
+    case UnaryOpType::Random:
+    case UnaryOpType::Not:
+        if (getExpType(rval).isArray())
+        {
+            std::stringstream ss;
+            ss << "The operation '" << unaryOpTypeToStr(unaryOpNode->getOperatorType())
+               << "' does not work with arrays.";
+            Error::error(node->getLineNum(), ss.str());
+        }
+    }
+
     // Unary ... requires an operand of int but was given ...
     switch (unaryOpNode->getOperatorType())
     {
@@ -430,7 +447,7 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
             std::stringstream ss;
             ss << "Unary '" << unaryOpTypeToStr(unaryOpNode->getOperatorType())
                << "' requires an operand of type int but was given "
-               << getExpType(rval).toString() << ".";
+               << getExpType(rval).getBasicType().toString(false) << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -444,7 +461,7 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
             std::stringstream ss;
             ss << "Unary '" << unaryOpTypeToStr(unaryOpNode->getOperatorType())
                << "' requires an operand of type bool but was given "
-               << getExpType(rval).toString() << ".";
+               << getExpType(rval).getBasicType().toString(false) << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -461,8 +478,6 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
             Error::error(node->getLineNum(), ss.str());
         }
     }
-
-
 }
 
 void SemanticAnalyzer::analyzeLBrack(BinaryOpNode* node)
@@ -508,7 +523,7 @@ void SemanticAnalyzer::analyzeLBrack(BinaryOpNode* node)
     {
         std::stringstream ss;
         ss << "Array '" << left->getIdName() << "' should be indexed by type int but got "
-           << getExpType(rightExp).toString() << ".";
+           << getExpType(rightExp).getBasicType().toString(false) << ".";
         Error::error(node->getLineNum(), ss.str());
     }
     // convert to expression type.

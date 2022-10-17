@@ -20,11 +20,11 @@ public:
     std::string toString(bool printOf=true, bool isStatic=false) const;
     void setTypeSpec(DataTypeEnum typeSpec);
     bool isArray() { return (m_nextType != nullptr); }
-    DataTypeEnum getBasicType()
+    DataType getBasicType()
     {
         if (m_nextType == nullptr)
         {
-            return m_enumType;
+            return DataType(m_enumType);
         }
 
         return m_nextType->getBasicType();
