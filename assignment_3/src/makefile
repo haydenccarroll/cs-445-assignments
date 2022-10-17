@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = --std=c++17 #-ly
+CXXFLAGS = --std=c++17 -g
 
 FLEX = flex
 FLEXFLAGS =

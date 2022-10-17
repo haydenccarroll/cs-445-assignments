@@ -11,7 +11,6 @@
 #include "hpp/subclasses/funDecl.hpp"
 #include "hpp/subclasses/id.hpp"
 #include "hpp/subclasses/if.hpp"
-#include "hpp/subclasses/param.hpp"
 #include "hpp/subclasses/range.hpp"
 #include "hpp/subclasses/return.hpp"
 #include "hpp/subclasses/unaryOp.hpp"

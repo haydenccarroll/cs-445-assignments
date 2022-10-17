@@ -14,7 +14,6 @@ enum class NodeType
     FunDeclNode,
     IdNode,
     IfNode,
-    ParamNode,
     RangeNode,
     RelOpNode,
     ReturnNode,

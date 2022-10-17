@@ -81,7 +81,7 @@ decl            : varDecl
 varDecl         : typeSpec varDeclList SEMICOLON
                     {
                         $$ = $2;
-                        VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($$);
+                        auto declNode = dynamic_cast<VarDeclNode*>($$);
                         if (declNode == nullptr)
                         {
                             Error::error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is of the wrong type.");
@@ -130,7 +130,13 @@ varDeclInit     : varDeclId
                     }
                 | varDeclId COLON simpleExp
                     {
-                        $$ = $1;
+                        auto decl = dynamic_cast<VarDeclNode*>($1);
+                        if (decl == nullptr)
+                        {
+                            throw std::runtime_error("dynamic cast failed for varDeclInit.");
+                        }
+                        decl->setInitialized(true);
+                        $$ = decl;
                         $$->addChild($3);
                     }
                 ;
@@ -216,10 +222,10 @@ parmList        : parmList SEMICOLON parmTypeList
 parmTypeList    : typeSpec parmIdList
                     {
                         $$ = $2;
-                        ParamNode* param = dynamic_cast<ParamNode*>($$);
+                        auto param = dynamic_cast<VarDeclNode*>($$);
                         if (param == nullptr)
                         {
-                            Error::error($2->getLineNum(), "dynamic_cast<ParamNode*> failed. Node is wrong type.");
+                            Error::error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. Node is wrong type.");
                         }
                         param->setTypeSpec($1);
                     }
@@ -245,12 +251,16 @@ parmIdList      : parmIdList COMMA parmId
 parmId          : ID
                     {
                         DataType dataType = DataType(DataTypeEnum::Void);
-                        $$ = new ParamNode($1->lineNum, $1->str, dataType);
+                        auto param = new VarDeclNode($1->lineNum, $1->str, dataType, false, true);
+                        param->setInitialized(true);
+                        $$ = param;
                     }
                 | ID LBRACK RBRACK
                     {
                         DataType dataType = DataType(DataTypeEnum::Void, true);
-                        $$ = new ParamNode($1->lineNum, $1->str, dataType);
+                        auto param = new VarDeclNode($1->lineNum, $1->str, dataType, false, true);
+                        param->setInitialized(true);
+                        $$ = param;
                     }
                 ;
 
@@ -386,8 +396,9 @@ iterStmtOpen    : WHILE simpleExp DO openStmt
                     {
                         $$ = new ForNode($1->lineNum);
                         DataType dataType = DataType(DataTypeEnum::Int);
-                        ASTNode* id = new VarDeclNode($2->lineNum, $2->str, dataType);
-                        $$->addChild(id);
+                        auto var = new VarDeclNode($2->lineNum, $2->str, dataType);
+                        var->setInitialized(true);
+                        $$->addChild(var);
                         $$->addChild($4);
                         $$->addChild($6);
                     }
@@ -403,7 +414,8 @@ iterStmtClosed  : WHILE simpleExp DO closedStmt
                     {
                         $$ = new ForNode($1->lineNum);
                         DataType dataType = DataType(DataTypeEnum::Int);
-                        ASTNode* id = new VarDeclNode($2->lineNum, $2->str, dataType);
+                        auto id = new VarDeclNode($2->lineNum, $2->str, dataType);
+                        id->setInitialized(true);
                         $$->addChild(id);
                         $$->addChild($4);
                         $$->addChild($6);

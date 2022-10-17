@@ -9,7 +9,6 @@
 DeclNode::DeclNode(unsigned int lineNum, std::string name, DataType dataType) :
 ASTNode::ASTNode(lineNum),
 m_name(name),
-m_dataType(dataType),
-m_uses(0)
+m_dataType(dataType)
 {
 }

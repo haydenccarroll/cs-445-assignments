@@ -14,9 +14,11 @@ public:
      * @param type data type of the variable
      * @param isStatic if variable is static, defaults to false
      */
-    VarDeclNode(unsigned int lineNum, std::string varName, DataType type, bool isStatic=false);
+    VarDeclNode(unsigned int lineNum, std::string varName, DataType type, bool isStatic=false, bool isParam=false);
     
     void printNode();
+
+    bool isParam() { return m_isParam; }
 
     virtual NodeType getNodeType() { return NodeType::VarDeclNode; }
     /**
@@ -25,6 +27,11 @@ public:
      * @param type concrete type
      */
     void setTypeSpec(DataTypeEnum type);
+
+    void setInitialized(bool isInitialized) { m_isInitialized = isInitialized; }
+    bool isInitialized() { return m_isInitialized; }
+    void use(unsigned int lineNum);
+    unsigned int getUsage() { return m_uses; }
 
     /**
      * @brief sets the m_isStatic member for itself and all siblings
@@ -36,4 +43,7 @@ public:
 
 private:
     bool m_isStatic;
+    bool m_isParam;
+    bool m_isInitialized;
+    unsigned int m_uses;
 };

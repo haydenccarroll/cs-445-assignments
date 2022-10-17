@@ -26,8 +26,11 @@ private:
     void analyzeMul(BinaryOpNode* node);
     void analyzeDiv(BinaryOpNode* node);
     void analyzeMod(BinaryOpNode* node);
+    void analyzeAss(BinaryOpNode* node);
+
 
     bool insertToSymTable(std::string, DeclNode* );
+    DeclNode* lookupSymTable(std::string name, unsigned int lineNum, bool use=true);
     void leaveScope();
 
     /**
