@@ -44,8 +44,8 @@ qc: # quick clean, remove everything but binary and .tar
 clean:
 	rm $(FLEXCPPS) $(BISONCPPS) $(BISONHDRS) $(PRJ) $(PRJ).tar $(PRJ).output
 
-tar: $(SRCS) $(HDRS) makefile
-	tar -cvf $(PRJ).tar $(SRCS) $(HDRS) makefile
+tar: $(SRCS) $(HDRS) makefile $(BISONSRCS) $(FLEXSRCS)
+	tar -cvf $(PRJ).tar $(SRCS) $(HDRS) makefile $(BISONSRCS) $(FLEXSRCS)
 
 $(BISONCPPS): $(BISONSRCS)
 	$(BISON) $(BISONFLAGS) $(BISONSRCS)

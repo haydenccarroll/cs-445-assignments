@@ -607,7 +607,7 @@ void SemanticAnalyzer::analyzeLBrack(BinaryOpNode* node)
     auto right = tryCast<IdNode*>(node->getChild(1));
     if (right)
     {
-        if (leftName.compare(right->getIdName()) == 0)
+        if (leftName.compare(right->getIdName()) == 0 && isArr)
         {
             std::stringstream ss;
             ss << "Array index is the unindexed array '" << leftName << "'.";

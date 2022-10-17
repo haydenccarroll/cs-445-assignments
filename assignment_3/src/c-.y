@@ -761,11 +761,6 @@ int main(int argc, char** argv)
         root->print();
     }
 
-    if (root == nullptr)
-    {
-        std::cout << "root is nullptr\n";
-    }
-
     SemanticAnalyzer semantics = SemanticAnalyzer(root, &symTable);
     semantics.analyze();
 
