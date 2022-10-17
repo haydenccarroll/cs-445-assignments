@@ -19,6 +19,10 @@ private:
     void analyzeCall(ASTNode* node);
     void analyzeId(ASTNode* node);
     void analyzeBinaryOp(ASTNode* node);
+    void analyzeUnaryOp(ASTNode* node);
+
+    void analyzeReturn(ASTNode* node);
+
     void analyzeCompoundStmt(ASTNode* node);
     void analyzeLBrack(BinaryOpNode* node);
     void analyzeAdd(BinaryOpNode* node);
@@ -27,6 +31,8 @@ private:
     void analyzeDiv(BinaryOpNode* node);
     void analyzeMod(BinaryOpNode* node);
     void analyzeAss(BinaryOpNode* node);
+
+    // void populateIdTypes(ASTNode* node);
 
 
     bool insertToSymTable(std::string, DeclNode* );

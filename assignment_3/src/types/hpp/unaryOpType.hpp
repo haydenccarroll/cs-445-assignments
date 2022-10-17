@@ -6,7 +6,7 @@ enum class UnaryOpType
 {
     Chsign,
     SizeOf,
-    Question,
+    Random,
     Not,
     Inc,
     Dec
@@ -20,7 +20,7 @@ inline std::string unaryOpTypeToStr(UnaryOpType type)
         return "chsign";
     case UnaryOpType::SizeOf:
         return "sizeof";
-    case UnaryOpType::Question:
+    case UnaryOpType::Random:
         return "?";
     case UnaryOpType::Not:
         return "not";

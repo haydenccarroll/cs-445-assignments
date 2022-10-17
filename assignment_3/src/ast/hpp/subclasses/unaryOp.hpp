@@ -17,6 +17,7 @@ public:
     UnaryOpNode(unsigned int lineNum, UnaryOpType type);
     void printNode();
     NodeType getNodeType() { return NodeType::UnaryOpNode; }
+    UnaryOpType getOperatorType() { return m_unaryOpType; }
 
 
 private:

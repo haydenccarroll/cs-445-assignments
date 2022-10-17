@@ -17,9 +17,10 @@ public:
      */
     ExpNode(unsigned int lineNum, DataType type);
     void setExpType(DataType type);
+    DataType getExpType() { return m_dataType; }
 
     virtual void printNode() = 0;
-    NodeType getNodeType() { return NodeType::ExpNode; }
+    virtual NodeType getNodeType() = 0;
 protected:
     DataType m_dataType;
 };

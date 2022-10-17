@@ -55,9 +55,9 @@ void VarDeclNode::use(unsigned int lineNum)
 {
     if (!m_isInitialized && m_uses == 0)
     {
-        std::stringstream ss;
-        ss << "Variable '" << m_name << "' may be uninitialized when used here.";
-        Error::warning(lineNum, ss.str());
+        // std::stringstream ss;
+        // ss << "Variable '" << m_name << "' may be uninitialized when used here.";
+        // Error::warning(lineNum, ss.str());
     }
     m_uses++;
 }

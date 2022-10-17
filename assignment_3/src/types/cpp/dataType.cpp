@@ -1,9 +1,16 @@
 #include "../hpp/dataType.hpp"
 
 #include <iostream>
+#include <sstream>
+#include <string>
+#include <stdexcept>
 
 DataType::DataType(DataType* type, bool isArray) 
 {
+    if (type == nullptr)
+    {
+        throw std::runtime_error("type is null in dataType constructor");
+    }
     m_nextType = nullptr;
     if (!isArray)
     {
@@ -78,6 +85,63 @@ void DataType::print(bool printOf, bool isStatic)
     }
 }
 
+std::string DataType::toString(bool printOf, bool isStatic) const
+{
+    std::stringstream ss;
+    int count = 0;
+    const DataType* tmpPtr = this;
+    DataTypeEnum enumType;
+    while (tmpPtr->m_nextType != nullptr)
+    {
+        tmpPtr = tmpPtr->m_nextType;
+        count++;
+    }
+    enumType = tmpPtr->m_enumType;
+
+    if (count != 0)
+    {
+        ss << "is array ";
+        count--;
+    }
+    for (int i=0; i < count; i++)
+    {
+        ss << "of array ";
+    }
+
+    if (printOf)
+    {
+        ss << "of ";
+    }
+
+    if (isStatic)
+    {
+        ss << "static ";
+    }
+
+    ss << "type ";
+    switch (enumType)
+    {
+    case DataTypeEnum::Bool:
+        ss << "bool";
+        break;
+    case DataTypeEnum::Char:
+        ss << "char";
+        break;
+    case DataTypeEnum::Int:
+        ss << "int";
+        break;
+    case DataTypeEnum::String:
+        ss << "string";
+        break;
+    case DataTypeEnum::Void:
+        ss << "void";
+        break;
+    }
+
+    return ss.str();
+}
+
+
 void DataType::setTypeSpec(DataTypeEnum typeSpec)
 {
     if (m_nextType != nullptr)
@@ -87,4 +151,14 @@ void DataType::setTypeSpec(DataTypeEnum typeSpec)
     {
         m_enumType = typeSpec;
     }
+}
+
+bool DataType::operator==(const DataType &right) const
+{
+    return (this->toString() == right.toString());
+};
+
+bool DataType::operator!=(const DataType &right) const
+{
+    return !(this->operator==(right));
 }

@@ -398,6 +398,7 @@ iterStmtOpen    : WHILE simpleExp DO openStmt
                         DataType dataType = DataType(DataTypeEnum::Int);
                         auto var = new VarDeclNode($2->lineNum, $2->str, dataType);
                         var->setInitialized(true);
+                        var->setTypeSpec(DataTypeEnum::Int);
                         $$->addChild(var);
                         $$->addChild($4);
                         $$->addChild($6);
@@ -414,9 +415,11 @@ iterStmtClosed  : WHILE simpleExp DO closedStmt
                     {
                         $$ = new ForNode($1->lineNum);
                         DataType dataType = DataType(DataTypeEnum::Int);
-                        auto id = new VarDeclNode($2->lineNum, $2->str, dataType);
-                        id->setInitialized(true);
-                        $$->addChild(id);
+                        auto var = new VarDeclNode($2->lineNum, $2->str, dataType);
+                        var->setInitialized(true);
+                        var->setTypeSpec(DataTypeEnum::Int);
+
+                        $$->addChild(var);
                         $$->addChild($4);
                         $$->addChild($6);
                     }
@@ -641,7 +644,7 @@ unaryOp         : DASH
                     }
                 | QUESTION
                     {
-                        $$ = new UnaryOpNode($1->lineNum, UnaryOpType::Question);
+                        $$ = new UnaryOpNode($1->lineNum, UnaryOpType::Random);
                     }
                 ;
 
