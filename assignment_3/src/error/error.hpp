@@ -28,6 +28,13 @@ public:
 
     }
 
+    static void arglist(std::string msg)
+    {
+        std::cout << "ERROR(ARGLIST): " << msg << std::endl;
+        s_errorCount++;
+        
+    }
+
     static void linker(std::string msg)
     {
         std::cout << "ERROR(LINKER): " << msg << std::endl;

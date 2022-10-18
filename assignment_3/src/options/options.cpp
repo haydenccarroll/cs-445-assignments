@@ -2,6 +2,7 @@
 #include "options.hpp"
 
 #include "ourgetopt.hpp"
+#include "../error/error.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -62,8 +63,6 @@ Options::Options(int argc, char **argv)
             break;
         }
     }
-
-    m_file = fopen(m_fileName.c_str(), "r");
 }
 
 void Options::printHelpScreen()
@@ -75,9 +74,4 @@ void Options::printHelpScreen()
               << "-h - print this usage message\n"
               << "-p - print the abstract syntax tree\n"
               << "-P - print the abstract syntax tree plus type information\n";
-}
-
-Options::~Options()
-{
-    fclose(m_file);
 }

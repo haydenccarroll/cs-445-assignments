@@ -20,7 +20,9 @@ public:
     DataType getExpType() { return m_dataType; }
 
     virtual void printNode() = 0;
+    virtual void printTypedNode() { printNode(); }
     virtual NodeType getNodeType() = 0;
+
 protected:
     DataType m_dataType;
 };

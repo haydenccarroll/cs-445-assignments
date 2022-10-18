@@ -18,6 +18,7 @@ public:
     void printNode();
     NodeType getNodeType() { return NodeType::UnaryOpNode; }
     UnaryOpType getOperatorType() { return m_unaryOpType; }
+    virtual void printTypedNode();
 
 
 private:

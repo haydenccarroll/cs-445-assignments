@@ -23,7 +23,7 @@ ASTNode::~ASTNode()
     m_sibling = nullptr;
 }
 
-void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl)
+void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl, bool printType)
 {
     for (int i=0; i < indentLevel; i++)
     {
@@ -37,7 +37,13 @@ void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl)
     {
         std::cout << "Child: " << childLvl << "  ";
     }
-    printNode(); // print contents of this node
+    if (printType)
+    {
+        printTypedNode();
+    } else
+    {
+        printNode();
+    }
     std::cout << " [line: " << m_lineNum << "]\n";
     
     // print children
@@ -45,14 +51,14 @@ void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl)
     {
         if (m_children[i] != nullptr)
         {
-            m_children[i]->print(indentLevel + 1, 0, i);
+            m_children[i]->print(indentLevel + 1, 0, i, printType);
         }
     }
 
     // print siblings
     if (m_sibling != nullptr)
     {
-        m_sibling->print(indentLevel, siblingLvl + 1);
+        m_sibling->print(indentLevel, siblingLvl + 1, -1, printType);
     }
 }
 

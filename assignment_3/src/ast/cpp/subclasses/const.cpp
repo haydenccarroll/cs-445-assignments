@@ -66,3 +66,26 @@ void ConstNode::printNode()
         break;
     }
 }
+
+void ConstNode::printTypedNode()
+{
+    std::cout << "Const ";
+    std::cout << std::boolalpha;
+    switch(m_constType)
+    {
+    case ConstType::Bool:
+        std::cout << m_boolValue;
+        break;
+    case ConstType::Int:
+        std::cout << m_intValue;
+        break;
+    case ConstType::Char:
+        std::cout << "'" << m_charValue << "'";
+        break;
+    case ConstType::String:
+        std::cout << "is array \"" << m_stringValue << "\"";
+        break;
+    }
+
+    std::cout << " " << m_dataType.getBasicType().toString();
+}

@@ -748,9 +748,21 @@ int main(int argc, char** argv)
 
     yydebug = options.isdFlag();
 
-    if (options.getFile())
+
+    if (options.getFileName() != "")
     {
-        yyin = options.getFile();
+        auto file = fopen(options.getFileName().c_str(), "r");
+        if (file == nullptr)
+        {
+            std::stringstream ss;
+            ss << "source file \"" << options.getFileName() << "\" could not be opened.";
+            Error::arglist(ss.str());
+            std::cout << "Number of warnings: " << Error::getWarningCount() << std::endl;
+            std::cout << "Number of errors: " << Error::getErrorCount() << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+        yyin = file;
     }
 
     yyparse();
@@ -769,7 +781,7 @@ int main(int argc, char** argv)
     // if AST print annotated flag is set and tree not null
     if (options.isPFlag() && root != nullptr)
     {
-        root->print(); // PRINT WITH TYPE INFO THOUGH
+        root->print(0, 0, -1, true); // PRINT WITH TYPE INFO THOUGH
         // print root with type info stuff
     }
 

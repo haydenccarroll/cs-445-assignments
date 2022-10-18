@@ -8,3 +8,10 @@ ExpNode::ExpNode(lineNum, DataTypeEnum::Void),
 m_functionName(funName)
 {
 }
+
+void CallNode::printTypedNode()
+{
+    std::cout << "Call: " << m_functionName
+              << " " << m_dataType.toString();
+
+}

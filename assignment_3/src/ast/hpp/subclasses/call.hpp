@@ -19,6 +19,7 @@ public:
     void printNode() { std::cout << "Call: " << m_functionName; }
     NodeType getNodeType() { return NodeType::CallNode; }
     std::string getFunName() { return m_functionName; }
+    virtual void printTypedNode();
 
 private:
     std::string m_functionName;

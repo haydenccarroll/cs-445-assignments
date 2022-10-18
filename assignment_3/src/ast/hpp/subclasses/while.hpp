@@ -11,6 +11,7 @@ public:
     WhileNode(unsigned int lineNum);
     void printNode() { std::cout << "While"; }
     NodeType getNodeType() { return NodeType::WhileNode; }
+    virtual void printTypedNode() { printNode(); }
 
 private:
 };

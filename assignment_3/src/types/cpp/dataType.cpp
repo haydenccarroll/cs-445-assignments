@@ -65,6 +65,12 @@ std::string DataType::toString(bool printOf, bool isStatic) const
         ss << "of ";
     }
 
+    if (m_enumType == DataTypeEnum::None)
+    {
+        ss << "undefined type";
+        return ss.str();
+    }
+
     if (isStatic)
     {
         ss << "static ";

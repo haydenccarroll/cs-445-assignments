@@ -20,6 +20,7 @@ public:
     NodeType getNodeType() { return NodeType::ConstNode; }
 
     void printNode();
+    virtual void printTypedNode();
 
 
 

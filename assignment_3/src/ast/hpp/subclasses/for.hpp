@@ -11,6 +11,7 @@ public:
     ForNode(unsigned int lineNum);
     void printNode() { std::cout << "For"; }
     NodeType getNodeType() { return NodeType::ForNode; }
+    virtual void printTypedNode() { printNode(); }
 
 private:
 };

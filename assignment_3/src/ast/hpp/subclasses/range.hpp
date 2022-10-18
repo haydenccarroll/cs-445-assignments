@@ -11,6 +11,7 @@ public:
     RangeNode(unsigned int lineNum);
     void printNode() { std::cout << "Range"; }
     NodeType getNodeType() { return NodeType::RangeNode; }
+    virtual void printTypedNode() { printNode(); }
 
 private:
 };

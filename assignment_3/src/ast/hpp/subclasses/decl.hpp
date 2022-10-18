@@ -18,6 +18,8 @@ public:
      */
     std::string getName() { return m_name; }
     DataType getDataType() { return m_dataType; }
+    virtual void printTypedNode() { printNode(); }
+
 protected:
     std::string m_name;
     DataType m_dataType;

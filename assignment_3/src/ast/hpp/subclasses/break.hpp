@@ -11,6 +11,7 @@ public:
     BreakNode(unsigned int lineNum);
     void printNode() { std::cout << "Break"; }
     NodeType getNodeType() { return NodeType::BreakNode; }
+    virtual void printTypedNode() { printNode(); }
 
 private:
 };

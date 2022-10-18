@@ -14,9 +14,10 @@ public:
      * @param lineNum 
      */
     IdNode(unsigned int lineNum, std::string idName);
-    void printNode() { std::cout << "Id: " << m_idName; }
+    void printNode();
     NodeType getNodeType() { return NodeType::IdNode; }
     std::string getIdName() { return m_idName; }
+    virtual void printTypedNode();
 
 private:
     std::string m_idName;

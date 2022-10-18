@@ -18,6 +18,7 @@ public:
     DataType getLValType() { return m_lValType; }
     DataType getRValType() { return m_rValType; }
     BinaryOpType getOperatorType() { return m_binaryOpType; }
+    virtual void printTypedNode();
 
 
 private:

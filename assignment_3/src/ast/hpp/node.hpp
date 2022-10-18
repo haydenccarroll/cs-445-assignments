@@ -34,8 +34,7 @@ public:
      * @param siblingLvl  used for recursive printing
      * @param childLvl    used for recursive printing
      */
-    void print(unsigned int indentLevel=0, int siblingLvl=0, int childLvl=-1);
-
+    void print(unsigned int indentLevel=0, int siblingLvl=0, int childLvl=-1, bool printType=false);
     /**
      * @brief adds a child to m_children
      * 
@@ -100,4 +99,5 @@ protected:
      * 
      */
     virtual void printNode() = 0;
+    virtual void printTypedNode() { printNode(); };
 };

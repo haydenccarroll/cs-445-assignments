@@ -81,3 +81,21 @@ void BinaryOpNode::printNode()
     }
     std::cout << binaryOpTypeToStr(m_binaryOpType);
 }
+
+void BinaryOpNode::printTypedNode()
+{
+    switch(m_binaryOpType)
+    {
+    case BinaryOpType::Ass:
+    case BinaryOpType::AddAss:
+    case BinaryOpType::SubAss:
+    case BinaryOpType::MulAss:
+    case BinaryOpType::DivAss:
+        std::cout << "Assign: ";
+        break;
+    default:
+        std::cout << "Op: ";
+    }
+    std::cout << binaryOpTypeToStr(m_binaryOpType) << " "
+              << m_dataType.toString();
+}

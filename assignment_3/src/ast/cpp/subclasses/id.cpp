@@ -9,3 +9,15 @@ ExpNode::ExpNode(lineNum, DataTypeEnum::Void),
 m_idName(idName)
 {
 }
+
+
+void IdNode::printNode()
+{
+    std::cout << "Id: " << m_idName;
+}
+
+void IdNode::printTypedNode()
+{
+    std::cout << "Id: " << m_idName << " "
+              << m_dataType.toString();
+}

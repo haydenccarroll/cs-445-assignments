@@ -12,6 +12,7 @@ public:
     CompoundStmtNode(unsigned int lineNum, bool isFromFunction=false);
     void printNode() { std::cout << "Compound"; }
     NodeType getNodeType() { return NodeType::CompoundStmtNode; }
+    virtual void printTypedNode() { printNode(); }
 
     void setIsFromFunction(bool isFromFunction) { m_isFromFunction = isFromFunction; }
     bool getIsFromFunction() { return m_isFromFunction; }

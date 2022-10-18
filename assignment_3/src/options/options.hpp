@@ -6,8 +6,6 @@ class Options
 {
 public:
     Options(int argc, char** argv);
-    ~Options();
-    FILE* getFile() { return m_file; };
     std::string getFileName() { return m_fileName; }
     void printHelpScreen();
     bool isdFlag() { return m_isdFlag; }
@@ -18,6 +16,5 @@ public:
 
 private:
     bool m_isdFlag, m_ispFlag, m_isPFlag, m_isDFlag, m_ishFlag;
-    FILE* m_file = nullptr;
     std::string m_fileName;
 };

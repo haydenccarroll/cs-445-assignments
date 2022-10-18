@@ -6,3 +6,6 @@ some mysteries:
 errors:
     arglist error if cant open file.
     never actually did -P printing.
+        make const print type
+        make all operators print their type
+        

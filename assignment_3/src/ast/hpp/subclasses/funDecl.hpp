@@ -16,5 +16,7 @@ public:
     FunDeclNode(unsigned int lineNum, std::string funcName, DataType returnType);
     void printNode();
     virtual NodeType getNodeType() { return NodeType::FunDeclNode; }
+    virtual void printTypedNode() { printNode(); }
+
 private:
 };

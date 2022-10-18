@@ -42,6 +42,7 @@ public:
      * @param isStatic true if static else false
      */
     void setStatic(bool isStatic);
+    virtual void printTypedNode() { printNode(); }
 
 
 private:

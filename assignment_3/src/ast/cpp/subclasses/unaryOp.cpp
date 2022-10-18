@@ -33,3 +33,19 @@ void UnaryOpNode::printNode()
     }
     std::cout << unaryOpTypeToStr(m_unaryOpType); 
 }
+
+void UnaryOpNode::printTypedNode()
+{ 
+    switch(m_unaryOpType)
+    {
+    case UnaryOpType::Inc:
+    case UnaryOpType::Dec:
+        std::cout << "Assign: ";
+        break;
+    default:
+        std::cout << "Op: ";
+    }
+    std::cout << unaryOpTypeToStr(m_unaryOpType)
+              << " " << m_dataType.toString();
+}
+
