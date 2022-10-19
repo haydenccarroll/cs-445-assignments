@@ -7,7 +7,7 @@
 #include <iostream>
 
 ConstNode::ConstNode(unsigned int lineNum, int value) 
-: ExpNode::ExpNode(lineNum, DataTypeEnum::Int),
+: ExpNode::ExpNode(lineNum, DataType(DataTypeEnum::Int)),
 m_constType(ConstType::Int),
 m_intValue(value),
 m_charValue(0),
@@ -17,7 +17,7 @@ m_stringValue("")
 }
 
 ConstNode::ConstNode(unsigned int lineNum, char value) 
-: ExpNode::ExpNode(lineNum, DataTypeEnum::Char),
+: ExpNode::ExpNode(lineNum, DataType(DataTypeEnum::Char)),
 m_constType(ConstType::Char),
 m_intValue(0),
 m_charValue(value),
@@ -27,7 +27,7 @@ m_stringValue("")
 }
 
 ConstNode::ConstNode(unsigned int lineNum, bool value) 
-: ExpNode::ExpNode(lineNum, DataTypeEnum::Bool),
+: ExpNode::ExpNode(lineNum, DataType(DataTypeEnum::Bool)),
 m_constType(ConstType::Bool),
 m_intValue(0),
 m_charValue(0),

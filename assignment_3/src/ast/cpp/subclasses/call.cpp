@@ -4,7 +4,7 @@
 #include <string>
 
 CallNode::CallNode(unsigned int lineNum, std::string funName) : 
-ExpNode::ExpNode(lineNum, DataTypeEnum::Void),
+ExpNode::ExpNode(lineNum, DataTypeEnum::None),
 m_functionName(funName)
 {
 }

@@ -29,7 +29,7 @@ private:
     void analyzeCompoundStmt(ASTNode* node);
     void analyzeLBrack(BinaryOpNode* node);
     void analyzeAss(BinaryOpNode* node);
-    DataType getExpType(ExpNode* node);
+    DataType calcExpType(ExpNode* node);
 
     bool isIdAnIndex(ASTNode* node);
     bool isIdInLval(ASTNode* node);

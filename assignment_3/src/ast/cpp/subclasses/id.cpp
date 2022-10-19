@@ -5,7 +5,7 @@
 #include <string>
 
 IdNode::IdNode(unsigned int lineNum, std::string idName) :
-ExpNode::ExpNode(lineNum, DataTypeEnum::Void),
+ExpNode::ExpNode(lineNum, DataTypeEnum::None),
 m_idName(idName)
 {
 }

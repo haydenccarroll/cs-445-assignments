@@ -6,7 +6,7 @@
 #include <string>
 
 UnaryOpNode::UnaryOpNode(unsigned int lineNum, UnaryOpType type) 
-: ExpNode::ExpNode(lineNum, DataTypeEnum::Void),
+: ExpNode::ExpNode(lineNum, DataTypeEnum::None),
 m_unaryOpType(type)
 {
     switch(m_unaryOpType)
