@@ -19,5 +19,5 @@ void IdNode::printNode()
 void IdNode::printTypedNode()
 {
     std::cout << "Id: " << m_idName << " "
-              << m_dataType.toString();
+              << m_dataType.getBasicType().toString();
 }

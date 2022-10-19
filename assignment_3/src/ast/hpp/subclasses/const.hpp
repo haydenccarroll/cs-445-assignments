@@ -22,8 +22,6 @@ public:
     void printNode();
     virtual void printTypedNode();
 
-
-
 private:
     const ConstType m_constType;
 

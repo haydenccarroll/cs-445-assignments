@@ -9,14 +9,10 @@
 class CompoundStmtNode : public ASTNode
 {
 public:
-    CompoundStmtNode(unsigned int lineNum, bool isFromFunction=false);
+    CompoundStmtNode(unsigned int lineNum);
     void printNode() { std::cout << "Compound"; }
     NodeType getNodeType() { return NodeType::CompoundStmtNode; }
     virtual void printTypedNode() { printNode(); }
 
-    void setIsFromFunction(bool isFromFunction) { m_isFromFunction = isFromFunction; }
-    bool getIsFromFunction() { return m_isFromFunction; }
-
 private:
-    bool m_isFromFunction;
 };

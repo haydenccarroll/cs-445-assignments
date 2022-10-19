@@ -28,7 +28,7 @@ void VarDeclNode::printNode()
         std::cout << "Var: ";
     }
     std::cout << m_name << " ";
-    m_dataType.print(true);
+    m_dataType.print();
 }
 
 void VarDeclNode::setTypeSpec(DataTypeEnum type)

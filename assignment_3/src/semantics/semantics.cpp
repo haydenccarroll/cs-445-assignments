@@ -62,19 +62,9 @@ DataType SemanticAnalyzer::calcExpType(ExpNode* node)
 
 void SemanticAnalyzer::analyzeNode(ASTNode* node)
 {
-    if (node == nullptr)
-    {
-        return;
-    }
-
-    if (node->getHasBeenAnalyzed())
-    {
-        return;
-    }
-
+    if (node == nullptr || node->getHasBeenAnalyzed()) { return; }
     node->setHasBeenAnalyzed(true);
 
-    std::stringstream ss;
     switch (node->getNodeType())
     {
     case NodeType::VarDeclNode:
@@ -108,14 +98,9 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
         break;
     }
 
-    int i=0;
     for (int i=0; i < node->getNumChildren(); i++)
     {
-        auto child = node->getChild(i);
-        if (child != nullptr)
-        {
-            analyzeNode(child);
-        }
+        analyzeNode(node->getChild(i));
     }
 
     calculateLeaveScope(node);
@@ -167,7 +152,6 @@ void SemanticAnalyzer::analyzeCompoundStmt(ASTNode* node)
     switch (parentType)
     {
         case NodeType::FunDeclNode:
-            return;
         case NodeType::ForNode:
             return;
     }
@@ -302,28 +286,6 @@ bool SemanticAnalyzer::isIdInLval(ASTNode* node)
 
     return false;
 }
-
-bool SemanticAnalyzer::isIdAnIndex(ASTNode* node)
-{
-    if (node == nullptr) { return false; }
-
-    auto ancestor = cast<BinaryOpNode*>(node->getAncestor(NodeType::BinaryOpNode));
-    while (ancestor != nullptr)
-    {
-        if (ancestor->getOperatorType() == BinaryOpType::Index)
-        {
-            if (ancestor->getChild(0) != node)
-            {
-                return true;
-            }
-            return false;
-        }
-        ancestor = cast<BinaryOpNode*>(ancestor->getAncestor(NodeType::BinaryOpNode));
-    }
-
-    return false;
-}
-
 
 void SemanticAnalyzer::analyzeReturn(ASTNode* node)
 {

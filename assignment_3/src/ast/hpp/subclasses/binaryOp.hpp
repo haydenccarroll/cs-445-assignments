@@ -15,14 +15,10 @@ public:
     BinaryOpNode(unsigned int lineNum, BinaryOpType type);
     void printNode();
     NodeType getNodeType() { return NodeType::BinaryOpNode; }
-    DataType getLValType() { return m_lValType; }
-    DataType getRValType() { return m_rValType; }
     BinaryOpType getOperatorType() { return m_binaryOpType; }
     virtual void printTypedNode();
 
 
 private:
     const BinaryOpType m_binaryOpType;
-    DataType m_lValType;
-    DataType m_rValType;
 };

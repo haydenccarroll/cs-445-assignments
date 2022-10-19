@@ -180,7 +180,6 @@ funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
                         {
                             Error::critical($6->getLineNum(), "Failed converting node to compstmt");
                         }
-                        compStmt->setIsFromFunction(true);
                         $$->addChild(compStmt);
                     }
                 | ID LPAREN parms RPAREN compoundStmt
@@ -194,7 +193,6 @@ funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
                         {
                             Error::critical($5->getLineNum(), "Failed converting node to compstmt");
                         }
-                        compStmt->setIsFromFunction(true);
                         $$->addChild(compStmt);
                     }
                 ;

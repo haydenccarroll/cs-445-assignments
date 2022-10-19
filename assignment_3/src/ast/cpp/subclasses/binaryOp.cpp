@@ -6,10 +6,8 @@
 #include <iostream>
 
 BinaryOpNode::BinaryOpNode(unsigned int lineNum, BinaryOpType type) : 
-ExpNode::ExpNode(lineNum, DataTypeEnum::Void),
-m_binaryOpType(type),
-m_lValType(DataTypeEnum::Void),
-m_rValType(DataTypeEnum::Void)
+ExpNode::ExpNode(lineNum, DataTypeEnum::None),
+m_binaryOpType(type)
 {
     switch(m_binaryOpType)
     {
@@ -39,28 +37,6 @@ m_rValType(DataTypeEnum::Void)
     case BinaryOpType::Ass:
     case BinaryOpType::Index:
         m_dataType = DataTypeEnum::Void;
-        break;
-    }
-
-    switch(m_binaryOpType)
-    {
-    case BinaryOpType::And:
-    case BinaryOpType::Or:
-        m_lValType = DataTypeEnum::Bool;
-        m_rValType = DataTypeEnum::Bool;
-        break;
-
-    case BinaryOpType::Add:
-    case BinaryOpType::Sub:
-    case BinaryOpType::Mul:
-    case BinaryOpType::Div:
-    case BinaryOpType::Mod:
-    case BinaryOpType::AddAss:
-    case BinaryOpType::SubAss:
-    case BinaryOpType::MulAss:
-    case BinaryOpType::DivAss:
-        m_lValType = DataTypeEnum::Int;
-        m_rValType = DataTypeEnum::Int;
         break;
     }
 }

@@ -64,30 +64,18 @@ void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl, bool
 
 ASTNode* ASTNode::getAncestor(NodeType type)
 {
-    if (m_parent == nullptr)
-    {
-        return nullptr;
-    }
+    if (m_parent == nullptr) { return nullptr; }
 
-    if (m_parent->getNodeType() == type)
-    {
-        return m_parent;
-    }
+    if (m_parent->getNodeType() == type) { return m_parent; }
 
     return m_parent->getAncestor(type);
 }
 
 bool ASTNode::isAncestor(ASTNode* node)
 {
-    if (this == node)
-    {
-        return true;
-    }
+    if (this == node) { return true; }
 
-    if (m_parent == nullptr)
-    {
-        return false;
-    }
+    if (m_parent == nullptr) { return false; }
 
     return m_parent->isAncestor(node);
 }
@@ -103,10 +91,8 @@ void ASTNode::addChild(ASTNode* child)
 
 void ASTNode::addSibling(ASTNode* sibling)
 {
-    if (sibling == nullptr)
-    {
-        return;
-    }
+    if (sibling == nullptr) { return; }
+
     ASTNode* currNode = this;
     while (currNode->m_sibling != nullptr)
     {
@@ -118,25 +104,18 @@ void ASTNode::addSibling(ASTNode* sibling)
 
 ASTNode* ASTNode::getChild(unsigned int index)
 {
-    if (index >= m_children.size())
-    {
-        return nullptr;
-    }
+    if (index >= m_children.size()) { return nullptr; }
 
     return m_children[index];
 }
 
 ASTNode* ASTNode::getSibling(unsigned int index)
 {
-    if (m_sibling == nullptr)
-    {
-        return nullptr;
-    }
-    if (index == 0)
-    {
+    if (m_sibling == nullptr) { return nullptr; }
+
+    if (index == 0) {
         return m_sibling;
     }
 
     return getSibling(index - 1);
 }
-

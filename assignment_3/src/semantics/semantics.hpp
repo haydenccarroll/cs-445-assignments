@@ -21,22 +21,16 @@ private:
     void analyzeBinaryOp(ASTNode* node);
     void analyzeUnaryOp(ASTNode* node);
     void analyzeForNode(ASTNode* node);
-
-    void calculateLeaveScope(ASTNode* node);
-
     void analyzeReturn(ASTNode* node);
-
     void analyzeCompoundStmt(ASTNode* node);
     void analyzeLBrack(BinaryOpNode* node);
     void analyzeAss(BinaryOpNode* node);
+
+    void calculateLeaveScope(ASTNode* node);
+
     DataType calcExpType(ExpNode* node);
 
-    bool isIdAnIndex(ASTNode* node);
     bool isIdInLval(ASTNode* node);
-
-
-    // void populateIdTypes(ASTNode* node);
-
 
     bool insertToSymTable(std::string, DeclNode* );
     DeclNode* lookupSymTable(std::string name, unsigned int lineNum, bool use=true, bool warnUninit=true);
