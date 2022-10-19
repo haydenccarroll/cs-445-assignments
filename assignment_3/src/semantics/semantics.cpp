@@ -49,12 +49,27 @@ DataType SemanticAnalyzer::calcExpType(ExpNode* node)
     } else if (node->getNodeType() == NodeType::BinaryOpNode)
     {
         auto binaryOpNode = cast<BinaryOpNode*>(node);
+        auto lval = cast<ExpNode*>(node->getChild(0));
+        auto rval = cast<ExpNode*>(node->getChild(1));
+
         if (binaryOpNode->getOperatorType() == BinaryOpType::Index ||
             binaryOpNode->getOperatorType() == BinaryOpType::Ass)
         {
-            auto lval = cast<ExpNode*>(binaryOpNode->getChild(0));
             node->setExpType(calcExpType(lval).getBasicType());
+        } else if (calcExpType(lval) == DataTypeEnum::None || 
+                   calcExpType(rval) == DataTypeEnum::None)
+        {
+            node->setExpType(DataTypeEnum::None);
         }
+    } else if (node->getNodeType() == NodeType::UnaryOpNode)
+    {
+        auto rval = cast<ExpNode*>(node->getChild(0));
+        if (calcExpType(rval) == DataTypeEnum::None)
+        {
+            node->setExpType(DataTypeEnum::None);
+        }
+
+
     }
 
     return node->getExpType();
