@@ -2,6 +2,7 @@
 
 #include "../../hpp/subclasses/exp.hpp"
 #include <string>
+#include <sstream>
 
 CallNode::CallNode(unsigned int lineNum, std::string funName) : 
 ExpNode::ExpNode(lineNum, DataTypeEnum::None),
@@ -9,9 +10,14 @@ m_functionName(funName)
 {
 }
 
-void CallNode::printTypedNode()
-{
-    std::cout << "Call: " << m_functionName
-              << " " << m_dataType.toString();
+std::string CallNode::toString(bool printType)
+{ 
+    std::stringstream ss;
+    ss << "Call: " << m_functionName;
+    if (printType)
+    {
+        ss << " " << m_dataType.toString();
+    }
 
+    return ss.str();
 }

@@ -1,11 +1,11 @@
 %{
 // C++ header stuff
-#include "options/options.hpp"
-#include "error/error.hpp"
-#include "symTable/symTable.hpp"
-#include "semantics/semantics.hpp"
-#include "types/types.hpp" // must be included before tab.h
-#include "ast/ast.hpp" // must be included before tab.h
+#include "options/include.hpp"
+#include "error/include.hpp"
+#include "symTable/include.hpp"
+#include "semantics/include.hpp"
+#include "types/include.hpp" // must be included before tab.h
+#include "ast/include.hpp" // must be included before tab.h
 
 #include <iostream>
 #include <string>

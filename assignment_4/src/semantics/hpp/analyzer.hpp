@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../ast/ast.hpp"
-#include "../symTable/symTable.hpp"
+#include "../../ast/include.hpp"
+#include "../../symTable/include.hpp"
 
 class SemanticAnalyzer
 {
@@ -27,28 +27,8 @@ private:
     void analyzeAss(BinaryOpNode* node);
 
     void calculateLeaveScope(ASTNode* node);
-
     DataType calcExpType(ExpNode* node);
-
-    bool isIdInLval(ASTNode* node);
-
     bool insertToSymTable(std::string, DeclNode* );
     DeclNode* lookupSymTable(std::string name, unsigned int lineNum, bool use=true, bool warnUninit=true);
     void leaveScope();
-
-    /**
-     * @brief casts this object to a child class T
-     * 
-     * @tparam T child class type
-     * @return T child class pointer to node
-     */
-    template <typename T> T cast(ASTNode* node);
-
-    /**
-     * @brief casts this object to a child class T
-     * 
-     * @tparam T child class type
-     * @return T child class pointer to node, nullptr if not able to cast
-     */
-    template <typename T> T tryCast(ASTNode* node);
 };

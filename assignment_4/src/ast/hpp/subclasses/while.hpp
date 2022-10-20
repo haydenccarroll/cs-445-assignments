@@ -1,17 +1,16 @@
 #pragma once
 
 #include "../node.hpp"
-#include "../../../types/types.hpp"
+#include "../../../types/include.hpp"
 
-#include <iostream>
+#include <string>
 
 class WhileNode : public ASTNode
 {
 public:
     WhileNode(unsigned int lineNum);
-    void printNode() { std::cout << "While"; }
-    NodeType getNodeType() { return NodeType::WhileNode; }
-    virtual void printTypedNode() { printNode(); }
+    std::string toString(bool printType=false) override;
+    NodeType getNodeType() override { return NodeType::WhileNode; }
 
 private:
 };

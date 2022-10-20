@@ -1,9 +1,9 @@
 %{
 
 // C++ headers and stuff
-#include "types/types.hpp" // must be included before c-.tab.h
-#include "ast/ast.hpp"
-#include "error/error.hpp"
+#include "types/include.hpp" // must be included before c-.tab.h
+#include "ast/include.hpp"
+#include "error/include.hpp"
 
 #include <iostream>
 #include <string>

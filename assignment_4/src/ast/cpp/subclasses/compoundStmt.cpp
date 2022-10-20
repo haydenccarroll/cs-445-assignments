@@ -2,8 +2,14 @@
 
 #include "../../hpp/node.hpp"
 
+#include <string>
 
 CompoundStmtNode::CompoundStmtNode(unsigned int lineNum) :
 ASTNode::ASTNode(lineNum)
 {
+}
+
+std::string CompoundStmtNode::toString(bool printType)
+{ 
+    return "Compound";
 }

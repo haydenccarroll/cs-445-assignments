@@ -1,9 +1,10 @@
 #include "../../hpp/subclasses/binaryOp.hpp"
 
 #include "../../hpp/subclasses/exp.hpp"
-#include "../../../types/types.hpp"
+#include "../../../types/include.hpp"
 
-#include <iostream>
+#include <sstream>
+#include <string>
 
 BinaryOpNode::BinaryOpNode(unsigned int lineNum, BinaryOpType type) : 
 ExpNode::ExpNode(lineNum, DataTypeEnum::None),
@@ -41,8 +42,9 @@ m_binaryOpType(type)
     }
 }
 
-void BinaryOpNode::printNode()
+std::string BinaryOpNode::toString(bool printType)
 {
+    std::stringstream ss;
     switch(m_binaryOpType)
     {
     case BinaryOpType::Ass:
@@ -50,28 +52,16 @@ void BinaryOpNode::printNode()
     case BinaryOpType::SubAss:
     case BinaryOpType::MulAss:
     case BinaryOpType::DivAss:
-        std::cout << "Assign: ";
+        ss << "Assign: ";
         break;
     default:
-        std::cout << "Op: ";
+        ss << "Op: ";
     }
-    std::cout << binaryOpTypeToStr(m_binaryOpType);
-}
+    ss << binaryOpTypeToStr(m_binaryOpType);
+    if (printType)
+    {
+        ss << " " << m_dataType.toString();
+    }
 
-void BinaryOpNode::printTypedNode()
-{
-    switch(m_binaryOpType)
-    {
-    case BinaryOpType::Ass:
-    case BinaryOpType::AddAss:
-    case BinaryOpType::SubAss:
-    case BinaryOpType::MulAss:
-    case BinaryOpType::DivAss:
-        std::cout << "Assign: ";
-        break;
-    default:
-        std::cout << "Op: ";
-    }
-    std::cout << binaryOpTypeToStr(m_binaryOpType) << " "
-              << m_dataType.toString();
+    return ss.str();
 }

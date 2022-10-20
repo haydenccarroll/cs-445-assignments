@@ -1,9 +1,9 @@
 #pragma once
 
 #include "exp.hpp"
-#include "../../../types/types.hpp"
+#include "../../../types/include.hpp"
 
-#include <iostream>
+#include <string>
 
 class UnaryOpNode : public ExpNode
 {
@@ -15,10 +15,9 @@ public:
      * @param type type of unary operator used
      */
     UnaryOpNode(unsigned int lineNum, UnaryOpType type);
-    void printNode();
-    NodeType getNodeType() { return NodeType::UnaryOpNode; }
+    std::string toString(bool printType=false) override;
+    NodeType getNodeType() override { return NodeType::UnaryOpNode; }
     UnaryOpType getOperatorType() { return m_unaryOpType; }
-    virtual void printTypedNode();
 
 
 private:

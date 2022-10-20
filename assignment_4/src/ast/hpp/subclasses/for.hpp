@@ -1,17 +1,16 @@
 #pragma once
 
 #include "../node.hpp"
-#include "../../../types/types.hpp"
+#include "../../../types/include.hpp"
 
-#include <iostream>
+#include <string>
 
 class ForNode : public ASTNode
 {
 public:
     ForNode(unsigned int lineNum);
-    void printNode() { std::cout << "For"; }
-    NodeType getNodeType() { return NodeType::ForNode; }
-    virtual void printTypedNode() { printNode(); }
+    std::string toString(bool printType=false) override;
+    NodeType getNodeType() override { return NodeType::ForNode; }
 
 private:
 };

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "exp.hpp"
-#include "../../../types/types.hpp"
+#include "../../../types/include.hpp"
+
+#include <string>
 
 class ConstNode : public ExpNode
 {
@@ -17,11 +19,9 @@ public:
     ConstNode(unsigned int lineNum, std::string value);
     ConstNode(unsigned int lineNum, bool value);
 
-    NodeType getNodeType() { return NodeType::ConstNode; }
+    NodeType getNodeType() override { return NodeType::ConstNode; }
 
-    void printNode();
-    virtual void printTypedNode();
-
+    std::string toString(bool printType=false) override;
 private:
     const ConstType m_constType;
 

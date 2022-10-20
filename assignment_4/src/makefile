@@ -15,20 +15,20 @@ BISONHDRS = $(PRJ).tab.h
 OPTIONHDRS = options/*.hpp
 OPTIONSRCS = options/*.cpp
 
-ASTHDRS = ast/hpp/*.hpp ast/hpp/*/*.hpp ast/ast.hpp
+ASTHDRS = ast/hpp/*.hpp ast/hpp/*/*.hpp ast/*.hpp
 ASTSRCS = ast/cpp/*.cpp ast/cpp/*/*.cpp
 
-TYPESHDRS = types/hpp/*.hpp types/types.hpp
+TYPESHDRS = types/hpp/*.hpp types/*.hpp
 TYPESSRC = types/cpp/*.cpp
 
-ERRORHDRS = error/error.hpp
+ERRORHDRS = error/*.hpp
 ERRORSRCS =
 
 SYMTABLEHDRS = symTable/*.hpp
 SYMTABLESRCS = symTable/*.cpp
 
-SEMANTICHDRS = semantics/*.hpp
-SEMANTICSRCS = semantics/*.cpp
+SEMANTICHDRS = semantics/hpp/*.hpp semantics/*.hpp
+SEMANTICSRCS = semantics/cpp/*.cpp
 
 HDRS = $(OPTIONHDRS) $(ASTHDRS) $(TYPESHDRS) $(ERRORHDRS) $(SYMTABLEHDRS) $(SEMANTICHDRS)
 SRCS = $(OPTIONSRCS) $(ASTSRCS) $(TYPESSRC) $(ERRORSRCS) $(SYMTABLESRCS) $(SEMANTICSRCS)

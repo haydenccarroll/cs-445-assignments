@@ -2,7 +2,7 @@
 #include "options.hpp"
 
 #include "ourgetopt.hpp"
-#include "../error/error.hpp"
+#include "../error/include.hpp"
 
 #include <iostream>
 #include <stdexcept>

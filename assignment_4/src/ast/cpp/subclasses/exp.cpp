@@ -10,7 +10,6 @@ m_dataType(type)
 {
 }
 
-
 void ExpNode::setExpType(DataType type)
 {
     m_dataType = type;

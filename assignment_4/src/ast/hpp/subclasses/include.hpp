@@ -1,0 +1,17 @@
+#pragma once
+
+#include "binaryOp.hpp"
+#include "break.hpp"
+#include "call.hpp"
+#include "compoundStmt.hpp"
+#include "const.hpp"
+#include "for.hpp"
+#include "funDecl.hpp"
+#include "id.hpp"
+#include "if.hpp"
+#include "range.hpp"
+#include "return.hpp"
+#include "unaryOp.hpp"
+#include "varDecl.hpp"
+#include "while.hpp"
+#include "decl.hpp"

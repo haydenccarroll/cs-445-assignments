@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "../../error/error.hpp"
+#include "../../error/include.hpp"
 
 ASTNode::ASTNode(unsigned int lineNum)
 {
@@ -37,13 +37,7 @@ void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl, bool
     {
         std::cout << "Child: " << childLvl << "  ";
     }
-    if (printType)
-    {
-        printTypedNode();
-    } else
-    {
-        printNode();
-    }
+    std::cout << this->toString(printType);
     std::cout << " [line: " << m_lineNum << "]\n";
     
     // print children

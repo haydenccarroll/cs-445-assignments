@@ -1,13 +1,15 @@
 #pragma once
 
 #include "../node.hpp"
-#include "../../../types/types.hpp"
+#include "../../../types/include.hpp"
+
+#include <string>
 
 class DeclNode : public ASTNode
 {
 public:
     DeclNode(unsigned int lineNum, std::string name, DataType dataType);
-    virtual void printNode() = 0;
+    virtual std::string toString(bool printType=false) = 0;
     virtual NodeType getNodeType() = 0;
 
 
@@ -18,7 +20,6 @@ public:
      */
     std::string getName() { return m_name; }
     DataType getDataType() { return m_dataType; }
-    virtual void printTypedNode() { printNode(); }
 
 protected:
     std::string m_name;

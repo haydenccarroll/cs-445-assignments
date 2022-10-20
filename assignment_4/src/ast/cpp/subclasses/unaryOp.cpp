@@ -1,9 +1,10 @@
 #include "../../hpp/subclasses/unaryOp.hpp"
 
 #include "../../hpp/subclasses/exp.hpp"
-#include "../../../types/types.hpp"
+#include "../../../types/include.hpp"
 
 #include <string>
+#include <sstream>
 
 UnaryOpNode::UnaryOpNode(unsigned int lineNum, UnaryOpType type) 
 : ExpNode::ExpNode(lineNum, DataTypeEnum::None),
@@ -20,32 +21,24 @@ m_unaryOpType(type)
     }
 }
 
-void UnaryOpNode::printNode()
+std::string UnaryOpNode::toString(bool printType)
 { 
+    std::stringstream ss;
+
     switch(m_unaryOpType)
     {
     case UnaryOpType::Inc:
     case UnaryOpType::Dec:
-        std::cout << "Assign: ";
+        ss << "Assign: ";
         break;
     default:
-        std::cout << "Op: ";
+        ss << "Op: ";
     }
-    std::cout << unaryOpTypeToStr(m_unaryOpType); 
-}
-
-void UnaryOpNode::printTypedNode()
-{ 
-    switch(m_unaryOpType)
+    ss << unaryOpTypeToStr(m_unaryOpType);
+    if (printType)
     {
-    case UnaryOpType::Inc:
-    case UnaryOpType::Dec:
-        std::cout << "Assign: ";
-        break;
-    default:
-        std::cout << "Op: ";
+        ss << " " << m_dataType.toString();
     }
-    std::cout << unaryOpTypeToStr(m_unaryOpType)
-              << " " << m_dataType.toString();
-}
 
+    return ss.str();
+}

@@ -1,11 +1,10 @@
 #include "../../hpp/subclasses/varDecl.hpp"
 
 #include "../../hpp/node.hpp"
-#include "../../../types/types.hpp"
-#include "../../../error/error.hpp"
+#include "../../../types/include.hpp"
+#include "../../../error/include.hpp"
 
 #include <string>
-#include <iostream>
 #include <sstream>
 
 VarDeclNode::VarDeclNode(unsigned int lineNum, std::string varName,
@@ -18,17 +17,20 @@ m_isParam(isParam)
 {
 }
 
-void VarDeclNode::printNode()
+std::string VarDeclNode::toString(bool printType)
 {
+    std::stringstream ss;
+
     if (m_isParam)
     {
-        std::cout << "Parm: ";
+        ss << "Parm: ";
     } else
     {
-        std::cout << "Var: ";
+        ss << "Var: ";
     }
-    std::cout << m_name << " ";
-    m_dataType.print();
+    ss << m_name << " " << m_dataType.toString();
+
+    return ss.str();
 }
 
 void VarDeclNode::setTypeSpec(DataTypeEnum type)

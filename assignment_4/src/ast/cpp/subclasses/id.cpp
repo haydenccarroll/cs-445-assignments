@@ -3,6 +3,7 @@
 #include "../../hpp/subclasses/exp.hpp"
 
 #include <string>
+#include <sstream>
 
 IdNode::IdNode(unsigned int lineNum, std::string idName) :
 ExpNode::ExpNode(lineNum, DataTypeEnum::None),
@@ -11,13 +12,14 @@ m_idName(idName)
 }
 
 
-void IdNode::printNode()
+std::string IdNode::toString(bool printType)
 {
-    std::cout << "Id: " << m_idName;
-}
+    std::stringstream ss;
+    ss << "Id: " << m_idName;
+    if (printType)
+    {
+        ss << " " << m_dataType.getBasicType().toString();
+    }
 
-void IdNode::printTypedNode()
-{
-    std::cout << "Id: " << m_idName << " "
-              << m_dataType.getBasicType().toString();
+    return ss.str();
 }

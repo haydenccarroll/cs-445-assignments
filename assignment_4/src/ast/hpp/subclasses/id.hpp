@@ -1,9 +1,9 @@
 #pragma once
 
 #include "exp.hpp"
-#include "../../../types/types.hpp"
+#include "../../../types/include.hpp"
 
-#include <iostream>
+#include <string>
 
 class IdNode : public ExpNode
 {
@@ -14,10 +14,9 @@ public:
      * @param lineNum 
      */
     IdNode(unsigned int lineNum, std::string idName);
-    void printNode();
-    NodeType getNodeType() { return NodeType::IdNode; }
+    std::string toString(bool printType=false) override;
+    NodeType getNodeType() override { return NodeType::IdNode; }
     std::string getIdName() { return m_idName; }
-    virtual void printTypedNode();
 
 private:
     std::string m_idName;

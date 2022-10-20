@@ -1,8 +1,8 @@
-#include "semantics.hpp"
+#include "../hpp/analyzer.hpp"
 
-#include "../symTable/symTable.hpp"
-#include "../ast/ast.hpp"
-#include "../error/error.hpp"
+#include "../../symTable/include.hpp"
+#include "../../ast/include.hpp"
+#include "../../error/include.hpp"
 
 #include <sstream>
 
@@ -20,59 +20,6 @@ void SemanticAnalyzer::analyze()
     {
         Error::linker("A function named 'main()' must be defined.");
     }
-}
-
-DataType SemanticAnalyzer::calcExpType(ExpNode* node)
-{
-    if (node == nullptr) { return DataTypeEnum::None; }
-
-    unsigned int lineNum = node->getLineNum();
-    std::string name;
-
-    if (node->getNodeType() == NodeType::IdNode)
-    {
-        name = cast<IdNode*>(node)->getIdName();
-        auto declNode = lookupSymTable(name, lineNum, false);
-        if (declNode && declNode->getNodeType() == NodeType::VarDeclNode)
-        {
-            node->setExpType(declNode->getDataType());
-        }
-    } else if (node->getNodeType() == NodeType::CallNode)
-    {
-        name = cast<CallNode*>(node)->getFunName();
-        auto declNode = lookupSymTable(name, lineNum, false);
-        if (declNode && declNode->getNodeType() == NodeType::FunDeclNode)
-        {
-            node->setExpType(declNode->getDataType());
-        }
-    
-    } else if (node->getNodeType() == NodeType::BinaryOpNode)
-    {
-        auto binaryOpNode = cast<BinaryOpNode*>(node);
-        auto lval = cast<ExpNode*>(node->getChild(0));
-        auto rval = cast<ExpNode*>(node->getChild(1));
-
-        if (binaryOpNode->getOperatorType() == BinaryOpType::Index ||
-            binaryOpNode->getOperatorType() == BinaryOpType::Ass)
-        {
-            node->setExpType(calcExpType(lval).getBasicType());
-        } else if (calcExpType(lval) == DataTypeEnum::None || 
-                   calcExpType(rval) == DataTypeEnum::None)
-        {
-            node->setExpType(DataTypeEnum::None);
-        }
-    } else if (node->getNodeType() == NodeType::UnaryOpNode)
-    {
-        auto rval = cast<ExpNode*>(node->getChild(0));
-        if (calcExpType(rval) == DataTypeEnum::None)
-        {
-            node->setExpType(DataTypeEnum::None);
-        }
-
-
-    }
-
-    return node->getExpType();
 }
 
 void SemanticAnalyzer::analyzeNode(ASTNode* node)
@@ -123,27 +70,9 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
     analyzeNode(node->getSibling(0));
 }
 
-void SemanticAnalyzer::calculateLeaveScope(ASTNode* node)
-{
-    auto parentType = NodeType::CompoundStmtNode;
-    if (node->getParent() != nullptr)
-    {
-        parentType = node->getParent()->getNodeType();
-    }
-
-    // if a compound statement that isnt child of a fornode, or if it is a fornode
-    if ((node->getNodeType() == NodeType::CompoundStmtNode &&
-        parentType != NodeType::ForNode) ||
-        node->getNodeType() == NodeType::ForNode)
-    {
-        leaveScope();
-    }
-}
-
 void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
 {
     if (node == nullptr) { return; }
-
     auto typedNode = cast<VarDeclNode*>(node);
     if (m_symTable->depth() == 1) // its a global variable, so already initialized.
     {
@@ -276,30 +205,6 @@ void SemanticAnalyzer::analyzeId(ASTNode* node)
     {
         auto varDecl = cast<VarDeclNode*>(entry);
     }
-}
-
-bool SemanticAnalyzer::isIdInLval(ASTNode* node)
-{
-    if (node == nullptr) { return false; }
-
-    auto ancestor = cast<BinaryOpNode*>(node->getAncestor(NodeType::BinaryOpNode));
-    while (ancestor != nullptr)
-    {
-        switch (ancestor->getOperatorType())
-        {
-        case BinaryOpType::Ass:
-        case BinaryOpType::AddAss:
-        case BinaryOpType::MulAss:
-        case BinaryOpType::DivAss:
-            if (node->isAncestor(ancestor->getChild(0)))
-            {
-                return true;
-            }
-        }
-        ancestor = cast<BinaryOpNode*>(ancestor->getAncestor(NodeType::BinaryOpNode));
-    }
-
-    return false;
 }
 
 void SemanticAnalyzer::analyzeReturn(ASTNode* node)
@@ -627,24 +532,55 @@ void SemanticAnalyzer::analyzeAss(BinaryOpNode* node)
     ASTNode* rval = node->getChild(1);
 }
 
-template <typename T> T SemanticAnalyzer::cast(ASTNode* node)
+DataType SemanticAnalyzer::calcExpType(ExpNode* node)
 {
-    if (node == nullptr)
+    if (node == nullptr) { return DataTypeEnum::None; }
+
+    unsigned int lineNum = node->getLineNum();
+    std::string name;
+
+    if (node->getNodeType() == NodeType::IdNode)
     {
-        return nullptr;
+        name = cast<IdNode*>(node)->getIdName();
+        auto declNode = lookupSymTable(name, lineNum, false);
+        if (declNode && declNode->getNodeType() == NodeType::VarDeclNode)
+        {
+            node->setExpType(declNode->getDataType());
+        }
+    } else if (node->getNodeType() == NodeType::CallNode)
+    {
+        name = cast<CallNode*>(node)->getFunName();
+        auto declNode = lookupSymTable(name, lineNum, false);
+        if (declNode && declNode->getNodeType() == NodeType::FunDeclNode)
+        {
+            node->setExpType(declNode->getDataType());
+        }
+    
+    } else if (node->getNodeType() == NodeType::BinaryOpNode)
+    {
+        auto binaryOpNode = cast<BinaryOpNode*>(node);
+        auto lval = cast<ExpNode*>(node->getChild(0));
+        auto rval = cast<ExpNode*>(node->getChild(1));
+
+        if (binaryOpNode->getOperatorType() == BinaryOpType::Index ||
+            binaryOpNode->getOperatorType() == BinaryOpType::Ass)
+        {
+            node->setExpType(calcExpType(lval).getBasicType());
+        } else if (calcExpType(lval) == DataTypeEnum::None || 
+                   calcExpType(rval) == DataTypeEnum::None)
+        {
+            node->setExpType(DataTypeEnum::None);
+        }
+    } else if (node->getNodeType() == NodeType::UnaryOpNode)
+    {
+        auto rval = cast<ExpNode*>(node->getChild(0));
+        if (calcExpType(rval) == DataTypeEnum::None)
+        {
+            node->setExpType(DataTypeEnum::None);
+        }
     }
 
-    T typedNode = dynamic_cast<T>(node);
-    if (typedNode == nullptr)
-    {
-        Error::critical(node->getLineNum(), "Could not dynamic_cast<> node");
-    }
-    return typedNode;
-}
-
-template <typename T> T SemanticAnalyzer::tryCast(ASTNode* node)
-{
-    return dynamic_cast<T>(node);
+    return node->getExpType();
 }
 
 bool SemanticAnalyzer::insertToSymTable(std::string str, DeclNode* node)
@@ -685,6 +621,23 @@ DeclNode* SemanticAnalyzer::lookupSymTable(std::string name, unsigned int lineNu
         varDecl->use(lineNum, warnUninit);
     }
     return node;
+}
+
+void SemanticAnalyzer::calculateLeaveScope(ASTNode* node)
+{
+    auto parentType = NodeType::CompoundStmtNode;
+    if (node->getParent() != nullptr)
+    {
+        parentType = node->getParent()->getNodeType();
+    }
+
+    // if a compound statement that isnt child of a fornode, or if it is a fornode
+    if ((node->getNodeType() == NodeType::CompoundStmtNode &&
+        parentType != NodeType::ForNode) ||
+        node->getNodeType() == NodeType::ForNode)
+    {
+        leaveScope();
+    }
 }
 
 void SemanticAnalyzer::leaveScope()

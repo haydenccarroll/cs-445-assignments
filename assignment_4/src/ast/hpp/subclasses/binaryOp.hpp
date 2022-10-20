@@ -1,7 +1,9 @@
 #pragma once
 
 #include "exp.hpp"
-#include "../../../types/types.hpp"
+#include "../../../types/include.hpp"
+
+#include <string>
 
 class BinaryOpNode : public ExpNode
 {
@@ -13,10 +15,9 @@ public:
      * @param type type of binary operator used
      */
     BinaryOpNode(unsigned int lineNum, BinaryOpType type);
-    void printNode();
-    NodeType getNodeType() { return NodeType::BinaryOpNode; }
+    std::string toString(bool printType=false) override;
+    NodeType getNodeType() override { return NodeType::BinaryOpNode; }
     BinaryOpType getOperatorType() { return m_binaryOpType; }
-    virtual void printTypedNode();
 
 
 private:

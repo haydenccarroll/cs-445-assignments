@@ -1,7 +1,7 @@
 #include "../../hpp/subclasses/decl.hpp"
 
 #include "../../hpp/node.hpp"
-#include "../../../types/types.hpp"
+#include "../../../types/include.hpp"
 
 #include <string>
 #include <iostream>

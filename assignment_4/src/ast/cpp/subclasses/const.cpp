@@ -1,10 +1,10 @@
 #include "../../hpp/subclasses/const.hpp"
 
 #include "../../hpp/subclasses/exp.hpp"
-#include "../../../types/types.hpp"
+#include "../../../types/include.hpp"
 
 #include <string>
-#include <iostream>
+#include <sstream>
 
 ConstNode::ConstNode(unsigned int lineNum, int value) 
 : ExpNode::ExpNode(lineNum, DataType(DataTypeEnum::Int)),
@@ -46,46 +46,31 @@ m_stringValue(value)
 {
 }
 
-void ConstNode::printNode()
+std::string ConstNode::toString(bool printType)
 {
-    std::cout << "Const ";
-    std::cout << std::boolalpha;
+    std::stringstream ss;
+    ss << "Const ";
+    ss << std::boolalpha;
     switch(m_constType)
     {
     case ConstType::Bool:
-        std::cout << m_boolValue;
+        ss << m_boolValue;
         break;
     case ConstType::Int:
-        std::cout << m_intValue;
+        ss << m_intValue;
         break;
     case ConstType::Char:
-        std::cout << "'" << m_charValue << "'";
+        ss << "'" << m_charValue << "'";
         break;
     case ConstType::String:
-        std::cout << "is array \"" << m_stringValue << "\"";
+        ss << "is array \"" << m_stringValue << "\"";
         break;
     }
-}
 
-void ConstNode::printTypedNode()
-{
-    std::cout << "Const ";
-    std::cout << std::boolalpha;
-    switch(m_constType)
+    if (printType)
     {
-    case ConstType::Bool:
-        std::cout << m_boolValue;
-        break;
-    case ConstType::Int:
-        std::cout << m_intValue;
-        break;
-    case ConstType::Char:
-        std::cout << "'" << m_charValue << "'";
-        break;
-    case ConstType::String:
-        std::cout << "is array \"" << m_stringValue << "\"";
-        break;
+        ss << " " << m_dataType.getBasicType().toString();
     }
 
-    std::cout << " " << m_dataType.getBasicType().toString();
+    return ss.str();
 }
