@@ -16,14 +16,11 @@ public:
     void setTypeSpec(DataTypeEnum type);
     void setInitialized(bool isInitialized) { m_isInitialized = isInitialized;}
     bool isInitialized() { return m_isInitialized; }
-    void use(unsigned int lineNum, bool warnUninit=true);
-    unsigned int getUsage() { return m_uses; }
     void setStatic(bool isStatic);
-
+    void use(unsigned int lineNum, bool warnUninit=true) override;
 
 private:
     bool m_isStatic;
     bool m_isParam;
     bool m_isInitialized;
-    unsigned int m_uses;
 };

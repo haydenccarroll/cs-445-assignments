@@ -21,7 +21,11 @@ public:
     std::string getName() { return m_name; }
     DataType getDataType() { return m_dataType; }
 
+    virtual void use(unsigned int lineNum, bool warnUninit=true);
+    unsigned int getUsage() { return m_uses; }
+
 protected:
     std::string m_name;
     DataType m_dataType;
+    unsigned int m_uses;
 };

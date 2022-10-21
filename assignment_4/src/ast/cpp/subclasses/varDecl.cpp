@@ -12,7 +12,6 @@ VarDeclNode::VarDeclNode(unsigned int lineNum, std::string varName,
 DeclNode::DeclNode(lineNum, varName, type),
 m_isStatic(isStatic),
 m_isInitialized(false),
-m_uses(0),
 m_isParam(isParam)
 {
 }

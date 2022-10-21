@@ -18,6 +18,9 @@ public:
     FunDeclNode(unsigned int lineNum, std::string funcName, DataType returnType);
     std::string toString(bool printType=false) override;
     NodeType getNodeType() override { return NodeType::FunDeclNode; }
+    void incrementNumReturn() { m_numReturn++; }
+    unsigned int getNumReturn() { return m_numReturn; }
 
 private:
+    unsigned int m_numReturn;
 };

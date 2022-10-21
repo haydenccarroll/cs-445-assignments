@@ -20,6 +20,7 @@ void SemanticAnalyzer::analyze()
     m_symTable->leave();
 
     analyzeNode(m_root);
+    checkUsageWarning(true); // does this for global scope.
     if (!m_isMainDefined)
     {
         Error::linker("A function named 'main' with no parameters must be defined.");
@@ -79,7 +80,7 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
         analyzeNode(node->getChild(i));
     }
 
-    calculateLeaveScope(node);
+    calculateLeaveScope(node, true);
 
     analyzeNode(node->getSibling(0));
 }
@@ -100,6 +101,39 @@ void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
             std::stringstream ss;
             ss << "Initializer for variable '" << typedNode->getName() << "' "
                << "is not a constant expression.";
+            Error::error(initExp->getLineNum(), ss.str());
+        }
+
+        if (initExp->getExpType().getBasicType() != typedNode->getDataType().getBasicType() &&
+            initExp->getExpType() != DataTypeEnum::None &&
+            typedNode->getDataType() != DataTypeEnum::None)
+        {
+            std::stringstream ss;
+            ss << "Initializer for variable '" << typedNode->getName() << "' "
+               << typedNode->getDataType().getBasicType().toString(true) << " is "
+               << initExp->getExpType().getBasicType().toString(true);
+            Error::error(initExp->getLineNum(), ss.str());
+        }
+
+        if (initExp->getExpType().isArray() && !typedNode->getDataType().isArray() &&
+            initExp->getExpType() != DataTypeEnum::None &&
+            typedNode->getDataType() != DataTypeEnum::None)
+        {
+            std::stringstream ss;
+            ss << "Initializer for variable '" << typedNode->getName() << "' "
+               << "requires both operands be arrays or not but variable is not "
+               << "an array and rhs is an array.";
+            Error::error(initExp->getLineNum(), ss.str());
+        }
+        
+        if (!initExp->getExpType().isArray() && typedNode->getDataType().isArray() &&
+            initExp->getExpType() != DataTypeEnum::None &&
+            typedNode->getDataType() != DataTypeEnum::None)
+        {
+            std::stringstream ss;
+            ss << "Initializer for variable '" << typedNode->getName() << "' "
+               << "requires both operands be arrays or not but variable is "
+               << "an array and rhs is not an array.";
             Error::error(initExp->getLineNum(), ss.str());
         }
     }
@@ -156,6 +190,8 @@ void SemanticAnalyzer::analyzeCall(ASTNode* node)
         Error::error(node->getLineNum(), ss.str());
         return;
     }
+
+    entry->use(node->getLineNum());
     
     if (entry->getNodeType() != NodeType::FunDeclNode)
     {
@@ -167,8 +203,6 @@ void SemanticAnalyzer::analyzeCall(ASTNode* node)
         varDecl->use(node->getLineNum());
         return;
     }
-
-
 
     errorOnWrongParamType(node);
 }
@@ -247,6 +281,8 @@ void SemanticAnalyzer::analyzeReturn(ASTNode* node)
             Error::error(node->getLineNum(), ss.str());
         }
     }
+
+    funcDecl->incrementNumReturn();
 }
 
 void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
@@ -850,10 +886,9 @@ DeclNode* SemanticAnalyzer::lookupSymTable(std::string name, unsigned int lineNu
         return nullptr;
     }
 
-    auto varDecl = tryCast<VarDeclNode*>(node);
-    if (varDecl && use == true)
+    if (use)
     {
-        varDecl->use(lineNum, warnUninit);
+        node->use(lineNum, warnUninit);
     }
     return node;
 }
@@ -867,10 +902,27 @@ void SemanticAnalyzer::calculateLeaveScope(ASTNode* node, bool isWarn)
     }
 
     // if a compound statement that isnt child of a fornode, or if it is a fornode
-    if ((node->getNodeType() == NodeType::CompoundStmtNode &&
-        parentType != NodeType::ForNode) ||
-        node->getNodeType() == NodeType::ForNode)
+    if (node->getNodeType() == NodeType::ForNode ||
+        node->getNodeType() == NodeType::FunDeclNode ||
+        (node->getNodeType() == NodeType::CompoundStmtNode &&
+        (parentType != NodeType::ForNode && parentType != NodeType::FunDeclNode))
+        
+        )
     {
+        auto funDecl = tryCast<FunDeclNode*>(node);
+        if (funDecl != nullptr)
+        {
+            if (funDecl->getNumReturn() == 0 && isWarn &&
+                (funDecl->getDataType() != DataTypeEnum::Void &&
+                 funDecl->getDataType() != DataTypeEnum::None))
+            {
+                std::stringstream ss;
+                ss << "Expecting to return " 
+                << funDecl->getDataType().getBasicType().toString(false)
+                << " but function '" << funDecl->getName() << "' has no return statement.";
+                Error::warning(funDecl->getLineNum(), ss.str());
+            }
+        }
         leaveScope(isWarn);
     }
 }
@@ -916,21 +968,47 @@ void SemanticAnalyzer::calculateEnterScope(ASTNode* node)
 
 void SemanticAnalyzer::leaveScope(bool isWarn)
 {
+
+    // check for unused warnings
+    if (isWarn)
+    {
+        checkUsageWarning(false);
+    }
+    m_symTable->leave();
+}
+
+void SemanticAnalyzer::checkUsageWarning(bool checkFunc)
+{
     // check for unused warnings
     auto map = m_symTable->getCurrScopeSymbols();
     for (auto const& [key, val] : map)
     {
         auto varDecl = tryCast<VarDeclNode*>(val);
-        if (varDecl == nullptr)
+        auto funDecl = tryCast<FunDeclNode*>(val);
+        if (varDecl != nullptr)
         {
-            continue;
+            if (varDecl->getUsage() == 0)
+            {
+                std::stringstream ss;
+                if (varDecl->isParam())
+                {
+                    ss << "The parameter '";
+                } else
+                {
+                    ss << "The variable '";
+                }
+                ss << key << "' seems not to be used.";
+                Error::warning(varDecl->getLineNum(), ss.str());
+            }
         }
-        if (varDecl->getUsage() == 0 && isWarn)
+        else if (funDecl != nullptr)
         {
-            std::stringstream ss;
-            ss << "The variable '" << key << "' seems not to be used.";
-            Error::warning(varDecl->getLineNum(), ss.str());
+            if (funDecl->getUsage() == 0 && funDecl->getName() != "main")
+            {
+                std::stringstream ss;
+                ss << "The function '" << key << "' seems not to be used.";
+                Error::warning(funDecl->getLineNum(), ss.str());
+            }
         }
     }
-    m_symTable->leave();
 }
