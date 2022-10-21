@@ -32,6 +32,7 @@ private:
 
     void traverseAndSetTypes(ASTNode* node);
     void errorOnWrongParamType(ASTNode* node);
+
     void errorOnWrongRangeType(ASTNode* node);
     void calculateLeaveScope(ASTNode* node, bool isWarn=true);
     void calculateEnterScope(ASTNode* node);

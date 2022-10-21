@@ -84,6 +84,7 @@ void ASTNode::addChild(ASTNode* child)
 {
     if (child != nullptr)
     {
+        child->m_parent = this;
         child->setParent(this);
     }
     m_children.push_back(child);
@@ -93,13 +94,29 @@ void ASTNode::addSibling(ASTNode* sibling)
 {
     if (sibling == nullptr) { return; }
 
+    sibling->setParent(this);
     ASTNode* currNode = this;
     while (currNode->m_sibling != nullptr)
     {
         currNode = currNode->m_sibling;
+
     }
 
     currNode->m_sibling = sibling;
+}
+
+void ASTNode::setParent(ASTNode* parent)
+{
+    if (parent == nullptr)
+    {
+        return;
+    }
+
+    m_parent = parent;
+    if (m_sibling != nullptr)
+    {
+        m_sibling->setParent(parent);
+    }
 }
 
 ASTNode* ASTNode::getChild(unsigned int index)

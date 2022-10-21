@@ -25,7 +25,6 @@ public:
     //setters
     void addChild(ASTNode* child);
     void addSibling(ASTNode* sibling);
-    void setParent(ASTNode* parent) { m_parent = parent; }
     void setHasBeenAnalyzed(bool isAnalyzed) { m_hasBeenAnalyzed = isAnalyzed; }
 
     /**
@@ -56,4 +55,6 @@ protected:
      * 
      */
     virtual std::string toString(bool printType=false) = 0;
+    void setParent(ASTNode* parent);
+
 };

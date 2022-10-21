@@ -43,12 +43,18 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
         analyzeForNode(node);
         break;
     case NodeType::RangeNode: // for whatever reason, we dont analyze anything in range node.
-        return;
+        analyzeRange(node);
     case NodeType::CompoundStmtNode:
         analyzeCompoundStmt(node);
         break;
     case NodeType::IdNode:
         analyzeId(node);
+        break;
+    case NodeType::IfNode:
+        analyzeIf(node);
+        break;
+    case NodeType::WhileNode:
+        analyzeWhile(node);
         break;
     case NodeType::CallNode:
         analyzeCall(node);
@@ -61,6 +67,9 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
         break;
     case NodeType::ReturnNode:
         analyzeReturn(node);
+        break;
+    case NodeType::BreakNode:
+        analyzeBreak(node);
         break;
     }
     calculateEnterScope(node);
@@ -147,7 +156,7 @@ void SemanticAnalyzer::analyzeCall(ASTNode* node)
         return;
     }
 
-    // errorOnWrongParamType(node);
+    errorOnWrongParamType(node);
 }
 
 
@@ -488,11 +497,16 @@ void SemanticAnalyzer::analyzeAss(BinaryOpNode* node)
 
 void SemanticAnalyzer::analyzeBreak(ASTNode* node)
 {
+    auto parent = node;
+    while (parent != nullptr)
+    {
+        parent = parent->getParent();
+    }
     if (!node->hasAncestor(NodeType::WhileNode) &&
         !node->hasAncestor(NodeType::ForNode))
     {
         Error::error(node->getLineNum(), 
-                     "Cannot have a break statement outside of a loop.");
+                     "Cannot have a break statement outside of loop.");
     }
 }
 
@@ -529,8 +543,8 @@ void SemanticAnalyzer::analyzeRange(ASTNode* node)
         if (isArray(child))
         {
             std::stringstream ss;
-            ss << "Cannot use array in position" << i+1
-               << "in range of for statement.";
+            ss << "Cannot use array in position " << i+1
+               << " in range of for statement.";
             Error::error(child->getLineNum(), ss.str());
         }
     }
@@ -559,13 +573,37 @@ void SemanticAnalyzer::errorOnWrongParamType(ASTNode* node)
     {
         DataType argType = currArg->getExpType();
         DataType paramType = currParam->getDataType();
-        if (argType != paramType)
+        if (argType.getBasicType() != paramType.getBasicType() &&
+            argType != DataTypeEnum::None &&
+            paramType != DataTypeEnum::None)
         {
             std::stringstream ss;
-            ss << "Expecting " << paramType.toString(false) 
-               << " in parameter " << i << " of call to " << call->getFunName()
-               << " declared on line " << funDecl->getLineNum() << " but got "
-               << argType.toString(false) << ".";
+            ss << "Expecting " << paramType.getBasicType().toString(false) 
+               << " in parameter " << i << " of call to '" << call->getFunName()
+               << "' declared on line " << funDecl->getLineNum() << " but got "
+               << argType.getBasicType().toString(false) << ".";
+            Error::error(currArg->getLineNum(), ss.str());
+        }
+
+        if (!argType.isArray() && paramType.isArray() &&
+            argType != DataTypeEnum::None &&
+            paramType != DataTypeEnum::None)
+        {
+            std::stringstream ss;
+            ss << "Expecting array in parameter "
+               << i << " of call to '" << call->getFunName()
+               << "' declared on line " << funDecl->getLineNum() << ".";
+            Error::error(currArg->getLineNum(), ss.str());
+        }
+
+        if (argType.isArray() && !paramType.isArray() &&
+            argType != DataTypeEnum::None &&
+            paramType != DataTypeEnum::None)
+        {
+            std::stringstream ss;
+            ss << "Not expecting array in parameter "
+               << i << " of call to '" << call->getFunName()
+               << "' declared on line " << funDecl->getLineNum() << ".";
             Error::error(currArg->getLineNum(), ss.str());
         }
         currArg = cast<ExpNode*>(currArg->getSibling(0));
@@ -576,7 +614,7 @@ void SemanticAnalyzer::errorOnWrongParamType(ASTNode* node)
 
 void SemanticAnalyzer::errorOnWrongRangeType(ASTNode* node)
 {
-    if (node == nullptr || node->getNodeType() != NodeType::CallNode)
+    if (node == nullptr || node->getNodeType() != NodeType::RangeNode)
     {
         return;
     }
@@ -589,12 +627,13 @@ void SemanticAnalyzer::errorOnWrongRangeType(ASTNode* node)
             continue;
         }
         auto childExp = cast<ExpNode*>(child);
-        if (childExp->getExpType() != DataTypeEnum::Int)
+        if (childExp->getExpType().getBasicType() != DataTypeEnum::Int &&
+            childExp->getExpType().getBasicType() != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "Expecting type int in position "
-               << i << " in range of for statement but got "
-               << childExp->getExpType().toString(false) << ".";
+               << i+1 << " in range of for statement but got "
+               << childExp->getExpType().getBasicType().toString(false) << ".";
             Error::error(childExp->getLineNum(), ss.str());
         }
     }
