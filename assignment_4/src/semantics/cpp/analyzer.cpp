@@ -192,11 +192,45 @@ void SemanticAnalyzer::analyzeId(ASTNode* node)
 void SemanticAnalyzer::analyzeReturn(ASTNode* node)
 {
     auto returnVal = tryCast<ExpNode*>(node->getChild(0));
+    auto funcDecl = cast<FunDeclNode*>(node->getAncestor(NodeType::FunDeclNode));
     if (returnVal)
     {
         if (returnVal->getExpType().isArray())
         {
             Error::error(node->getLineNum(), "Cannot return an array.");
+        }
+
+        if (funcDecl->getDataType() == DataTypeEnum::Void)
+        {
+
+            std::stringstream ss;
+            ss << "Function '" << funcDecl->getName() << "' at line " 
+               << funcDecl->getLineNum() << " is expecting no return value, but "
+               << "return has a value.";
+            Error::error(node->getLineNum(), ss.str());
+        } else if (funcDecl->getDataType().getBasicType() 
+                   != returnVal->getExpType().getBasicType() &&
+                   funcDecl->getDataType() != DataTypeEnum::None &&
+                   returnVal->getExpType() != DataTypeEnum::None)
+        {
+            std::stringstream ss;
+            ss << "Function '" << funcDecl->getName() << "' at line " 
+               << funcDecl->getLineNum() << " is expecting to return "
+               << funcDecl->getDataType().getBasicType().toString(false)
+               << " but returns " << returnVal->getExpType().getBasicType().toString(false)
+               << ".";
+            Error::error(node->getLineNum(), ss.str());
+        }
+    } else
+    {
+        if (funcDecl->getDataType() != DataTypeEnum::Void)
+        {
+            std::stringstream ss;
+            ss << "Function '" << funcDecl->getName() << "' at line " 
+               << funcDecl->getLineNum() << " is expecting to return "
+               << funcDecl->getDataType().getBasicType().toString(false)
+               << " but return has no value.";
+            Error::error(node->getLineNum(), ss.str());
         }
     }
 }
@@ -512,21 +546,40 @@ void SemanticAnalyzer::analyzeBreak(ASTNode* node)
 
 void SemanticAnalyzer::analyzeIf(ASTNode* node)
 {
-    if (isArray(node->getChild(0)))
+    auto condition = cast<ExpNode*>(node->getChild(0));
+    if (isArray(condition))
     {
-
-        Error::error(node->getChild(0)->getLineNum(), 
+        Error::error(condition->getLineNum(), 
                      "Cannot use array as test condition in if statement.");
+    }
+
+
+    if (condition->getExpType().getBasicType() != DataTypeEnum::Bool &&
+        condition->getExpType() != DataTypeEnum::None)
+    {
+        std::stringstream ss;
+        ss << "Expecting Boolean test condition in if statement but got "
+           << condition->getExpType().getBasicType().toString(false) << ".";
+        Error::error(condition->getLineNum(), ss.str());
     }
 }
 
 void SemanticAnalyzer::analyzeWhile(ASTNode* node)
 {
-    if (isArray(node->getChild(0)))
+    auto condition = cast<ExpNode*>(node->getChild(0));
+    if (isArray(condition))
     {
-
-        Error::error(node->getChild(0)->getLineNum(), 
+        Error::error(condition->getLineNum(), 
                      "Cannot use array as test condition in while statement.");
+    }
+
+    if (condition->getExpType().getBasicType() != DataTypeEnum::Bool &&
+        condition->getExpType() != DataTypeEnum::None)
+    {
+        std::stringstream ss;
+        ss << "Expecting Boolean test condition in while statement but got "
+           << condition->getExpType().getBasicType().toString(false) << ".";
+        Error::error(condition->getLineNum(), ss.str());
     }
 }
 
