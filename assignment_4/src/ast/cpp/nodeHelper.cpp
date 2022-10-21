@@ -42,3 +42,91 @@ bool isArray(ASTNode* node)
 
     return false;
 }
+
+bool doesContainID(ASTNode* node)
+{
+    if (node == nullptr) { return false;}
+    if (node->getNodeType() == NodeType::IdNode) { return true;}
+
+    for (int i=0; i < node->getNumChildren(); i++)
+    {
+        if (doesContainID(node->getChild(i)))
+        {
+            return true;
+        }
+    }
+
+    if (doesContainID(node->getSibling(0)))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool doesContainCall(ASTNode* node)
+{
+    if (node == nullptr) { return false;}
+    if (node->getNodeType() == NodeType::CallNode) { return true;}
+
+    for (int i=0; i < node->getNumChildren(); i++)
+    {
+        if (doesContainCall(node->getChild(i)))
+        {
+            return true;
+        }
+    }
+
+    if (doesContainCall(node->getSibling(0)))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool doesContainRand(ASTNode* node)
+{
+    if (node == nullptr) { return false;}
+    if (node->getNodeType() == NodeType::UnaryOpNode)
+    {
+        auto unaryNode = cast<UnaryOpNode*>(node);
+        if (unaryNode->getOperatorType() == UnaryOpType::Random)
+        {
+            return true;
+        }
+    }
+
+    for (int i=0; i < node->getNumChildren(); i++)
+    {
+        if (doesContainRand(node->getChild(i)))
+        {
+            return true;
+        }
+    }
+
+    if (doesContainRand(node->getSibling(0)))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool isConstantExp(ASTNode* node)
+{
+    if (node == nullptr) { return false; }
+
+    auto expNode = tryCast<ExpNode*>(node);
+    if (expNode == nullptr)
+    {
+        return false;
+    }
+
+    if (doesContainID(node) || doesContainRand(node) || doesContainCall(node))
+    {
+        return false;
+    }
+
+    return true;
+}

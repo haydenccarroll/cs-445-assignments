@@ -17,11 +17,10 @@ stuff to add to hw4:
     DONE Function x at line x is expecting to return x but returns x
     DONE Too few parameters passed for function x declared on line x
     DONE Too many parameters passed for function x declared on line x
-    
-    Initializer for variable x is not a constant expression
+    DONE Initializer for variable x is not a constant expression
+
     Initializer for variable x of x is of x
     Initializer for variable x requires both operands be arrays or not but variable isx am array and rhs isx an array
-
     WARN Expecting to return x but function has no return statement
     WARN the function x seems not to be used
     WARN the variable x seems not to be used

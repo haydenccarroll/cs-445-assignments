@@ -91,6 +91,18 @@ void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
     {
         typedNode->setInitialized(true);
     }
+
+    auto initExp = cast<ExpNode*>(node->getChild(0));
+    if (initExp)
+    {
+        if (!isConstantExp(initExp))
+        {
+            std::stringstream ss;
+            ss << "Initializer for variable '" << typedNode->getName() << "' "
+               << "is not a constant expression.";
+            Error::error(initExp->getLineNum(), ss.str());
+        }
+    }
     insertToSymTable(typedNode->getName(), typedNode);
 
 }
