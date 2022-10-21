@@ -22,7 +22,7 @@ void SemanticAnalyzer::analyze()
     analyzeNode(m_root);
     if (!m_isMainDefined)
     {
-        Error::linker("A function named 'main()' must be defined.");
+        Error::linker("A function named 'main()' with no parameters must be defined.");
     }
 }
 
@@ -155,6 +155,8 @@ void SemanticAnalyzer::analyzeCall(ASTNode* node)
         varDecl->use(node->getLineNum());
         return;
     }
+
+
 
     errorOnWrongParamType(node);
 }
@@ -662,6 +664,34 @@ void SemanticAnalyzer::errorOnWrongParamType(ASTNode* node)
         currArg = cast<ExpNode*>(currArg->getSibling(0));
         currParam = cast<VarDeclNode*>(currParam->getSibling(0));
         i++;
+    }
+
+    unsigned int numArgs = i;
+    unsigned int numParams = i;
+    while (currArg != nullptr)
+    {
+        currArg = cast<ExpNode*>(currArg->getSibling(0));
+        numArgs++;
+    }
+
+    while (currParam != nullptr)
+    {
+        currParam = cast<VarDeclNode*>(currParam->getSibling(0));
+        numParams++;
+    }
+
+    if (numArgs < numParams)
+    {
+        std::stringstream ss;
+        ss << "Too few parameters passed for function '" << funDecl->getName()
+           << "' declared on line " << funDecl->getLineNum() << ".";
+        Error::error(node->getLineNum(), ss.str());
+    } else if (numArgs > numParams)
+    {
+        std::stringstream ss;
+        ss << "Too many parameters passed for function '" << funDecl->getName()
+           << "' declared on line " << funDecl->getLineNum() << ".";
+        Error::error(node->getLineNum(), ss.str());
     }
 }
 

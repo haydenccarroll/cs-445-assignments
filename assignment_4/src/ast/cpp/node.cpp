@@ -23,6 +23,17 @@ ASTNode::~ASTNode()
     m_sibling = nullptr;
 }
 
+unsigned int ASTNode::getNumSiblings()
+{
+    if (m_sibling == nullptr)
+    {
+        return 0;
+    }
+
+    return 1 + m_sibling->getNumSiblings();
+}
+
+
 void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl, bool printType)
 {
     for (int i=0; i < indentLevel; i++)
