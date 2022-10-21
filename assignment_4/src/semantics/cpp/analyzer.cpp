@@ -22,7 +22,7 @@ void SemanticAnalyzer::analyze()
     analyzeNode(m_root);
     if (!m_isMainDefined)
     {
-        Error::linker("A function named 'main()' with no parameters must be defined.");
+        Error::linker("A function named 'main' with no parameters must be defined.");
     }
 }
 
