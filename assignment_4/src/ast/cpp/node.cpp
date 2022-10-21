@@ -65,6 +65,12 @@ ASTNode* ASTNode::getAncestor(NodeType type)
     return m_parent->getAncestor(type);
 }
 
+bool ASTNode::hasAncestor(NodeType type)
+{
+    return (getAncestor(type) != nullptr);
+}
+
+
 bool ASTNode::isAncestor(ASTNode* node)
 {
     if (this == node) { return true; }

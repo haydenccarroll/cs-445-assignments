@@ -175,6 +175,11 @@ void SymbolTable::debug(bool state)
     debugFlg = state;
 }
 
+void SymbolTable::clear()
+{
+    stack.clear();
+}
+
 
 // Returns the number of scopes in the symbol table
 int SymbolTable::depth()

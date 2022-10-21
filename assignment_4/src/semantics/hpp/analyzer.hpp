@@ -24,11 +24,19 @@ private:
     void analyzeReturn(ASTNode* node);
     void analyzeCompoundStmt(ASTNode* node);
     void analyzeLBrack(BinaryOpNode* node);
+    void analyzeBreak(ASTNode* node);
+    void analyzeIf(ASTNode* node);
+    void analyzeWhile(ASTNode* node);
+    void analyzeRange(ASTNode* node);
     void analyzeAss(BinaryOpNode* node);
 
-    void calculateLeaveScope(ASTNode* node);
-    DataType calcExpType(ExpNode* node);
+    void traverseAndSetTypes(ASTNode* node);
+    void errorOnWrongParamType(ASTNode* node);
+    void errorOnWrongRangeType(ASTNode* node);
+    void calculateLeaveScope(ASTNode* node, bool isWarn=true);
+    void calculateEnterScope(ASTNode* node);
+    DataType calcExpType(ASTNode* node);
     bool insertToSymTable(std::string, DeclNode* );
     DeclNode* lookupSymTable(std::string name, unsigned int lineNum, bool use=true, bool warnUninit=true);
-    void leaveScope();
+    void leaveScope(bool isWarn=true);
 };

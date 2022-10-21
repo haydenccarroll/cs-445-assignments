@@ -56,6 +56,7 @@ private:
 
 public:
     SymbolTable();
+    void clear();
     void debug(bool state);                          // sets the debug flags
     bool test();                                     // runs tests to validate the SymbolTable class
     int depth();                                     // what is the depth of the scope stack?

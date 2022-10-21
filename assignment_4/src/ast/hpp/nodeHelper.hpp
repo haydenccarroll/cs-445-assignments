@@ -25,3 +25,5 @@ template <typename T> T tryCast(ASTNode* node)
 }
 
 bool isIdInLval(ASTNode* node);
+
+bool isArray(ASTNode* node);

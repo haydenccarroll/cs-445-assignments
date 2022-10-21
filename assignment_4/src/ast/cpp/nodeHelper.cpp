@@ -26,3 +26,19 @@ bool isIdInLval(ASTNode* node)
 
     return false;
 }
+
+bool isArray(ASTNode* node)
+{
+    if (node == nullptr) { return false; }
+
+    if (node->getNodeType() == NodeType::IdNode)
+    {
+        auto idNode = cast<IdNode*>(node);
+        if (idNode->getExpType().isArray())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

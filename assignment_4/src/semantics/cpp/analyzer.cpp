@@ -15,6 +15,10 @@ m_isMainDefined(false)
 
 void SemanticAnalyzer::analyze()
 {
+    m_symTable->enter("traverse and set types");
+    traverseAndSetTypes(m_root);
+    m_symTable->leave();
+
     analyzeNode(m_root);
     if (!m_isMainDefined)
     {
@@ -59,6 +63,7 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
         analyzeReturn(node);
         break;
     }
+    calculateEnterScope(node);
 
     for (int i=0; i < node->getNumChildren(); i++)
     {
@@ -72,7 +77,6 @@ void SemanticAnalyzer::analyzeNode(ASTNode* node)
 
 void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
 {
-    if (node == nullptr) { return; }
     auto typedNode = cast<VarDeclNode*>(node);
     if (m_symTable->depth() == 1) // its a global variable, so already initialized.
     {
@@ -84,31 +88,11 @@ void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
 
 void SemanticAnalyzer::analyzeCompoundStmt(ASTNode* node)
 {
-    if (node == nullptr) { return; }
-
-    auto parentType = NodeType::CompoundStmtNode;
-    if (node->getParent() != nullptr)
-    {
-        parentType = node->getParent()->getNodeType();
-    }
-
-    // if fun decl or for node is parent, dont do anything, they handle it.
-    switch (parentType)
-    {
-        case NodeType::FunDeclNode:
-        case NodeType::ForNode:
-            return;
-    }
-
-    std::stringstream ss;
-    ss << "Compount Stmt at line: " << node ->getLineNum();
-    m_symTable->enter(ss.str());
+    // all scope stuff is handled in different function
 }
 
 void SemanticAnalyzer::analyzeFunDecl(ASTNode* node)
 {
-    if (node == nullptr) { return; }
-
     auto funDeclNode = cast<FunDeclNode*>(node);
     std::string funName = funDeclNode->getName();
 
@@ -133,30 +117,15 @@ void SemanticAnalyzer::analyzeFunDecl(ASTNode* node)
     {
         m_isMainDefined = true;
     }
-
-    std::stringstream ss;
-    ss << "Function: " << funName << " at line: " << node->getLineNum();
-    m_symTable->enter(ss.str());
 }
 
 void SemanticAnalyzer::analyzeForNode(ASTNode* node)
 {
-    if (node == nullptr) { return; }
-
-    auto funDeclNode = cast<ForNode*>(node);
-
-
-    std::stringstream ss;
-    ss << "For at line: " << node->getLineNum();
-    m_symTable->enter(ss.str());
 }
 
 void SemanticAnalyzer::analyzeCall(ASTNode* node)
 {
-    if (node == nullptr) { return; }
-
     auto callNode = cast<CallNode*>(node);
-    calcExpType(callNode);
     std::string funName = callNode->getFunName();
     auto entry = lookupSymTable(funName, node->getLineNum(), false);
     if (entry == nullptr)
@@ -175,16 +144,20 @@ void SemanticAnalyzer::analyzeCall(ASTNode* node)
 
         auto varDecl = cast<VarDeclNode*>(entry);
         varDecl->use(node->getLineNum());
+        return;
     }
+
+    // errorOnWrongParamType(node);
 }
+
+
+
 
 void SemanticAnalyzer::analyzeId(ASTNode* node)
 {
-    if (node == nullptr) { return; }
     bool warnUninit = !isIdInLval(node);
 
     auto typedNode = cast<IdNode*>(node);
-    calcExpType(typedNode);
     std::string idName = typedNode->getIdName();
 
     auto entry = lookupSymTable(idName, node->getLineNum(), true, warnUninit);
@@ -209,12 +182,10 @@ void SemanticAnalyzer::analyzeId(ASTNode* node)
 
 void SemanticAnalyzer::analyzeReturn(ASTNode* node)
 {
-    if (node == nullptr) { return; }
-
     auto returnVal = tryCast<ExpNode*>(node->getChild(0));
     if (returnVal)
     {
-        if (calcExpType(returnVal).isArray())
+        if (returnVal->getExpType().isArray())
         {
             Error::error(node->getLineNum(), "Cannot return an array.");
         }
@@ -223,9 +194,8 @@ void SemanticAnalyzer::analyzeReturn(ASTNode* node)
 
 void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
 {
-    if (node == nullptr) { return; }
-
     auto binaryOpNode = cast<BinaryOpNode*>(node);
+
     auto lval = cast<ExpNode*>(node->getChild(0));
     auto rval = cast<ExpNode*>(node->getChild(1));
 
@@ -256,18 +226,18 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
     case BinaryOpType::GT:
     case BinaryOpType::GEQ:
     case BinaryOpType::Ass:
-        if (calcExpType(lval).isArray() && !calcExpType(rval).isArray() &&
-            calcExpType(lval) != DataTypeEnum::None &&
-            calcExpType(rval) != DataTypeEnum::None)
+        if (lval->getExpType().isArray() && !rval->getExpType().isArray() &&
+            lval->getExpType() != DataTypeEnum::None &&
+            rval->getExpType() != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
                << "' requires both operands be arrays or not but lhs is an array"
                << " and rhs is not an array.";
             Error::error(node->getLineNum(), ss.str());
-        } else if (!calcExpType(lval).isArray() && calcExpType(rval).isArray() &&
-                    calcExpType(lval) != DataTypeEnum::None &&
-                    calcExpType(rval) != DataTypeEnum::None)
+        } else if (!lval->getExpType().isArray() && rval->getExpType().isArray() &&
+                    lval->getExpType() != DataTypeEnum::None &&
+                    rval->getExpType() != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
@@ -276,15 +246,15 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
             Error::error(node->getLineNum(), ss.str());
         }
    
-        if (calcExpType(lval).getBasicType() != calcExpType(rval).getBasicType() &&
-            calcExpType(lval) != DataTypeEnum::None &&
-            calcExpType(rval) != DataTypeEnum::None)
+        if (lval->getExpType().getBasicType() != rval->getExpType().getBasicType() &&
+            lval->getExpType() != DataTypeEnum::None &&
+            rval->getExpType() != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of the same type but lhs is "
-            << calcExpType(lval).getBasicType().toString(false)
-            <<  " and rhs is " << calcExpType(rval).getBasicType().toString(false) << ".";
+            << lval->getExpType().getBasicType().toString(false)
+            <<  " and rhs is " << rval->getExpType().getBasicType().toString(false) << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -294,23 +264,23 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
     {
     case BinaryOpType::And:
     case BinaryOpType::Or:
-        if (calcExpType(lval).getBasicType() != DataTypeEnum::Bool &&
-            calcExpType(lval) != DataTypeEnum::None)
+        if (lval->getExpType().getBasicType() != DataTypeEnum::Bool &&
+            lval->getExpType() != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type bool "
-            <<  "but lhs is " << calcExpType(lval).getBasicType().toString() << ".";
+            <<  "but lhs is " << lval->getExpType().getBasicType().toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
 
-        if (calcExpType(rval).getBasicType() != DataTypeEnum::Bool &&
-            calcExpType(rval) != DataTypeEnum::None)
+        if (rval->getExpType().getBasicType() != DataTypeEnum::Bool &&
+            rval->getExpType() != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type bool "
-            <<  "but rhs is " << calcExpType(rval).getBasicType().toString() << ".";
+            <<  "but rhs is " << rval->getExpType().getBasicType().toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -327,23 +297,23 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
     case BinaryOpType::Mul:
     case BinaryOpType::Div:
     case BinaryOpType::Mod:
-        if (calcExpType(lval).getBasicType() != DataTypeEnum::Int &&
-            calcExpType(lval) != DataTypeEnum::None) // if is none, it errored above. dont cascade errors.
+        if (lval->getExpType().getBasicType() != DataTypeEnum::Int &&
+            lval->getExpType() != DataTypeEnum::None) // if is none, it errored above. dont cascade errors.
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type int "
-            <<  "but lhs is " << calcExpType(lval).getBasicType().toString() << ".";
+            <<  "but lhs is " << lval->getExpType().getBasicType().toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
 
-        if (calcExpType(rval).getBasicType() != DataTypeEnum::Int &&
-            calcExpType(rval) != DataTypeEnum::None)
+        if (rval->getExpType().getBasicType() != DataTypeEnum::Int &&
+            rval->getExpType() != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "'" << binaryOpTypeToStr(binaryOpNode->getOperatorType())
             << "' requires operands of type int "
-            <<  "but rhs is " << calcExpType(rval).getBasicType().toString() << ".";
+            <<  "but rhs is " << rval->getExpType().getBasicType().toString() << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -362,7 +332,7 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
     case BinaryOpType::Mul:
     case BinaryOpType::Div:
     case BinaryOpType::Mod:
-        if (calcExpType(lval).isArray() || calcExpType(rval).isArray())
+        if (lval->getExpType().isArray() || rval->getExpType().isArray())
         {
             std::stringstream ss;
             ss << "The operation '" 
@@ -375,9 +345,6 @@ void SemanticAnalyzer::analyzeBinaryOp(ASTNode* node)
 
 void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
 {
-    if (node == nullptr) { return; }
-
-
     auto unaryOpNode = cast<UnaryOpNode*>(node);
     auto rval = cast<ExpNode*>(node->getChild(0));
 
@@ -389,7 +356,7 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
     case UnaryOpType::Chsign:
     case UnaryOpType::Random:
     case UnaryOpType::Not:
-        if (calcExpType(rval).isArray())
+        if (rval->getExpType().isArray())
         {
             std::stringstream ss;
             ss << "The operation '" << unaryOpTypeToStr(unaryOpNode->getOperatorType())
@@ -405,13 +372,13 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
     case UnaryOpType::Inc:
     case UnaryOpType::Chsign:
     case UnaryOpType::Random:
-        if (calcExpType(rval).getBasicType() != DataType(DataTypeEnum::Int) && 
-            calcExpType(rval) != DataTypeEnum::None)
+        if (rval->getExpType().getBasicType() != DataType(DataTypeEnum::Int) && 
+            rval->getExpType() != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "Unary '" << unaryOpTypeToStr(unaryOpNode->getOperatorType())
                << "' requires an operand of type int but was given "
-               << calcExpType(rval).getBasicType().toString(false) << ".";
+               << rval->getExpType().getBasicType().toString(false) << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -420,13 +387,13 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
     switch (unaryOpNode->getOperatorType())
     {
     case UnaryOpType::Not:
-        if (calcExpType(rval).getBasicType() != DataType(DataTypeEnum::Bool) && 
-            calcExpType(rval) != DataTypeEnum::Void)
+        if (rval->getExpType().getBasicType() != DataTypeEnum::Bool && 
+            rval->getExpType() != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "Unary '" << unaryOpTypeToStr(unaryOpNode->getOperatorType())
                << "' requires an operand of type bool but was given "
-               << calcExpType(rval).getBasicType().toString(false) << ".";
+               << rval->getExpType().getBasicType().toString(false) << ".";
             Error::error(node->getLineNum(), ss.str());
         }
     }
@@ -435,8 +402,8 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
     switch (unaryOpNode->getOperatorType())
     {
     case UnaryOpType::SizeOf:
-        if (!calcExpType(rval).isArray() && 
-            calcExpType(rval) != DataTypeEnum::None)
+        if (!rval->getExpType().isArray() && 
+            rval->getExpType() != DataTypeEnum::None)
         {
             std::stringstream ss;
             ss << "The operation '" << unaryOpTypeToStr(unaryOpNode->getOperatorType())
@@ -448,13 +415,6 @@ void SemanticAnalyzer::analyzeUnaryOp(ASTNode* node)
 
 void SemanticAnalyzer::analyzeLBrack(BinaryOpNode* node)
 {
-    if (node == nullptr)
-    {
-        return;
-    }
-
-    calcExpType(node);
-
     bool isArr = false;
     auto left = cast<IdNode*>(node->getChild(0));
     std::string leftName = left->getIdName();
@@ -487,26 +447,20 @@ void SemanticAnalyzer::analyzeLBrack(BinaryOpNode* node)
     }
 
     auto rightExp = cast<ExpNode*>(node->getChild(1));
-    if (calcExpType(rightExp).getBasicType() != DataType(DataTypeEnum::Int) && 
-        calcExpType(rightExp) != DataTypeEnum::None)
+    if (rightExp->getExpType().getBasicType() != DataType(DataTypeEnum::Int) && 
+        rightExp->getExpType() != DataTypeEnum::None)
     {
         std::stringstream ss;
         ss << "Array '" << left->getIdName() << "' should be indexed by type int but got "
-           << calcExpType(rightExp).getBasicType().toString(false) << ".";
+           << rightExp->getExpType().getBasicType().toString(false) << ".";
         Error::error(node->getLineNum(), ss.str());
     }
 }
 
 void SemanticAnalyzer::analyzeAss(BinaryOpNode* node)
 {
-    if (node == nullptr)
-    {
-        return;
-    }
-
     // analyze right side first
     analyzeNode(node->getChild(1));
-    calcExpType(node);
 
     auto lvalId = tryCast<IdNode*>(node->getChild(0));
     if (lvalId)
@@ -532,55 +486,202 @@ void SemanticAnalyzer::analyzeAss(BinaryOpNode* node)
     ASTNode* rval = node->getChild(1);
 }
 
-DataType SemanticAnalyzer::calcExpType(ExpNode* node)
+void SemanticAnalyzer::analyzeBreak(ASTNode* node)
 {
-    if (node == nullptr) { return DataTypeEnum::None; }
+    if (!node->hasAncestor(NodeType::WhileNode) &&
+        !node->hasAncestor(NodeType::ForNode))
+    {
+        Error::error(node->getLineNum(), 
+                     "Cannot have a break statement outside of a loop.");
+    }
+}
 
-    unsigned int lineNum = node->getLineNum();
+void SemanticAnalyzer::analyzeIf(ASTNode* node)
+{
+    if (isArray(node->getChild(0)))
+    {
+
+        Error::error(node->getChild(0)->getLineNum(), 
+                     "Cannot use array as test condition in if statement.");
+    }
+}
+
+void SemanticAnalyzer::analyzeWhile(ASTNode* node)
+{
+    if (isArray(node->getChild(0)))
+    {
+
+        Error::error(node->getChild(0)->getLineNum(), 
+                     "Cannot use array as test condition in while statement.");
+    }
+}
+
+void SemanticAnalyzer::analyzeRange(ASTNode* node)
+{
+    for (int i=0; i < node->getNumChildren(); i++)
+    {
+        ASTNode* child = node->getChild(i);
+        if (child == nullptr)
+        {
+            continue;
+        }
+
+        if (isArray(child))
+        {
+            std::stringstream ss;
+            ss << "Cannot use array in position" << i+1
+               << "in range of for statement.";
+            Error::error(child->getLineNum(), ss.str());
+        }
+    }
+
+    errorOnWrongRangeType(node);
+}
+
+void SemanticAnalyzer::errorOnWrongParamType(ASTNode* node)
+{
+    if (node == nullptr || node->getNodeType() != NodeType::CallNode)
+    {
+        return;
+    }
+    auto call = cast<CallNode*>(node);
+
+    auto funDecl = tryCast<FunDeclNode*>(lookupSymTable(call->getFunName(), call->getLineNum(), false, false));
+    if (funDecl == nullptr)
+    {
+        return;
+    }
+
+    auto currArg = cast<ExpNode*>(call->getChild(0));
+    auto currParam = cast<VarDeclNode*>(funDecl->getChild(0));
+    unsigned int i = 1;
+    while (currArg != nullptr && currParam != nullptr)
+    {
+        DataType argType = currArg->getExpType();
+        DataType paramType = currParam->getDataType();
+        if (argType != paramType)
+        {
+            std::stringstream ss;
+            ss << "Expecting " << paramType.toString(false) 
+               << " in parameter " << i << " of call to " << call->getFunName()
+               << " declared on line " << funDecl->getLineNum() << " but got "
+               << argType.toString(false) << ".";
+            Error::error(currArg->getLineNum(), ss.str());
+        }
+        currArg = cast<ExpNode*>(currArg->getSibling(0));
+        currParam = cast<VarDeclNode*>(currParam->getSibling(0));
+        i++;
+    }
+}
+
+void SemanticAnalyzer::errorOnWrongRangeType(ASTNode* node)
+{
+    if (node == nullptr || node->getNodeType() != NodeType::CallNode)
+    {
+        return;
+    }
+    
+    for (int i=0; i < node->getNumChildren(); i++)
+    {
+        ASTNode* child = node->getChild(i);
+        if (child == nullptr)
+        {
+            continue;
+        }
+        auto childExp = cast<ExpNode*>(child);
+        if (childExp->getExpType() != DataTypeEnum::Int)
+        {
+            std::stringstream ss;
+            ss << "Expecting type int in position "
+               << i << " in range of for statement but got "
+               << childExp->getExpType().toString(false) << ".";
+            Error::error(childExp->getLineNum(), ss.str());
+        }
+    }
+
+}
+
+void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
+{
+    if (node == nullptr) { return; }
+
+    if (node->getNodeType() == NodeType::VarDeclNode)
+    {
+        auto varDecl = cast<VarDeclNode*>(node);
+        m_symTable->insert(varDecl->getName(), varDecl);
+    } else if (node->getNodeType() == NodeType::FunDeclNode)
+    {
+        auto funDecl = cast<FunDeclNode*>(node);
+        m_symTable->insert(funDecl->getName(), funDecl);
+    }
+
+    calcExpType(node);
+    calculateEnterScope(node);
+
+    for (int i=0; i < node->getNumChildren(); i++)
+    {
+        traverseAndSetTypes(node->getChild(i));
+    }
+
+    calculateLeaveScope(node, false);
+
+    traverseAndSetTypes(node->getSibling(0));
+}
+
+DataType SemanticAnalyzer::calcExpType(ASTNode* node)
+{
+    if (node == nullptr || tryCast<ExpNode*>(node) == nullptr) 
+    {
+        return DataTypeEnum::None;
+    }
+
+    auto expNode = cast<ExpNode*>(node);
+
+    unsigned int lineNum = expNode->getLineNum();
     std::string name;
 
-    if (node->getNodeType() == NodeType::IdNode)
+    if (expNode->getNodeType() == NodeType::IdNode)
     {
-        name = cast<IdNode*>(node)->getIdName();
-        auto declNode = lookupSymTable(name, lineNum, false);
+        name = cast<IdNode*>(expNode)->getIdName();
+        auto declNode = m_symTable->lookup(name);
         if (declNode && declNode->getNodeType() == NodeType::VarDeclNode)
         {
-            node->setExpType(declNode->getDataType());
+            expNode->setExpType(declNode->getDataType());
         }
-    } else if (node->getNodeType() == NodeType::CallNode)
+    } else if (expNode->getNodeType() == NodeType::CallNode)
     {
-        name = cast<CallNode*>(node)->getFunName();
-        auto declNode = lookupSymTable(name, lineNum, false);
+        name = cast<CallNode*>(expNode)->getFunName();
+        auto declNode = m_symTable->lookup(name);
         if (declNode && declNode->getNodeType() == NodeType::FunDeclNode)
         {
-            node->setExpType(declNode->getDataType());
+            expNode->setExpType(declNode->getDataType());
         }
     
-    } else if (node->getNodeType() == NodeType::BinaryOpNode)
+    } else if (expNode->getNodeType() == NodeType::BinaryOpNode)
     {
-        auto binaryOpNode = cast<BinaryOpNode*>(node);
-        auto lval = cast<ExpNode*>(node->getChild(0));
-        auto rval = cast<ExpNode*>(node->getChild(1));
+        auto binaryOpNode = cast<BinaryOpNode*>(expNode);
+        auto lval = cast<ExpNode*>(expNode->getChild(0));
+        auto rval = cast<ExpNode*>(expNode->getChild(1));
 
         if (binaryOpNode->getOperatorType() == BinaryOpType::Index ||
             binaryOpNode->getOperatorType() == BinaryOpType::Ass)
         {
-            node->setExpType(calcExpType(lval).getBasicType());
+            expNode->setExpType(calcExpType(lval).getBasicType());
         } else if (calcExpType(lval) == DataTypeEnum::None || 
                    calcExpType(rval) == DataTypeEnum::None)
         {
-            node->setExpType(DataTypeEnum::None);
+            expNode->setExpType(DataTypeEnum::None);
         }
-    } else if (node->getNodeType() == NodeType::UnaryOpNode)
+    } else if (expNode->getNodeType() == NodeType::UnaryOpNode)
     {
-        auto rval = cast<ExpNode*>(node->getChild(0));
+        auto rval = cast<ExpNode*>(expNode->getChild(0));
         if (calcExpType(rval) == DataTypeEnum::None)
         {
-            node->setExpType(DataTypeEnum::None);
+            expNode->setExpType(DataTypeEnum::None);
         }
     }
 
-    return node->getExpType();
+    return expNode->getExpType();
 }
 
 bool SemanticAnalyzer::insertToSymTable(std::string str, DeclNode* node)
@@ -623,7 +724,7 @@ DeclNode* SemanticAnalyzer::lookupSymTable(std::string name, unsigned int lineNu
     return node;
 }
 
-void SemanticAnalyzer::calculateLeaveScope(ASTNode* node)
+void SemanticAnalyzer::calculateLeaveScope(ASTNode* node, bool isWarn)
 {
     auto parentType = NodeType::CompoundStmtNode;
     if (node->getParent() != nullptr)
@@ -636,11 +737,50 @@ void SemanticAnalyzer::calculateLeaveScope(ASTNode* node)
         parentType != NodeType::ForNode) ||
         node->getNodeType() == NodeType::ForNode)
     {
-        leaveScope();
+        leaveScope(isWarn);
     }
 }
 
-void SemanticAnalyzer::leaveScope()
+void SemanticAnalyzer::calculateEnterScope(ASTNode* node)
+{
+    if (node->getNodeType() == NodeType::CompoundStmtNode)
+    {
+        auto parentType = NodeType::CompoundStmtNode;
+        if (node->getParent() != nullptr)
+        {
+            parentType = node->getParent()->getNodeType();
+        }
+
+        // if fun decl or for node is parent, dont do anything, they handle it.
+        switch (parentType)
+        {
+            case NodeType::FunDeclNode:
+            case NodeType::ForNode:
+                return;
+        }
+
+        std::stringstream ss;
+        ss << "Compount Stmt at line: " << node ->getLineNum();
+        m_symTable->enter(ss.str());
+        return;
+    }
+
+    else if (node->getNodeType() == NodeType::ForNode)
+    {
+        std::stringstream ss;
+        ss << "For loop at line: " << node->getLineNum();
+        m_symTable->enter(ss.str());
+    }
+
+    else if (node->getNodeType() == NodeType::FunDeclNode)
+    {
+        std::stringstream ss;
+        ss << "Func decl at line: " << node->getLineNum();
+        m_symTable->enter(ss.str());
+    }
+}
+
+void SemanticAnalyzer::leaveScope(bool isWarn)
 {
     // check for unused warnings
     auto map = m_symTable->getCurrScopeSymbols();
@@ -651,7 +791,7 @@ void SemanticAnalyzer::leaveScope()
         {
             continue;
         }
-        if (varDecl->getUsage() == 0)
+        if (varDecl->getUsage() == 0 && isWarn)
         {
             std::stringstream ss;
             ss << "The variable '" << key << "' seems not to be used.";

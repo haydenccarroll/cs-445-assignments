@@ -4,11 +4,11 @@ some mysteries:
         strange and emptyline contradict. I have working solution though.
 
 stuff to add to hw4:
-    Cannot have a break statement outside of loop.
-    Cannot use array as test condition in % statement (idk what this means)
-    Cannot use array in position &d in range of for statement.
-    Expecting x in parameter x of call to x declared on line x but got x
-    Expecting x in position d in range of for statement but got x
+    DONE Cannot have a break statement outside of loop.
+    DONE Cannot use array as test condition in % statement
+    DONE Cannot use array in position &d in range of for statement.
+    DONE Expecting x in parameter x of call to x declared on line x but got x
+    DONE Expecting x in position d in range of for statement but got x
     Expecting Boolean test condition in x statement but got x
     Expecting array in parameter x of call to x declared on line x
     Function x at line x is expecting no return value, but return has a value

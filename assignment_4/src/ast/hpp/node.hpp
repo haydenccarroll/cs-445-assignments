@@ -38,6 +38,7 @@ public:
     void print(unsigned int indentLevel=0, int siblingLvl=0, int childLvl=-1, bool printType=false);
 
     bool isAncestor(ASTNode* node);
+    bool hasAncestor(NodeType type);
 
 
 
