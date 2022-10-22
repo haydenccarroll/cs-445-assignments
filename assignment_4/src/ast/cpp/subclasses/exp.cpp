@@ -4,7 +4,7 @@
 
 #include <string>
 
-ExpNode::ExpNode(unsigned int lineNum, DataType type) :
+ExpNode::ExpNode(int lineNum, DataType type) :
 ASTNode::ASTNode(lineNum),
 m_dataType(type)
 {

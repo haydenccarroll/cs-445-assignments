@@ -9,12 +9,14 @@
 SemanticAnalyzer::SemanticAnalyzer(ASTNode* root, SymbolTable* symTable) :
 m_root(root),
 m_symTable(symTable),
-m_isMainDefined(false)
+m_isMainDefined(false),
+m_ioRoot(nullptr)
 {
 }
 
 void SemanticAnalyzer::analyze()
 {
+    addIOToSymTable();
     m_symTable->enter("traverse and set types");
     traverseAndSetTypes(m_root);
     m_symTable->leave();
@@ -807,7 +809,7 @@ DataType SemanticAnalyzer::calcExpType(ASTNode* node)
 
     auto expNode = cast<ExpNode*>(node);
 
-    unsigned int lineNum = expNode->getLineNum();
+    int lineNum = expNode->getLineNum();
     std::string name;
 
     if (expNode->getNodeType() == NodeType::IdNode)
@@ -878,7 +880,7 @@ bool SemanticAnalyzer::insertToSymTable(std::string str, DeclNode* node)
     return ok;
 }
 
-DeclNode* SemanticAnalyzer::lookupSymTable(std::string name, unsigned int lineNum, bool use, bool warnUninit)
+DeclNode* SemanticAnalyzer::lookupSymTable(std::string name, int lineNum, bool use, bool warnUninit)
 {
     DeclNode* node = m_symTable->lookup(name);
     if (node == nullptr)
@@ -1011,4 +1013,80 @@ void SemanticAnalyzer::checkUsageWarning(bool checkFunc)
             }
         }
     }
+}
+
+void SemanticAnalyzer::createIOAST()
+{
+    if (m_ioRoot != nullptr)
+    {
+        delete m_ioRoot;
+        m_ioRoot = nullptr;
+    }
+    auto outputFun = new FunDeclNode(-1, "output", DataTypeEnum::Void);
+    auto outputFunParam = new VarDeclNode(-1, "*dummy*", DataTypeEnum::Int, false, true);
+    outputFun->use(-1, false);
+    outputFunParam->use(-1, false);
+
+    auto outputBFun = new FunDeclNode(-1, "outputb", DataTypeEnum::Void);
+    auto outputBFunParam = new VarDeclNode(-1, "*dummy*", DataTypeEnum::Bool, false, true);
+    outputBFun->use(-1, false);
+    outputBFunParam->use(-1, false);
+
+    auto outputCFun = new FunDeclNode(-1, "outputc", DataTypeEnum::Void);
+    auto outputCFunParam = new VarDeclNode(-1, "*dummy*", DataTypeEnum::Char, false, true);
+    outputCFun->use(-1, false);
+    outputCFunParam->use(-1, false);
+
+    auto inputFun = new FunDeclNode(-1, "input", DataTypeEnum::Int);
+    inputFun->use(-1, false);
+
+    auto inputBFun = new FunDeclNode(-1, "inputb", DataTypeEnum::Bool);
+    inputBFun->use(-1, false);
+
+    auto inputCFun = new FunDeclNode(-1, "inputc", DataTypeEnum::Char);
+    inputCFun->use(-1, false);
+
+    auto outnlFun = new FunDeclNode(-1, "outnl", DataTypeEnum::Void);
+    outnlFun->use(-1, false);
+
+    outputFun->addChild(outputFunParam);
+    outputBFun->addChild(outputBFunParam);
+    outputCFun->addChild(outputCFunParam);
+
+    outputFun->addSibling(outputBFun);
+    outputFun->addSibling(outputCFun);
+    outputFun->addSibling(inputFun);
+    outputFun->addSibling(inputBFun);
+    outputFun->addSibling(inputCFun);
+    outputFun->addSibling(outnlFun);
+
+    m_ioRoot = outputFun;
+}
+
+void SemanticAnalyzer::addIOToSymTable()
+{
+    if (m_ioRoot == nullptr)
+    {
+        createIOAST();
+    }
+
+    recursiveAddToSym(m_ioRoot);
+}
+
+void SemanticAnalyzer::recursiveAddToSym(ASTNode* node)
+{
+    if (node == nullptr) { return; }
+
+    if (node->getNodeType() == NodeType::FunDeclNode || 
+        node->getNodeType() == NodeType::VarDeclNode)
+    {
+        auto decl = cast<DeclNode*>(node);
+        m_symTable->insert(decl->getName(), decl);
+    }
+
+    for (int i=0; i < node->getNumChildren(); i++)
+    {
+        recursiveAddToSym(node->getChild(i));
+    }
+    recursiveAddToSym(node->getSibling(0));
 }

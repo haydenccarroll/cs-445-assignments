@@ -4,7 +4,7 @@
 
 #include <string>
 
-BreakNode::BreakNode(unsigned int lineNum) :
+BreakNode::BreakNode(int lineNum) :
 ASTNode::ASTNode(lineNum)
 {
 }

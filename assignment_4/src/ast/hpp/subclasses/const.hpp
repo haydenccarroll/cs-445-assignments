@@ -14,10 +14,10 @@ public:
      * @param lineNum 
      * @param value value of respective data type
      */
-    ConstNode(unsigned int lineNum, int value);
-    ConstNode(unsigned int lineNum, char value);
-    ConstNode(unsigned int lineNum, std::string value);
-    ConstNode(unsigned int lineNum, bool value);
+    ConstNode(int lineNum, int value);
+    ConstNode(int lineNum, char value);
+    ConstNode(int lineNum, std::string value);
+    ConstNode(int lineNum, bool value);
 
     NodeType getNodeType() override { return NodeType::ConstNode; }
 

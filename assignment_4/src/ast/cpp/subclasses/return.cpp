@@ -4,7 +4,7 @@
 
 #include <string>
 
-ReturnNode::ReturnNode(unsigned int lineNum) :
+ReturnNode::ReturnNode(int lineNum) :
 ASTNode::ASTNode(lineNum)
 {
 }

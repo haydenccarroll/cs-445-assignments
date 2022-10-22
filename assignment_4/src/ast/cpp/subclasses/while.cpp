@@ -4,7 +4,7 @@
 
 #include <string>
 
-WhileNode::WhileNode(unsigned int lineNum) :
+WhileNode::WhileNode(int lineNum) :
 ASTNode::ASTNode(lineNum)
 {
 }

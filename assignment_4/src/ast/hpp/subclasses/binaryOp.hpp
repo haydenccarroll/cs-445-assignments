@@ -14,7 +14,7 @@ public:
      * @param lineNum 
      * @param type type of binary operator used
      */
-    BinaryOpNode(unsigned int lineNum, BinaryOpType type);
+    BinaryOpNode(int lineNum, BinaryOpType type);
     std::string toString(bool printType=false) override;
     NodeType getNodeType() override { return NodeType::BinaryOpNode; }
     BinaryOpType getOperatorType() { return m_binaryOpType; }

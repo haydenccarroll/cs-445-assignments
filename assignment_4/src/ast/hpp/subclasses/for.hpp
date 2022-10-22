@@ -8,7 +8,7 @@
 class ForNode : public ASTNode
 {
 public:
-    ForNode(unsigned int lineNum);
+    ForNode(int lineNum);
     std::string toString(bool printType=false) override;
     NodeType getNodeType() override { return NodeType::ForNode; }
 

@@ -4,7 +4,7 @@
 
 #include <string>
 
-CompoundStmtNode::CompoundStmtNode(unsigned int lineNum) :
+CompoundStmtNode::CompoundStmtNode(int lineNum) :
 ASTNode::ASTNode(lineNum)
 {
 }

@@ -14,7 +14,7 @@ public:
      * @param lineNum 
      * @param type type of unary operator used
      */
-    UnaryOpNode(unsigned int lineNum, UnaryOpType type);
+    UnaryOpNode(int lineNum, UnaryOpType type);
     std::string toString(bool printType=false) override;
     NodeType getNodeType() override { return NodeType::UnaryOpNode; }
     UnaryOpType getOperatorType() { return m_unaryOpType; }

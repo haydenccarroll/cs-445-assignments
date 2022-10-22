@@ -7,7 +7,7 @@
 #include <string>
 #include <sstream>
 
-VarDeclNode::VarDeclNode(unsigned int lineNum, std::string varName,
+VarDeclNode::VarDeclNode(int lineNum, std::string varName,
                          DataType type, bool isStatic, bool isParam) :
 DeclNode::DeclNode(lineNum, varName, type),
 m_isStatic(isStatic),
@@ -53,7 +53,7 @@ void VarDeclNode::setStatic(bool isStatic)
     }
 }
 
-void VarDeclNode::use(unsigned int lineNum, bool warnUninit)
+void VarDeclNode::use(int lineNum, bool warnUninit)
 {
     if (m_isInitialized == false && m_uses == 0 && warnUninit)
     {

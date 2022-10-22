@@ -15,7 +15,7 @@ public:
      * @param funcName name of function declared
      * @param returnType return type of function
      */
-    FunDeclNode(unsigned int lineNum, std::string funcName, DataType returnType);
+    FunDeclNode(int lineNum, std::string funcName, DataType returnType);
     std::string toString(bool printType=false) override;
     NodeType getNodeType() override { return NodeType::FunDeclNode; }
     void incrementNumReturn() { m_numReturn++; }

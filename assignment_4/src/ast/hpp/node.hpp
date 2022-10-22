@@ -9,7 +9,7 @@
 
 class ASTNode {
 public:
-    ASTNode(unsigned int lineNum);
+    ASTNode(int lineNum);
     ~ASTNode();
 
     // getters
@@ -49,7 +49,7 @@ protected:
     ASTNode* m_parent;
 
     bool m_hasBeenAnalyzed;
-    unsigned int m_lineNum;
+    int m_lineNum;
 
     /**
      * @brief used for print() purposes. prints stuff specific to this node.

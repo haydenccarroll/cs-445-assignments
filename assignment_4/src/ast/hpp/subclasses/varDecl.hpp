@@ -8,7 +8,7 @@
 class VarDeclNode : public DeclNode
 {
 public:
-    VarDeclNode(unsigned int lineNum, std::string varName, DataType type, bool isStatic=false, bool isParam=false);
+    VarDeclNode(int lineNum, std::string varName, DataType type, bool isStatic=false, bool isParam=false);
     
     std::string toString(bool printType=false) override;
     bool isParam() { return m_isParam; }
@@ -17,7 +17,7 @@ public:
     void setInitialized(bool isInitialized) { m_isInitialized = isInitialized;}
     bool isInitialized() { return m_isInitialized; }
     void setStatic(bool isStatic);
-    void use(unsigned int lineNum, bool warnUninit=true) override;
+    void use(int lineNum, bool warnUninit=true) override;
 
 private:
     bool m_isStatic;

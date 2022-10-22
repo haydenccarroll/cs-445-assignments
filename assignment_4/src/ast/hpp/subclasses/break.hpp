@@ -8,7 +8,7 @@
 class BreakNode : public ASTNode
 {
 public:
-    BreakNode(unsigned int lineNum);
+    BreakNode(int lineNum);
     std::string toString(bool printType=false) override;
     NodeType getNodeType() override { return NodeType::BreakNode; }
 

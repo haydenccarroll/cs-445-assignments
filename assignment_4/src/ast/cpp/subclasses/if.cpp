@@ -4,7 +4,7 @@
 
 #include <string>
 
-IfNode::IfNode(unsigned int lineNum) :
+IfNode::IfNode(int lineNum) :
 ASTNode::ASTNode(lineNum)
 {
 }

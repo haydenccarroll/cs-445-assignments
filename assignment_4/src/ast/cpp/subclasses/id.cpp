@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 
-IdNode::IdNode(unsigned int lineNum, std::string idName) :
+IdNode::IdNode(int lineNum, std::string idName) :
 ExpNode::ExpNode(lineNum, DataTypeEnum::None),
 m_idName(idName)
 {

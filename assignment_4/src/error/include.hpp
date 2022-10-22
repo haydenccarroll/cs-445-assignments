@@ -8,19 +8,19 @@ class Error
 {
 public:
     Error(){};
-    static void error(unsigned int lineNum, std::string msg)
+    static void error(int lineNum, std::string msg)
     {
         std::cout << "ERROR(" << lineNum << "): " << msg << std::endl;
         s_errorCount++;
     }
 
-    static void warning(unsigned int lineNum, std::string msg)
+    static void warning(int lineNum, std::string msg)
     {
         std::cout << "WARNING(" << lineNum << "): " << msg << std::endl;
         s_warningCount++;
     }
 
-    static void critical(unsigned int lineNum, std::string msg)
+    static void critical(int lineNum, std::string msg)
     {
         std::stringstream ss;
         ss << "CRITICAL(" << lineNum << "): " << msg << std::endl;

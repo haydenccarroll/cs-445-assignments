@@ -6,7 +6,7 @@
 #include <string>
 #include <sstream>
 
-UnaryOpNode::UnaryOpNode(unsigned int lineNum, UnaryOpType type) 
+UnaryOpNode::UnaryOpNode(int lineNum, UnaryOpType type) 
 : ExpNode::ExpNode(lineNum, DataTypeEnum::None),
 m_unaryOpType(type)
 {

@@ -5,7 +5,7 @@
 
 #include "../../error/include.hpp"
 
-ASTNode::ASTNode(unsigned int lineNum)
+ASTNode::ASTNode(int lineNum)
 {
     m_lineNum = lineNum;
     m_sibling = nullptr;

@@ -8,7 +8,7 @@
 class ReturnNode : public ASTNode
 {
 public:
-    ReturnNode(unsigned int lineNum);
+    ReturnNode(int lineNum);
     std::string toString(bool printType=false) override;
     NodeType getNodeType() override { return NodeType::ReturnNode; }
 

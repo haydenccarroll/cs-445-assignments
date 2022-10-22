@@ -5,7 +5,7 @@
 
 #include <string>
 #include <sstream>
-FunDeclNode::FunDeclNode(unsigned int lineNum, std::string funcName, DataType returnType) :
+FunDeclNode::FunDeclNode(int lineNum, std::string funcName, DataType returnType) :
 DeclNode::DeclNode(lineNum, funcName, returnType)
 {
 }

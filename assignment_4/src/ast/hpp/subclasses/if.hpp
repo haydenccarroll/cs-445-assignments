@@ -8,7 +8,7 @@
 class IfNode : public ASTNode
 {
 public:
-    IfNode(unsigned int lineNum);
+    IfNode(int lineNum);
     std::string toString(bool printType=false) override;
     NodeType getNodeType() override { return NodeType::IfNode; }
 

@@ -4,7 +4,7 @@
 
 #include <string>
 
-RangeNode::RangeNode(unsigned int lineNum) :
+RangeNode::RangeNode(int lineNum) :
 ASTNode::ASTNode(lineNum)
 {
 }

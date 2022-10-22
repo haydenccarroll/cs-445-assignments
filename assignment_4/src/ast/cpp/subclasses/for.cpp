@@ -4,7 +4,7 @@
 
 #include <string>
 
-ForNode::ForNode(unsigned int lineNum) :
+ForNode::ForNode(int lineNum) :
 ASTNode::ASTNode(lineNum)
 {
 }

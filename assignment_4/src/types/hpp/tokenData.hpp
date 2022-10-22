@@ -10,5 +10,5 @@ struct TokenData
     char charV;           // used for characters
     int num;              // used for numbers
     bool boolV;
-    unsigned int lineNum; // line where token found
+    int lineNum; // line where token found
 };

@@ -13,7 +13,7 @@ public:
      * 
      * @param lineNum 
      */
-    IdNode(unsigned int lineNum, std::string idName);
+    IdNode(int lineNum, std::string idName);
     std::string toString(bool printType=false) override;
     NodeType getNodeType() override { return NodeType::IdNode; }
     std::string getIdName() { return m_idName; }

@@ -10,6 +10,7 @@ public:
     void analyze();
 private:
     ASTNode* m_root;
+    ASTNode* m_ioRoot;
     SymbolTable* m_symTable;
     bool m_isMainDefined;
 
@@ -34,11 +35,15 @@ private:
     void errorOnWrongParamType(ASTNode* node);
     void checkUsageWarning(bool checkFunc=false);
 
+    void createIOAST();
+    void addIOToSymTable();
+    void recursiveAddToSym(ASTNode* node);
+
     void errorOnWrongRangeType(ASTNode* node);
     void calculateLeaveScope(ASTNode* node, bool isWarn=true);
     void calculateEnterScope(ASTNode* node);
     DataType calcExpType(ASTNode* node);
     bool insertToSymTable(std::string, DeclNode* );
-    DeclNode* lookupSymTable(std::string name, unsigned int lineNum, bool use=true, bool warnUninit=true);
+    DeclNode* lookupSymTable(std::string name, int lineNum, bool use=true, bool warnUninit=true);
     void leaveScope(bool isWarn=true);
 };

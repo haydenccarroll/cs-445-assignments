@@ -15,7 +15,7 @@ public:
      * @param idName name of id
      * @param isArray true if id is an array
      */
-    ExpNode(unsigned int lineNum, DataType type);
+    ExpNode(int lineNum, DataType type);
     void setExpType(DataType type);
     DataType getExpType() { return m_dataType; }
 

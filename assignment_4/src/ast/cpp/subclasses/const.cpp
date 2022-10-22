@@ -6,7 +6,7 @@
 #include <string>
 #include <sstream>
 
-ConstNode::ConstNode(unsigned int lineNum, int value) 
+ConstNode::ConstNode(int lineNum, int value) 
 : ExpNode::ExpNode(lineNum, DataType(DataTypeEnum::Int)),
 m_constType(ConstType::Int),
 m_intValue(value),
@@ -16,7 +16,7 @@ m_stringValue("")
 {
 }
 
-ConstNode::ConstNode(unsigned int lineNum, char value) 
+ConstNode::ConstNode(int lineNum, char value) 
 : ExpNode::ExpNode(lineNum, DataType(DataTypeEnum::Char)),
 m_constType(ConstType::Char),
 m_intValue(0),
@@ -26,7 +26,7 @@ m_stringValue("")
 {
 }
 
-ConstNode::ConstNode(unsigned int lineNum, bool value) 
+ConstNode::ConstNode(int lineNum, bool value) 
 : ExpNode::ExpNode(lineNum, DataType(DataTypeEnum::Bool)),
 m_constType(ConstType::Bool),
 m_intValue(0),
@@ -36,7 +36,7 @@ m_stringValue("")
 {
 }
 
-ConstNode::ConstNode(unsigned int lineNum, std::string value) 
+ConstNode::ConstNode(int lineNum, std::string value) 
 : ExpNode::ExpNode(lineNum, DataType(DataTypeEnum::Char, true)),
 m_constType(ConstType::String),
 m_intValue(0),

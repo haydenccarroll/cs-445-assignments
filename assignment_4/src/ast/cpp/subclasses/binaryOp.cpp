@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 
-BinaryOpNode::BinaryOpNode(unsigned int lineNum, BinaryOpType type) : 
+BinaryOpNode::BinaryOpNode(int lineNum, BinaryOpType type) : 
 ExpNode::ExpNode(lineNum, DataTypeEnum::None),
 m_binaryOpType(type)
 {

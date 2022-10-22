@@ -8,7 +8,7 @@
 class DeclNode : public ASTNode
 {
 public:
-    DeclNode(unsigned int lineNum, std::string name, DataType dataType);
+    DeclNode(int lineNum, std::string name, DataType dataType);
     virtual std::string toString(bool printType=false) = 0;
     virtual NodeType getNodeType() = 0;
 
@@ -21,7 +21,7 @@ public:
     std::string getName() { return m_name; }
     DataType getDataType() { return m_dataType; }
 
-    virtual void use(unsigned int lineNum, bool warnUninit=true);
+    virtual void use(int lineNum, bool warnUninit=true);
     unsigned int getUsage() { return m_uses; }
 
 protected:
