@@ -846,7 +846,7 @@ DataType SemanticAnalyzer::calcExpType(ASTNode* node)
         {
             expNode->setExpType(calcExpType(lval));
 
-        } else if (calcExpType(lval) == DataTypeEnum::None || 
+        } else if (calcExpType(lval) == DataTypeEnum::None &&
                    calcExpType(rval) == DataTypeEnum::None)
         {
             expNode->setExpType(DataTypeEnum::None);
