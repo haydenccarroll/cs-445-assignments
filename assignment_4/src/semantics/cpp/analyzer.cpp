@@ -196,7 +196,6 @@ void SemanticAnalyzer::analyzeCall(ASTNode* node)
         return;
     }
 
-    entry->use(node->getLineNum());
     
     if (entry->getNodeType() != NodeType::FunDeclNode)
     {
@@ -205,9 +204,12 @@ void SemanticAnalyzer::analyzeCall(ASTNode* node)
         Error::error(node->getLineNum(), ss.str());
 
         auto varDecl = cast<VarDeclNode*>(entry);
-        varDecl->use(node->getLineNum());
+        varDecl->use(node->getLineNum(), false);
         return;
     }
+
+    entry->use(node->getLineNum());
+
 
     errorOnWrongParamType(node);
 }
