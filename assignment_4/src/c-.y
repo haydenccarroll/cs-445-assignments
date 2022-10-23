@@ -777,7 +777,7 @@ int main(int argc, char** argv)
     // do semantic analysis
 
     // if AST print annotated flag is set and tree not null
-    if (options.isPFlag() && root != nullptr && Error::getErrorCount() != -1)
+    if (options.isPFlag() && root != nullptr && Error::getErrorCount() == 0)
     {
         root->print(0, 0, -1, true); // PRINT WITH TYPE INFO THOUGH
         // print root with type info stuff
