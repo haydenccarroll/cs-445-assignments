@@ -538,10 +538,10 @@ void SemanticAnalyzer::analyzeLBrack(BinaryOpNode* node)
     auto right = tryCast<IdNode*>(node->getChild(1));
     if (right)
     {
-        if (leftName.compare(right->getIdName()) == 0 && isArr)
+        if (right->getExpType().isArray())
         {
             std::stringstream ss;
-            ss << "Array index is the unindexed array '" << leftName << "'.";
+            ss << "Array index is the unindexed array '" << right->getIdName() << "'.";
             Error::error(node->getLineNum(), ss.str());
         }
     }
