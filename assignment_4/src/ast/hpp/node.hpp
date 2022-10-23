@@ -21,7 +21,7 @@ public:
     bool getHasBeenAnalyzed() { return m_hasBeenAnalyzed; }
     unsigned int getNumChildren() { return m_children.size(); }
     unsigned int getNumSiblings();
-    unsigned int getLineNum() { return m_lineNum; };
+    int getLineNum() { return m_lineNum; };
 
     //setters
     void addChild(ASTNode* child);

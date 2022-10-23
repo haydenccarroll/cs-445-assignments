@@ -98,6 +98,7 @@ void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
     auto initExp = cast<ExpNode*>(node->getChild(0));
     if (initExp)
     {
+        analyzeNode(initExp);
         if (!isConstantExp(initExp))
         {
             std::stringstream ss;
@@ -138,6 +139,8 @@ void SemanticAnalyzer::analyzeVarDecl(ASTNode* node)
                << "an array and rhs is not an array.";
             Error::error(initExp->getLineNum(), ss.str());
         }
+    
+        typedNode->setInitialized(true);
     }
     insertToSymTable(typedNode->getName(), typedNode);
 
@@ -558,7 +561,7 @@ void SemanticAnalyzer::analyzeAss(BinaryOpNode* node)
     analyzeNode(node->getChild(1));
 
     auto lvalId = tryCast<IdNode*>(node->getChild(0));
-    if (lvalId)
+    if (lvalId) // is a variable of some kind, array or normal
     {
         auto lvalDecl = lookupSymTable(lvalId->getIdName(), lvalId->getLineNum(), false);
         auto lvalVarDecl = tryCast<VarDeclNode*>(lvalDecl);
@@ -566,7 +569,8 @@ void SemanticAnalyzer::analyzeAss(BinaryOpNode* node)
         {
             lvalVarDecl->setInitialized(true);
         }
-    } else
+
+    } else // is indexing an array
     {
         auto lvalLbrack = cast<BinaryOpNode*>(node->getChild(0));
         auto array = cast<IdNode*>(lvalLbrack->getChild(0));
@@ -577,8 +581,6 @@ void SemanticAnalyzer::analyzeAss(BinaryOpNode* node)
             arrayVarDecl->setInitialized(true);
         }
     }
-
-    ASTNode* rval = node->getChild(1);
 }
 
 void SemanticAnalyzer::analyzeBreak(ASTNode* node)
@@ -835,10 +837,13 @@ DataType SemanticAnalyzer::calcExpType(ASTNode* node)
         auto lval = cast<ExpNode*>(expNode->getChild(0));
         auto rval = cast<ExpNode*>(expNode->getChild(1));
 
-        if (binaryOpNode->getOperatorType() == BinaryOpType::Index ||
-            binaryOpNode->getOperatorType() == BinaryOpType::Ass)
+        if (binaryOpNode->getOperatorType() == BinaryOpType::Index)
         {
             expNode->setExpType(calcExpType(lval).getBasicType());
+        } else if (binaryOpNode->getOperatorType() == BinaryOpType::Ass) 
+        {
+            expNode->setExpType(calcExpType(lval));
+
         } else if (calcExpType(lval) == DataTypeEnum::None || 
                    calcExpType(rval) == DataTypeEnum::None)
         {
