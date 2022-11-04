@@ -19,10 +19,13 @@ ASTHDRS = ast/hpp/*.hpp ast/hpp/*/*.hpp ast/*.hpp
 ASTSRCS = ast/cpp/*.cpp ast/cpp/*/*.cpp
 
 TYPESHDRS = types/hpp/*.hpp types/*.hpp
-TYPESSRC = types/cpp/*.cpp
+TYPESSRCS = types/cpp/*.cpp
 
 ERRORHDRS = error/*.hpp
 ERRORSRCS =
+
+YYERRHDRS = yyerror/*.hpp
+YYERRSRCS = yyerr/*.cpp
 
 SYMTABLEHDRS = symTable/*.hpp
 SYMTABLESRCS = symTable/*.cpp
@@ -30,8 +33,8 @@ SYMTABLESRCS = symTable/*.cpp
 SEMANTICHDRS = semantics/hpp/*.hpp semantics/*.hpp
 SEMANTICSRCS = semantics/cpp/*.cpp
 
-HDRS = $(OPTIONHDRS) $(ASTHDRS) $(TYPESHDRS) $(ERRORHDRS) $(SYMTABLEHDRS) $(SEMANTICHDRS)
-SRCS = $(OPTIONSRCS) $(ASTSRCS) $(TYPESSRC) $(ERRORSRCS) $(SYMTABLESRCS) $(SEMANTICSRCS)
+HDRS = $(OPTIONHDRS) $(ASTHDRS) $(TYPESHDRS) $(ERRORHDRS) $(SYMTABLEHDRS) $(SEMANTICHDRS) $(YYERRHDRS)
+SRCS = $(OPTIONSRCS) $(ASTSRCS) $(TYPESSRCS) $(ERRORSRCS) $(SYMTABLESRCS) $(SEMANTICSRCS) $(YYERRSRCS)
 
 PRJ = c-
 
