@@ -1,7 +1,0 @@
-// C-F22
-main()
-{
-   int a;
-   bool b;
-   char c;
-}

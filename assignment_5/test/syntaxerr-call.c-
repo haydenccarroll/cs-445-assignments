@@ -1,0 +1,20 @@
+// C-F22
+cat(int x) {int;}
+
+main()
+{
+        dog();
+        dog(111);
+        dog(while);
+        dog(while, while);
+        dog(dog(),cat());
+
+        dog(;
+        dog);
+}
+
+int x, y;
+
+cat(int x) {int;
+}
+int x, 77;
