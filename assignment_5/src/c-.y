@@ -6,6 +6,7 @@
 #include "semantics/include.hpp"
 #include "types/include.hpp" // must be included before tab.h
 #include "ast/include.hpp" // must be included before tab.h
+#include "yyerror/include.hpp"
 
 #include <iostream>
 #include <string>
@@ -15,7 +16,7 @@
 #include "c-.tab.h"
 
 extern int yylex();
-void yyerror(std::string msg) { std::cout << msg << std::endl; };
+
 extern FILE* yyin;
 extern int yydebug;
 
@@ -733,6 +734,8 @@ constant        : NUMCONST
 %%
 int main(int argc, char** argv)
 {
+    // for yyerror/ stuff
+    initErrorProcessing();
     Options options(argc, argv);
     SymbolTable symTable = SymbolTable();
     symTable.debug(options.isDFlag());

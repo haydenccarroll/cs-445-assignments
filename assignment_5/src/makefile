@@ -25,7 +25,7 @@ ERRORHDRS = error/*.hpp
 ERRORSRCS =
 
 YYERRHDRS = yyerror/*.hpp
-YYERRSRCS = yyerr/*.cpp
+YYERRSRCS = yyerror/*.cpp
 
 SYMTABLEHDRS = symTable/*.hpp
 SYMTABLESRCS = symTable/*.cpp

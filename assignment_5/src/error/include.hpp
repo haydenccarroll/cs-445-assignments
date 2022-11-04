@@ -43,6 +43,8 @@ public:
 
     static unsigned int getErrorCount() { return s_errorCount; }
 
+    static void incError() { s_errorCount++; }
+
     static unsigned int getWarningCount() { return s_warningCount; }
 
 private:

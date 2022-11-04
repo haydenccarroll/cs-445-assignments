@@ -5,6 +5,10 @@
 #include <string>
 #include "yyerror.hpp"
 
+// NOTE: make sure these variables interface with your code!!!
+extern int lineNum;        // line number of last token scanned in your scanner (.l)
+extern char *lastToken; // last token scanned in your scanner (connect to your .l)
+
 // // // // // // // // // // // // // // // // // // // // 
 //
 // Error message printing
@@ -171,7 +175,7 @@ void yyerror(const char *msg)
     }
 
     // print components
-    printf("ERROR(%d): Syntax error, unexpected %s", line, strs[3]);
+    printf("ERROR(%d): Syntax error, unexpected %s", lineNum, strs[3]);
     if (elaborate(strs[3])) {
         if (lastToken[0]=='\'' || lastToken[0]=='"') printf(" %s", lastToken); 
         else printf(" \"%s\"", lastToken);
@@ -186,9 +190,7 @@ void yyerror(const char *msg)
     printf(".\n");
     fflush(stdout);   // force a dump of the error
 
-    numErrors++;      // count the number of errors
+    Error::incError();      // count the number of errors
 
     free(space);
 }
-
-

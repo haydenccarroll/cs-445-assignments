@@ -11,13 +11,16 @@
 
 #include "c-.tab.h"
 
+
 extern char* yytext;
+
+char* lastToken = nullptr;
+int lineNum = 1;
 
 int passToken(int tokenClass);
 std::string processStringConst(std::string str);
 char processCharConst(std::string str);
 
-static int lineNum = 1;
 
 %}
 %option noyywrap
@@ -116,6 +119,8 @@ int passToken(int tokenClass)
         yylval.tokenData->boolV = (yylval.tokenData->inputStr == "true");
         break;
     }
+
+    lastToken = yytext;
 
     return tokenClass;
 }
