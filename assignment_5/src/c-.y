@@ -77,10 +77,15 @@ decl            : varDecl
                     {
                         $$ = $1;
                     }
+                | error
+                    {
+                        $$ = nullptr;
+                    }
                 ;
 
 varDecl         : typeSpec varDeclList SEMICOLON
                     {
+                        yyerrok;
                         $$ = $2;
                         auto declNode = dynamic_cast<VarDeclNode*>($$);
                         if (declNode == nullptr)
@@ -89,15 +94,26 @@ varDecl         : typeSpec varDeclList SEMICOLON
                         }
                         declNode->setTypeSpec($1);
                     }
+                | error varDeclList SEMICOLON
+                    {
+                        $$ = nullptr;
+                        yyerrok;
+                    }
+                | typeSpec error SEMICOLON
+                    {
+                        $$ = nullptr;
+                        yyerrok;
+                    }
                 ;
 
 scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
                     {
+                        yyerrok;
                         $$ = $3;
                         VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($$);
                         if (declNode == nullptr)
                         {
-                            Error::error($3->getLineNum(), "dynamic_cast<VarDeclNode*> failed. Node is wrong type.");
+                            Error::critical($3->getLineNum(), "dynamic_cast<VarDeclNode*> failed. Node is wrong type.");
                         }
                         declNode->setStatic(true);
                         declNode->setInitialized(true);
@@ -105,11 +121,12 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
                     }
                 | typeSpec varDeclList SEMICOLON
                     {
+                        yyerrok;
                         $$ = $2;
                         VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($2);
                         if (declNode == nullptr)
                         {
-                            Error::error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is wrong type.");
+                            Error::critical($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is wrong type.");
                         }
                         declNode->setTypeSpec($1);
                     }
@@ -117,12 +134,21 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
 
 varDeclList     : varDeclList COMMA varDeclInit
                     {
+                        yyerrok;
                         $$ = $1;
                         $$->addSibling($3);
                     }
                 | varDeclInit
                     {
                         $$ = $1;
+                    }
+                | varDeclList COMMA error
+                    {
+                        $$ = nullptr;
+                    }
+                | error
+                    {
+                        $$ = nullptr;
                     }
                 ;
 
@@ -141,6 +167,11 @@ varDeclInit     : varDeclId
                         $$ = decl;
                         $$->addChild($3);
                     }
+                | error COLON simpleExp
+                    {
+                        $$ = nullptr;
+                        yyerrok;
+                    }
                 ;
 
 varDeclId       : ID
@@ -153,6 +184,15 @@ varDeclId       : ID
                     {
                         DataType dataType = DataType(DataTypeEnum::Void, true);
                         $$ = new VarDeclNode($1->lineNum, $1->str, dataType);
+                    }
+                | ID LBRACK error
+                    {
+                        $$ = nullptr;
+                    }
+                | error RBRACK
+                    {
+                        $$ = nullptr;
+                        yyerrok;
                     }
                 ;
 
@@ -196,6 +236,22 @@ funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
                         }
                         $$->addChild(compStmt);
                     }
+                | typeSpec error
+                    {
+                        $$ = nullptr;
+                    }
+                | typeSpec ID LPAREN error
+                    {
+                        $$ = nullptr;
+                    }
+                | ID LPAREN error
+                    {
+                        $$ = nullptr;
+                    }
+                | ID LPAREN parms RPAREN error
+                    {
+                        $$ = nullptr;
+                    }
                 ;
 
 parms           : parmList
@@ -217,6 +273,14 @@ parmList        : parmList SEMICOLON parmTypeList
                     {
                         $$ = $1;
                     }
+                | parmList SEMICOLON error
+                    {
+                        $$ = nullptr;
+                    }
+                | error
+                    {
+                        $$ = nullptr;
+                    }
                 ;
 
 parmTypeList    : typeSpec parmIdList
@@ -229,10 +293,15 @@ parmTypeList    : typeSpec parmIdList
                         }
                         param->setTypeSpec($1);
                     }
+                | typeSpec error
+                    {
+                        $$ = nullptr;
+                    }
                 ;
 
 parmIdList      : parmIdList COMMA parmId
                     {
+                        yyerrok;
                         if ($1 == nullptr)
                         {
                             $$ = $3;
@@ -245,6 +314,10 @@ parmIdList      : parmIdList COMMA parmId
                 | parmId
                     {
                         $$ = $1;
+                    }
+                | parmIdList COMMA error
+                    {
+                        $$ = nullptr;
                     }
                 ;
 
@@ -282,6 +355,16 @@ openStmt        : selectStmtOpen
                     {
                         $$ = $1;
                     }
+                | IF error THEN stmt
+                    {
+                        $$ = nullptr;
+                        yyerrok;
+                    }
+                | IF error THEN closedStmt ELSE openStmt
+                    {
+                        $$ = nullptr;
+                        yyerrok;
+                    }
                 ;
 
 closedStmt      : selectStmtClosed
@@ -308,6 +391,38 @@ closedStmt      : selectStmtClosed
                     {
                         $$ = $1;
                     }
+                | IF error
+                    {
+                        $$ = nullptr;
+                    }
+                | IF error ELSE closedStmt
+                    {
+                        $$ = nullptr;
+                        yyerrok;
+                    }
+                | IF error THEN closedStmt ELSE closedStmt
+                    {
+                        $$ = nullptr;
+                        yyerrok;
+                    }
+                | WHILE error DO closedStmt
+                    {
+                        $$ = nullptr; 
+                        yyerrok;
+                    }
+                | WHILE error
+                    {
+                        $$ = nullptr;
+                    }
+                | FOR ID ASS error DO closedStmt
+                    {
+                        $$ = nullptr;
+                        yyerrok;
+                    }
+                | FOR error
+                    {
+                        $$ = nullptr;
+                    }
                 ;
 
 expStmt         : exp SEMICOLON
@@ -318,6 +433,11 @@ expStmt         : exp SEMICOLON
                     {
                         $$ = nullptr;
                     }
+                | error SEMICOLON
+                    {
+                        $$ = nullptr;
+                        yyerrok;
+                    }
                 ;
 
 compoundStmt    : LCURL localDecls stmtList RCURL
@@ -325,6 +445,7 @@ compoundStmt    : LCURL localDecls stmtList RCURL
                         $$ = new CompoundStmtNode($1->lineNum);
                         $$->addChild($2);
                         $$->addChild($3);
+                        yyerrok;
                     }
                 ;
 
@@ -438,6 +559,19 @@ iterRange       : simpleExp TO simpleExp
                         $$->addChild($3);
                         $$->addChild($5);
                     }
+                | simpleExp TO error
+                    {
+                        $$ = nullptr;
+                    }
+                | error BY error
+                    {
+                        $$ = nullptr;
+                        yyerrok;
+                    }
+                | simpleExp TO simpleExp BY error
+                    {
+                        $$ = nullptr;
+                    }
                 ;
 
 returnStmt      : RETURN SEMICOLON 
@@ -448,6 +582,12 @@ returnStmt      : RETURN SEMICOLON
                     {
                         $$ = new ReturnNode($1->lineNum);
                         $$->addChild($2);
+                        yyerrok;
+                    }
+                | RETURN error SEMICOLON
+                    {
+                        $$ = nullptr;
+                        yyerrok;
                     }
                 ;
 
@@ -477,6 +617,25 @@ exp             : mutable assignop exp
                 | simpleExp
                     {
                         $$ = $1;
+                    }
+                | error assignop exp
+                    {
+                         $$ = nullptr;
+                         yyerrok;
+                    }
+                | mutable assignop error
+                    {
+                         $$ = nullptr;
+                    }
+                | error INC
+                    {
+                        $$ = nullptr;
+                        yyerrok;
+                    }
+                | error DEC
+                    {
+                        $$ = nullptr;
+                        yyerrok;
                     }
                 ;
 
@@ -512,6 +671,10 @@ simpleExp       : simpleExp OR andExp
                     {
                         $$ = $1;
                     }
+                | simpleExp OR error
+                    {
+                        $$ = nullptr;
+                    }
                 ;
 
 andExp          : andExp AND unaryRelExp
@@ -524,6 +687,10 @@ andExp          : andExp AND unaryRelExp
                     {
                         $$ = $1;
                     }
+                | andExp AND error
+                    {
+                        $$ = nullptr;
+                    }
                 ;
 
 unaryRelExp     : NOT unaryRelExp
@@ -534,6 +701,10 @@ unaryRelExp     : NOT unaryRelExp
                 | relExp
                     {
                         $$ = $1;
+                    }
+                | NOT error
+                    {
+                        $$ = nullptr;
                     }
                 ;
 
@@ -585,6 +756,10 @@ sumExp          : sumExp sumOp mulExp
                     {
                         $$ = $1;
                     }
+                | sumExp sumOp error
+                    {
+                        $$ = nullptr;
+                    }
                 ;
 
 sumOp           : PLUS
@@ -606,6 +781,10 @@ mulExp          : mulExp mulOp unaryExp
                 | unaryExp
                     {
                         $$ = $1;
+                    }
+                | mulExp mulOp error
+                    {
+                        $$ = nullptr;
                     }
                 ;
 
@@ -631,6 +810,10 @@ unaryExp        : unaryOp unaryExp
                 | factor
                     {
                         $$ = $1;
+                    }
+                | unaryOp error
+                    {
+                        $$ = nullptr;
                     }
                 ;
 
@@ -674,6 +857,7 @@ mutable         : ID
 immutable       : LPAREN exp RPAREN
                     {
                         $$ = $2;
+                        yyerrok;
                     }
                 | call
                     {
@@ -683,12 +867,21 @@ immutable       : LPAREN exp RPAREN
                     {
                         $$ = $1;
                     }
+                | LPAREN error
+                    {
+                        $$ = nullptr;
+                    }
                 ;
 
 call            : ID LPAREN args RPAREN
                     {
                         $$ = new CallNode($1->lineNum, $1->str);
                         $$->addChild($3);
+                    }
+                | error LPAREN
+                    {
+                        $$ = nullptr;
+                        yyerrok;
                     }
                 ;
 
@@ -706,10 +899,15 @@ argList         : argList COMMA exp
                     {
                         $$ = $1;
                         $$->addSibling($3);
+                        yyerrok;
                     }
                 | exp
                     {
                         $$ = $1;
+                    }
+                | argList COMMA error
+                    {
+                        $$ = nullptr;
                     }
                 ;
 
@@ -752,7 +950,9 @@ int main(int argc, char** argv)
 
     if (options.getFileName() != "")
     {
-        auto file = fopen(options.getFileName().c_str(), "r");
+    std::cout << "====================================" << std::endl;
+    std::cout << "FILE: " << options.getFileName().substr(options.getFileName().find_last_of("/\\") + 1) << std::endl;
+    auto file = fopen(options.getFileName().c_str(), "r");
         if (file == nullptr)
         {
             std::stringstream ss;
@@ -767,6 +967,13 @@ int main(int argc, char** argv)
     }
 
     yyparse();
+
+    if (Error::getErrorCount() != 0)
+    {
+        std::cout << "Number of warnings: " << Error::getWarningCount() << std::endl;
+        std::cout << "Number of errors: " << Error::getErrorCount() << std::endl;
+        return EXIT_SUCCESS;
+    }
 
     // if AST print flag (-p) is on and tree is not null
     if (options.ispFlag() && root != nullptr)
