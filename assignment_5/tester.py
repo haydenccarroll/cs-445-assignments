@@ -126,8 +126,7 @@ class Make:
         self._execute('make')
 
     def clean(self):
-        pass
-        # self._execute('make clean')
+        self._execute('make clean')
 
     def tar(self):
         self._execute('make tar')

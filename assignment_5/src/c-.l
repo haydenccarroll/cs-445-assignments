@@ -87,7 +87,11 @@ true|false                        { return passToken(BOOLCONST); }
 
 \"([^\\"\n]|\\.)*\"               { return passToken(STRINGCONST); }
 
-.                                 { std::cout << "ERROR(" << lineNum << "): Invalid or misplaced input character: '" << yytext << "'. Character Ignored.\n"; }
+.                                 { 
+                                    std::stringstream ss;
+                                    ss << "Invalid or misplaced input character: '" << yytext << "'. Character Ignored.";
+                                    Error::error(lineNum, ss.str()); 
+                                  }
 %%
 
 ///@brief given a token class (ID, NUMCONST, KEYWORD, etc...), pull the data from yytext and put it in yylval.tokenData.
