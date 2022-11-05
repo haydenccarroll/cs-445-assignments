@@ -138,8 +138,11 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
 varDeclList     : varDeclList COMMA varDeclInit
                     {
                         yyerrok;
-                        $$ = $1;
-                        $$->addSibling($3);
+                        if ($$ != nullptr)
+                        {
+                            $$ = $1;
+                            $$->addSibling($3);
+                        }
                     }
                 | varDeclInit
                     {
