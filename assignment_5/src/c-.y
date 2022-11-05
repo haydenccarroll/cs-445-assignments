@@ -123,12 +123,15 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
                     {
                         yyerrok;
                         $$ = $2;
-                        VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($2);
-                        if (declNode == nullptr)
+                        if ($$ != nullptr)
                         {
-                            Error::critical($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is wrong type.");
+                            VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($2);
+                            if (declNode == nullptr)
+                            {
+                                Error::critical($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is wrong type.");
+                            }
+                            declNode->setTypeSpec($1);
                         }
-                        declNode->setTypeSpec($1);
                     }
                 ;
 

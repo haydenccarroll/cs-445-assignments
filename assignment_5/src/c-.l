@@ -180,7 +180,7 @@ char processCharConst(std::string str)
     else if (processedStr.length() == 0)
     {
         std::stringstream ss;
-        ss << "a character cannot be of size 0.";
+        ss << "Empty character ''.  Characters ignored.";
         Error::error(lineNum, ss.str());
     }
 
