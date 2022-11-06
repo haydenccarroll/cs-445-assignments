@@ -122,6 +122,7 @@ void initErrorProcessing() {
     niceTokenNameMap["PLUS"] = (char *)"\'+\'";
     niceTokenNameMap["ASTERISK"] = (char *)"\'*\'";
     niceTokenNameMap["DASH"] = (char *)"\'-\'";
+    niceTokenNameMap["SLASH"] = (char *)"\'/\'";
 
 
 

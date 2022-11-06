@@ -173,14 +173,17 @@ varDeclInit     : varDeclId
                     }
                 | varDeclId COLON simpleExp
                     {
-                        auto decl = dynamic_cast<VarDeclNode*>($1);
-                        if (decl == nullptr)
+                        if ($1 != nullptr)
                         {
-                            throw std::runtime_error("dynamic cast failed for varDeclInit.");
+                            auto decl = dynamic_cast<VarDeclNode*>($1);
+                            if (decl == nullptr)
+                            {
+                                throw std::runtime_error("dynamic cast failed for varDeclInit.");
+                            }
+                            decl->setInitialized(true);
+                            $$ = decl;
+                            $$->addChild($3);
                         }
-                        decl->setInitialized(true);
-                        $$ = decl;
-                        $$->addChild($3);
                     }
                 | error COLON simpleExp
                     {
