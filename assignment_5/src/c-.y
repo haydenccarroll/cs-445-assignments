@@ -324,18 +324,17 @@ parmTypeList    : typeSpec parmIdList
 
 parmIdList      : parmIdList COMMA parmId
                     {
-                        yyerrok;
                         if ($1 == nullptr)
                         {
                             $$ = $3;
                         }
-                        else {
-                            $$ = $1;
-                        }
-                        if ($$ != nullptr)
+                        else
                         {
+                            $$ = $1;
                             $$->addSibling($3);
                         }
+                        yyerrok;
+
                     }
                 | parmId
                     {
