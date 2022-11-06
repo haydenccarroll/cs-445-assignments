@@ -61,7 +61,10 @@ program         : declList
 declList        : declList decl
                     {
                         $$ = $1;
-                        $$->addSibling($2);
+                        if ($$ != nullptr)
+                        {
+                            $$->addSibling($2);
+                        }
                     }
                 | decl
                     {
@@ -278,7 +281,10 @@ parms           : parmList
 parmList        : parmList SEMICOLON parmTypeList
                     {
                         $$ = $1;
-                        $$->addSibling($3);
+                        if ($$ != nullptr)
+                        {
+                            $$->addSibling($3);
+                        }
                     }
                 | parmTypeList
                     {
@@ -297,12 +303,15 @@ parmList        : parmList SEMICOLON parmTypeList
 parmTypeList    : typeSpec parmIdList
                     {
                         $$ = $2;
-                        auto param = dynamic_cast<VarDeclNode*>($$);
-                        if (param == nullptr)
+                        if ($$ != nullptr)
                         {
-                            Error::error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. Node is wrong type.");
+                            auto param = dynamic_cast<VarDeclNode*>($$);
+                            if (param == nullptr)
+                            {
+                                Error::error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. Node is wrong type.");
+                            }
+                            param->setTypeSpec($1);
                         }
-                        param->setTypeSpec($1);
                     }
                 | typeSpec error
                     {
@@ -466,11 +475,13 @@ compoundStmt    : LCURL localDecls stmtList RCURL
 
 localDecls      : localDecls scopedVarDecl
                     {
-                        if ($1 == nullptr)
+                        if ($1 == nullptr && $2 == nullptr)
+                        {
+                        } else if ($1 == nullptr)
                         {
                             $$ = $2;
-                        }
-                        else {
+                        } else
+                        {
                             $$ = $1;
                             $$->addSibling($2);
                         }
@@ -483,11 +494,13 @@ localDecls      : localDecls scopedVarDecl
 
 stmtList        : stmtList stmt
                     {
-                        if ($1 == nullptr)
+                        if ($1 == nullptr && $2 == nullptr)
+                        {
+                        } else if ($1 == nullptr)
                         {
                             $$ = $2;
-                        }
-                        else {
+                        } else
+                        {
                             $$ = $1;
                             $$->addSibling($2);
                         }
