@@ -87,12 +87,15 @@ varDecl         : typeSpec varDeclList SEMICOLON
                     {
                         yyerrok;
                         $$ = $2;
-                        auto declNode = dynamic_cast<VarDeclNode*>($$);
-                        if (declNode == nullptr)
+                        if ($$ != nullptr)
                         {
-                            Error::error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is of the wrong type.");
+                            auto declNode = dynamic_cast<VarDeclNode*>($$);
+                            if (declNode == nullptr)
+                            {
+                                Error::error($2->getLineNum(), "dynamic_cast<VarDeclNode*> failed. node is of the wrong type.");
+                            }
+                            declNode->setTypeSpec($1);
                         }
-                        declNode->setTypeSpec($1);
                     }
                 | error varDeclList SEMICOLON
                     {
@@ -110,14 +113,17 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
                     {
                         yyerrok;
                         $$ = $3;
-                        VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($$);
-                        if (declNode == nullptr)
+                        if ($$ != nullptr)
                         {
-                            Error::critical($3->getLineNum(), "dynamic_cast<VarDeclNode*> failed. Node is wrong type.");
+                            VarDeclNode* declNode = dynamic_cast<VarDeclNode*>($$);
+                            if (declNode == nullptr)
+                            {
+                                Error::critical($3->getLineNum(), "dynamic_cast<VarDeclNode*> failed. Node is wrong type.");
+                            }
+                            declNode->setStatic(true);
+                            declNode->setInitialized(true);
+                            declNode->setTypeSpec($2);
                         }
-                        declNode->setStatic(true);
-                        declNode->setInitialized(true);
-                        declNode->setTypeSpec($2); 
                     }
                 | typeSpec varDeclList SEMICOLON
                     {
@@ -138,9 +144,9 @@ scopedVarDecl   : STATIC typeSpec varDeclList SEMICOLON
 varDeclList     : varDeclList COMMA varDeclInit
                     {
                         yyerrok;
+                        $$ = $1;
                         if ($$ != nullptr)
                         {
-                            $$ = $1;
                             $$->addSibling($3);
                         }
                     }
@@ -175,15 +181,14 @@ varDeclInit     : varDeclId
                     }
                 | error COLON simpleExp
                     {
-                        $$ = nullptr;
                         yyerrok;
+                        $$ = nullptr;
                     }
                 ;
 
 varDeclId       : ID
                     {
                         DataType dataType = DataType(DataTypeEnum::Void);
-
                         $$ = new VarDeclNode($1->lineNum, $1->str, dataType);
                     }
                 | ID LBRACK NUMCONST RBRACK
@@ -197,8 +202,8 @@ varDeclId       : ID
                     }
                 | error RBRACK
                     {
-                        $$ = nullptr;
                         yyerrok;
+                        $$ = nullptr;
                     }
                 ;
 
@@ -314,6 +319,9 @@ parmIdList      : parmIdList COMMA parmId
                         }
                         else {
                             $$ = $1;
+                        }
+                        if ($$ != nullptr)
+                        {
                             $$->addSibling($3);
                         }
                     }
@@ -363,13 +371,13 @@ openStmt        : selectStmtOpen
                     }
                 | IF error THEN stmt
                     {
-                        $$ = nullptr;
                         yyerrok;
+                        $$ = nullptr;
                     }
                 | IF error THEN closedStmt ELSE openStmt
                     {
-                        $$ = nullptr;
                         yyerrok;
+                        $$ = nullptr;
                     }
                 ;
 
@@ -403,18 +411,18 @@ closedStmt      : selectStmtClosed
                     }
                 | IF error ELSE closedStmt
                     {
-                        $$ = nullptr;
                         yyerrok;
+                        $$ = nullptr;
                     }
                 | IF error THEN closedStmt ELSE closedStmt
                     {
-                        $$ = nullptr;
                         yyerrok;
+                        $$ = nullptr;
                     }
                 | WHILE error DO closedStmt
                     {
-                        $$ = nullptr; 
                         yyerrok;
+                        $$ = nullptr; 
                     }
                 | WHILE error
                     {
@@ -422,8 +430,8 @@ closedStmt      : selectStmtClosed
                     }
                 | FOR ID ASS error DO closedStmt
                     {
-                        $$ = nullptr;
                         yyerrok;
+                        $$ = nullptr;
                     }
                 | FOR error
                     {
@@ -441,17 +449,18 @@ expStmt         : exp SEMICOLON
                     }
                 | error SEMICOLON
                     {
-                        $$ = nullptr;
                         yyerrok;
+                        $$ = nullptr;
                     }
                 ;
 
 compoundStmt    : LCURL localDecls stmtList RCURL
                     {
+                        yyerrok;
+
                         $$ = new CompoundStmtNode($1->lineNum);
                         $$->addChild($2);
                         $$->addChild($3);
-                        yyerrok;
                     }
                 ;
 
@@ -586,9 +595,9 @@ returnStmt      : RETURN SEMICOLON
                     }
                 | RETURN exp SEMICOLON
                     {
+                        yyerrok;
                         $$ = new ReturnNode($1->lineNum);
                         $$->addChild($2);
-                        yyerrok;
                     }
                 | RETURN error SEMICOLON
                     {
@@ -626,12 +635,12 @@ exp             : mutable assignop exp
                     }
                 | error assignop exp
                     {
-                         $$ = nullptr;
-                         yyerrok;
+                        $$ = nullptr;
+                        yyerrok;
                     }
                 | mutable assignop error
                     {
-                         $$ = nullptr;
+                        $$ = nullptr;
                     }
                 | error INC
                     {
@@ -669,9 +678,13 @@ assignop        : ASS
 
 simpleExp       : simpleExp OR andExp
                     {
-                        $$ = new BinaryOpNode($1->getLineNum(), BinaryOpType::Or);
-                        $$->addChild($1);
-                        $$->addChild($3);
+                        if ($1 != nullptr)
+                        {
+                            $$ = new BinaryOpNode($1->getLineNum(), BinaryOpType::Or);
+                            $$->addChild($1);
+                            $$->addChild($3);
+                        }
+
                     }
                 | andExp
                     {
@@ -685,9 +698,13 @@ simpleExp       : simpleExp OR andExp
 
 andExp          : andExp AND unaryRelExp
                     {
-                        $$ = new BinaryOpNode($1->getLineNum(), BinaryOpType::And);
-                        $$->addChild($1);
-                        $$->addChild($3);
+                        if ($1 != nullptr)
+                        {
+                            $$ = new BinaryOpNode($1->getLineNum(), BinaryOpType::And);
+                            $$->addChild($1);
+                            $$->addChild($3);
+                        }
+
                     }
                 | unaryRelExp
                     {
@@ -701,8 +718,11 @@ andExp          : andExp AND unaryRelExp
 
 unaryRelExp     : NOT unaryRelExp
                     {
-                        $$ = new UnaryOpNode($1->lineNum, UnaryOpType::Not);
-                        $$->addChild($2);
+                        if ($1 != nullptr)
+                        {
+                            $$ = new UnaryOpNode($1->lineNum, UnaryOpType::Not);
+                            $$->addChild($2);
+                        }
                     }
                 | relExp
                     {
@@ -717,8 +737,11 @@ unaryRelExp     : NOT unaryRelExp
 relExp          : sumExp relop sumExp
                     {
                         $$ = $2;
-                        $$->addChild($1);
-                        $$->addChild($3);
+                        if ($$ != nullptr)
+                        {
+                            $$->addChild($1);
+                            $$->addChild($3);
+                        }
                     }
                 | sumExp
                     {
@@ -728,35 +751,56 @@ relExp          : sumExp relop sumExp
 
 relop           : LT
                     {
-                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::LT);
+                        if ($1 != nullptr)
+                        {
+                            $$ = new BinaryOpNode($1->lineNum, BinaryOpType::LT);
+                        }
                     }
                 | LEQ
                     {
-                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::LEQ);
+                        if ($1 != nullptr)
+                        {
+                            $$ = new BinaryOpNode($1->lineNum, BinaryOpType::LEQ);
+                        }
                     }
                 | GT
                     {
-                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::GT);
+                        if ($1 != nullptr)
+                        {
+                            $$ = new BinaryOpNode($1->lineNum, BinaryOpType::GT);
+                        }
                     }
                 | GEQ
                     {
-                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::GEQ);
+                        if ($1 != nullptr)
+                        {
+                            $$ = new BinaryOpNode($1->lineNum, BinaryOpType::GEQ);
+                        }
                     }
                 | EQ
                     {
-                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::EQ);
+                        if ($1 != nullptr)
+                        {
+                            $$ = new BinaryOpNode($1->lineNum, BinaryOpType::EQ);
+                        }
                     }
                 | NEQ
                     {
-                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::NEQ);
+                        if ($1 != nullptr)
+                        {
+                            $$ = new BinaryOpNode($1->lineNum, BinaryOpType::NEQ);
+                        }
                     }
                 ;
 
 sumExp          : sumExp sumOp mulExp
                     {
                         $$ = $2;
-                        $$->addChild($1);
-                        $$->addChild($3);
+                        if ($$ != nullptr)
+                        {
+                            $$->addChild($1);
+                            $$->addChild($3);
+                        }
                     }
                 | mulExp
                     {
@@ -770,19 +814,28 @@ sumExp          : sumExp sumOp mulExp
 
 sumOp           : PLUS
                     {
-                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Add);
+                        if ($1 != nullptr)
+                        {
+                            $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Add);
+                        }
                     }
                 | DASH
                     {
-                        $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Sub);
+                        if ($1 != nullptr)
+                        {
+                            $$ = new BinaryOpNode($1->lineNum, BinaryOpType::Sub);
+                        }
                     }
                 ;
 
 mulExp          : mulExp mulOp unaryExp
                     {
                         $$ = $2;
-                        $$->addChild($1);
-                        $$->addChild($3);
+                        if ($$ != nullptr)
+                        {
+                            $$->addChild($1);
+                            $$->addChild($3);
+                        }
                     }
                 | unaryExp
                     {
@@ -811,7 +864,10 @@ mulOp           : ASTERISK
 unaryExp        : unaryOp unaryExp
                     {
                         $$ = $1;
+                        if ($$ != nullptr)
+                        {
                         $$->addChild($2);
+                        }
                     }
                 | factor
                     {
@@ -862,8 +918,8 @@ mutable         : ID
 
 immutable       : LPAREN exp RPAREN
                     {
-                        $$ = $2;
                         yyerrok;
+                        $$ = $2;
                     }
                 | call
                     {
@@ -903,9 +959,12 @@ args            : argList
 
 argList         : argList COMMA exp
                     {
-                        $$ = $1;
-                        $$->addSibling($3);
                         yyerrok;
+                        $$ = $1;
+                        if ($$ != nullptr)
+                        {
+                        $$->addSibling($3);
+                        }
                     }
                 | exp
                     {
