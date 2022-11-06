@@ -232,26 +232,14 @@ funDecl         : typeSpec ID LPAREN parms RPAREN compoundStmt
                         DataType dataType = DataType($1);
                         $$ = new FunDeclNode($2->lineNum, $2->str, dataType);
                         $$->addChild($4);
-
-                        auto compStmt = dynamic_cast<CompoundStmtNode*>($6);
-                        if (compStmt == nullptr)
-                        {
-                            Error::critical($6->getLineNum(), "Failed converting node to compstmt");
-                        }
-                        $$->addChild(compStmt);
+                        $$->addChild($6);
                     }
                 | ID LPAREN parms RPAREN compoundStmt
                     {
                         DataType dataType = DataType(DataTypeEnum::Void);
                         $$ = new FunDeclNode($1->lineNum, $1->str, dataType);
                         $$->addChild($3);
-
-                        auto compStmt = dynamic_cast<CompoundStmtNode*>($5);
-                        if (compStmt == nullptr)
-                        {
-                            Error::critical($5->getLineNum(), "Failed converting node to compstmt");
-                        }
-                        $$->addChild(compStmt);
+                        $$->addChild($5);
                     }
                 | typeSpec error
                     {
@@ -334,13 +322,16 @@ parmIdList      : parmIdList COMMA parmId
                             $$->addSibling($3);
                         }
                         yyerrok;
-
                     }
                 | parmId
                     {
                         $$ = $1;
                     }
                 | parmIdList COMMA error
+                    {
+                        $$ = nullptr;
+                    }
+                | error
                     {
                         $$ = nullptr;
                     }
@@ -1034,9 +1025,7 @@ int main(int argc, char** argv)
 
     if (options.getFileName() != "")
     {
-    std::cout << "====================================" << std::endl;
-    std::cout << "FILE: " << options.getFileName().substr(options.getFileName().find_last_of("/\\") + 1) << std::endl;
-    auto file = fopen(options.getFileName().c_str(), "r");
+        auto file = fopen(options.getFileName().c_str(), "r");
         if (file == nullptr)
         {
             std::stringstream ss;
