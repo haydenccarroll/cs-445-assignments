@@ -83,7 +83,8 @@ true|false                        { return passToken(BOOLCONST); }
 
 [0-9]+                            { return passToken(NUMCONST); }
 
-\'((\\\')|([^\n\']))*\'           { return passToken(CHARCONST); }
+"''"                              { Error::error(lineNum, "Empty character ''.  Characters ignored."); }
+\'((\\\')|([^\n\']))+\'           { return passToken(CHARCONST); }
 
 \"([^\\"\n]|\\.)*\"               { return passToken(STRINGCONST); }
 
@@ -180,8 +181,8 @@ char processCharConst(std::string str)
     else if (processedStr.length() == 0)
     {
         std::stringstream ss;
-        ss << "Empty character ''.  Characters ignored.";
-        Error::error(lineNum, ss.str());
+        ss << "Processed char is empty. Should not be possible!.";
+        Error::critical(lineNum, ss.str());
     }
 
     return processedStr[0];
