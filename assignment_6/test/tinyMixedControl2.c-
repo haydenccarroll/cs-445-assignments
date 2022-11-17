@@ -1,0 +1,20 @@
+// C-F22
+main()
+{
+   if true then 
+      while true do
+         if true then 
+            while true do 555;
+         else 666;
+   else 777;
+
+   if true then 
+      while true do 333;
+   else
+      while true do 555;
+
+   if true then 
+      while true do
+         while true do 555;
+   else 666;
+}

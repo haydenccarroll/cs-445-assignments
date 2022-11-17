@@ -1,0 +1,11 @@
+// C-F22
+int dog(){return 777;  }
+
+main()
+{
+    int x:10;
+    for i = x to x by x do ;
+    "dog" == "cat";
+    666+dog();
+}
+

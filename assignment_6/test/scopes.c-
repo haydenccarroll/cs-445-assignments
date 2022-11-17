@@ -1,0 +1,12 @@
+main()
+{
+    int a, b;
+
+    {
+         char c, d;
+    }
+
+    {
+         bool e, f;
+    }
+}

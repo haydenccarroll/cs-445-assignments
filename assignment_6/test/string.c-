@@ -1,0 +1,5 @@
+char g[8]:"corgi";
+main() {
+    char s[10]:"beach day";
+}
+    

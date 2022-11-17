@@ -1,0 +1,5 @@
+main()
+{
+     { int x; x=666; }
+     { int y; output(y);}
+}

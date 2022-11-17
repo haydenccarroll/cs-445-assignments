@@ -1,0 +1,21 @@
+// get frames in the right place
+// C-S20
+yvonne(int x)
+{
+   int y;
+   y = 11111;
+}
+
+int louise(int x) {return 101 * x;}
+
+main()
+{
+   int z; 
+   z = 22222;
+   { int x[5];
+     yvonne(11);
+   }
+   yvonne(101);
+
+   z = 451 * 8 + louise(33);      // 6941
+}

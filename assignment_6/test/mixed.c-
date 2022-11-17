@@ -1,0 +1,30 @@
+// C-F22
+int a:1, b[4], c:3;
+main() {
+    while true do {
+        if false then 
+                 {{{ b[2*a]; }}}
+        else break;
+    }
+    if true then ; else;
+}
+
+
+int gromit[10];
+int thelma(int a, b[]; bool c)
+{
+    int zz:666;
+
+    a = thelma(a, b, true) * 2;
+    if a > 3 then  {
+        a = gromit[7];
+    }
+    else return zz;
+}
+
+int thelma(int a, b; bool c)
+{
+    int zz:666;
+
+    a = thelma(a, b, true) * 2;
+}

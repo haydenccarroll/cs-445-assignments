@@ -1,0 +1,7 @@
+int cat(int x) {return x;}
+
+main()
+{
+   cat(666);
+}
+    

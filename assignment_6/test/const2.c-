@@ -1,0 +1,12 @@
+int g;
+main()
+{
+    int x, y;
+    char c[100];
+    "dogs";
+    "horses";
+    {
+       int z;
+    }
+}
+int h;
