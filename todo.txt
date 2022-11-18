@@ -8,7 +8,3 @@ THE WRONG LIST:
     seems like some global variables are out of order. maybe string constants go first in memory?
         or maybe stuff that has = or :, the right side should get processed first.
         ex: a2a.diff
-    
-    when calculating the size of a function, we need to also check parameters siblings.
-    its possible in thecase of int a, b, char c, that the b will not get seen.
-

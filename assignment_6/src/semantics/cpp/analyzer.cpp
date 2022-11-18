@@ -1245,7 +1245,11 @@ int SemanticAnalyzer::calcFuncSize(ASTNode* node)
             continue;
         }
 
-        runSum -= child->getMemSize();
+        while (child != nullptr)
+        {
+            runSum -= child->getMemSize();
+            child = child->getSibling(0);
+        }
     }
 
     return runSum;
