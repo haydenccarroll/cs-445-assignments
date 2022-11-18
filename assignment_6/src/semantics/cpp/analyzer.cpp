@@ -861,7 +861,8 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
             if (node->getNodeType() == NodeType::VarDeclNode)
             {
                 auto varDecl = cast<VarDeclNode*>(node);
-                if (varDecl->getDataType().isArray())
+                if (varDecl->getDataType().isArray() &&
+                    !varDecl->isParam())
                 {
                     node->setMemLoc(fOffsets.back() - 1);
                 }
