@@ -842,7 +842,8 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         }
     }
 
-    if (node->getMemRefType() == MemReferenceType::Global) // its a global variable
+    if (node->getMemRefType() == MemReferenceType::Global || 
+        node->getMemRefType() == MemReferenceType::Static) // its a global variable
     {
         if (node->getNodeType() == NodeType::VarDeclNode ||
             node->getNodeType() == NodeType::ConstNode)
