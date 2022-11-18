@@ -42,6 +42,7 @@ private:
     void errorOnWrongRangeType(ASTNode* node);
     bool calculateLeaveScope(ASTNode* node, bool isWarn=true);
     bool calculateEnterScope(ASTNode* node);
+    int calcFuncSize(ASTNode* node);
     DataType calcExpType(ASTNode* node);
     bool insertToSymTable(std::string, DeclNode* );
     DeclNode* lookupSymTable(std::string name, int lineNum, bool use=true, bool warnUninit=true);

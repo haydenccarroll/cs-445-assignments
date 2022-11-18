@@ -874,6 +874,7 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
             if (node->getNodeType() == NodeType::FunDeclNode)
             {
                 node->setMemLoc(0);
+                node->setMemSize(calcFuncSize(node));
             }
             else
             {
@@ -1197,3 +1198,27 @@ void SemanticAnalyzer::recursiveAddToSym(ASTNode* node)
     }
     recursiveAddToSym(node->getSibling(0));
 }
+
+int SemanticAnalyzer::calcFuncSize(ASTNode* node)
+{
+    auto funDecl = tryCast<FunDeclNode*>(node);
+    if (funDecl == nullptr)
+    {
+        return 0;
+    }
+
+    int runSum = -2;
+    for (int i=0; i < funDecl->getNumChildren(); i++)
+    {
+        auto child = funDecl->getChild(i);
+        if (child == nullptr || child->getNodeType() != NodeType::VarDeclNode)
+        {
+            continue;
+        }
+
+        runSum -= child->getMemSize();
+    }
+
+    return runSum;
+}
+

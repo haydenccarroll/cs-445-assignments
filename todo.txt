@@ -1,0 +1,5 @@
+THE WRONG LIST:
+    seems like most global and local mem: stuff is off by 1.
+    we dont handle parameter arrays good, because they dont have a specified size. they should default to size 1.
+    it seems as if for loop variables dont have a size when used inside the loop. same story probably.
+    we arent printing static when we should.
