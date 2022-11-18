@@ -833,13 +833,17 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
             if (node->getNodeType() == NodeType::VarDeclNode ||
                 node->getNodeType() == NodeType::ConstNode)
             {
+                node->setMemLoc(gOffset);
                 gOffset -= node->getMemSize();
             }
         }
         else
         {
-            node->setMemLoc(fOffsets.back());
-            fOffsets.back() -= node->getMemSize();
+            if (node->getNodeType() == NodeType::VarDeclNode)
+            {
+                node->setMemLoc(fOffsets.back());
+                fOffsets.back() -= node->getMemSize();
+            }
         }
     }
 
@@ -859,7 +863,14 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         fOffsets.pop_back();
         if (node->getMemRefType() == MemReferenceType::Global) // its global
         {
-            node->setMemLoc(gOffset);
+            if (node->getNodeType() == NodeType::FunDeclNode)
+            {
+                node->setMemLoc(0);
+            }
+            else
+            {
+                node->setMemLoc(gOffset);
+            }
         }
         else
         {
@@ -896,6 +907,7 @@ DataType SemanticAnalyzer::calcExpType(ASTNode* node)
         {
             expNode->setExpType(declNode->getDataType());
             expNode->setMemSize(declNode->getMemSize());
+            expNode->setMemLoc(declNode->getMemLoc());
             expNode->setMemRefType(declNode->getMemRefType());
         }
     } else if (expNode->getNodeType() == NodeType::CallNode)

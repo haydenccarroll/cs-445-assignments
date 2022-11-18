@@ -23,6 +23,7 @@ public:
     unsigned int getNumSiblings();
     int getLineNum() { return m_lineNum; };
     int getMemSize() { return m_memSize; }
+    int getMemLoc() { return m_memLoc; }
     MemReferenceType getMemRefType() { return m_memRefType; }
 
 //setters
