@@ -833,7 +833,26 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
             if (node->getNodeType() == NodeType::VarDeclNode ||
                 node->getNodeType() == NodeType::ConstNode)
             {
-                node->setMemLoc(gOffset);
+                auto varDecl = tryCast<VarDeclNode*>(node);
+                auto constNode = tryCast<ConstNode*>(node);
+                if (varDecl != nullptr)
+                {
+                    if (varDecl->getDataType().isArray())
+                    {
+                        node->setMemLoc(gOffset - 1);
+                    }
+                }
+                else if (constNode != nullptr)
+                {
+                    if (constNode->getExpType().isArray())
+                    {
+                        node->setMemLoc(gOffset - 1);
+                    }
+                }
+                else
+                {
+                    node->setMemLoc(gOffset);
+                }
                 gOffset -= node->getMemSize();
             }
         }
@@ -841,7 +860,15 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         {
             if (node->getNodeType() == NodeType::VarDeclNode)
             {
-                node->setMemLoc(fOffsets.back());
+                auto varDecl = cast<VarDeclNode*>(node);
+                if (varDecl->getDataType().isArray())
+                {
+                    node->setMemLoc(fOffsets.back() - 1);
+                }
+                else
+                {
+                    node->setMemLoc(fOffsets.back());
+                }
                 fOffsets.back() -= node->getMemSize();
             }
         }
