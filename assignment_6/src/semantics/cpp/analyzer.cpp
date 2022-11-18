@@ -911,7 +911,6 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         }
     }
 
-
     bool didLeaveScope = calculateLeaveScope(node, false);
     if (didLeaveScope)
     {
@@ -936,9 +935,15 @@ DataType SemanticAnalyzer::calcExpType(ASTNode* node)
     if (expNode->getNodeType() == NodeType::IdNode)
     {
         name = cast<IdNode*>(expNode)->getIdName();
+        auto idNode = cast<IdNode*>(expNode);
         auto declNode = m_symTable->lookup(name);
         if (declNode && declNode->getNodeType() == NodeType::VarDeclNode)
         {
+            auto varDecl = tryCast<VarDeclNode*>(declNode);
+            if (varDecl)
+            {
+                idNode->setStatic(varDecl->isStatic());
+            }
             expNode->setExpType(declNode->getDataType());
             expNode->setMemSize(declNode->getMemSize());
             expNode->setMemLoc(declNode->getMemLoc());

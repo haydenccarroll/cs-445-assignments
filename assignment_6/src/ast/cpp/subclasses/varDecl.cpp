@@ -27,7 +27,7 @@ std::string VarDeclNode::toString(bool printType)
     {
         ss << "Var: ";
     }
-    ss << m_name << " " << m_dataType.toString();
+    ss << m_name << " " << m_dataType.toString(true, m_isStatic);
 
     return ss.str();
 }

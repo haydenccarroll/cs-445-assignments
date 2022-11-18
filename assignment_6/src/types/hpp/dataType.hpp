@@ -19,7 +19,7 @@ public:
     void print(bool printOf=true, bool isStatic=false);
     std::string toString(bool printOf=true, bool isStatic=false) const;
     void setTypeSpec(DataTypeEnum typeSpec);
-    bool isArray() { return (m_nextType != nullptr); }
+    bool isArray() const { return (m_nextType != nullptr); }
     DataType getBasicType()
     {
         if (m_nextType == nullptr)

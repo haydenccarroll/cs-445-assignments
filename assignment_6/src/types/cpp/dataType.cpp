@@ -52,6 +52,11 @@ std::string DataType::toString(bool printOf, bool isStatic) const
 
     for (int i=0; i < count; i++)
     {
+        if (i == 0 && isStatic)
+        {
+            ss << "of static array ";
+            continue;
+        }
         ss << "of array ";
     }
 
@@ -66,7 +71,7 @@ std::string DataType::toString(bool printOf, bool isStatic) const
         return ss.str();
     }
 
-    if (isStatic)
+    if (isStatic && !this->isArray())
     {
         ss << "static ";
     }
