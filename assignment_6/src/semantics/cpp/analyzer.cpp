@@ -793,7 +793,8 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
     {
         auto funDecl = cast<FunDeclNode*>(node);
         m_symTable->insert(funDecl->getName(), funDecl);
-    }
+        fOffsets.push_back(-2);
+     } 
 
     calcExpType(node);
     if (m_symTable->depth() == 2)
@@ -830,7 +831,7 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
     if (didEnterScope)
     {
         // push back a -2, because every scope has to have room for return frame ptr and return addr
-        fOffsets.push_back(-2);
+        // fOffsets.push_back(-2);
     }
     else
     {
@@ -881,9 +882,6 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         }
     }
 
-
-    // do some memory stuff here.
-
     for (int i=0; i < node->getNumChildren(); i++)
     {
         traverseAndSetTypes(node->getChild(i));
@@ -902,13 +900,14 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
     {
         int innerScopeOffset = fOffsets.back();
         node->setMemSize(innerScopeOffset); // sets size for node
-        fOffsets.pop_back();
         if (node->getMemRefType() == MemReferenceType::Global) // its global
         {
             if (node->getNodeType() == NodeType::FunDeclNode)
             {
                 node->setMemLoc(0);
                 node->setMemSize(calcFuncSize(node));
+                fOffsets.pop_back();
+
             }
             else
             {
