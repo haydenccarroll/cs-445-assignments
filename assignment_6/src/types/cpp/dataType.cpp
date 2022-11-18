@@ -50,11 +50,6 @@ std::string DataType::toString(bool printOf, bool isStatic) const
     }
     enumType = tmpPtr->m_enumType;
 
-    if (count != 0)
-    {
-        ss << "is array ";
-        count--;
-    }
     for (int i=0; i < count; i++)
     {
         ss << "of array ";

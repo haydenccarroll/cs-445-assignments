@@ -18,7 +18,7 @@ std::string IdNode::toString(bool printType)
     ss << "Id: " << m_idName;
     if (printType)
     {
-        ss << " " << m_dataType.getBasicType().toString();
+        ss << " " << m_dataType.toString();
     }
 
     return ss.str();

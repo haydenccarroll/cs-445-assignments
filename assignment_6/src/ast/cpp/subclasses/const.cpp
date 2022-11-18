@@ -63,13 +63,13 @@ std::string ConstNode::toString(bool printType)
         ss << "'" << m_charValue << "'";
         break;
     case ConstType::String:
-        ss << "is array \"" << m_stringValue << "\"";
+        ss << "\"" << m_stringValue << "\"";
         break;
     }
 
     if (printType)
     {
-        ss << " " << m_dataType.getBasicType().toString();
+        ss << " " << m_dataType.toString();
     }
 
     return ss.str();

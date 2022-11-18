@@ -17,6 +17,7 @@ public:
     void setInitialized(bool isInitialized) { m_isInitialized = isInitialized;}
     bool isInitialized() { return m_isInitialized; }
     void setStatic(bool isStatic);
+    bool isStatic() { return m_isStatic; }
     void use(int lineNum, bool warnUninit=true) override;
 
 private:

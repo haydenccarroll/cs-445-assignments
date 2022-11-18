@@ -13,3 +13,21 @@ main()
    output(*c);
 }
 
+1. track size for following:
+    function
+    Var
+    const
+    id`
+    Compound
+    for
+    (not while)
+
+2. the following start at -2 for size. (need space for frame)
+    func
+    compound
+    for
+
+3. size for vars + chararr const is positive (pretty simple to calc)
+
+4. func compound for have negative size
+    frame is -2 - minimum f offset of scope

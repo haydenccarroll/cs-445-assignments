@@ -6,6 +6,10 @@
 
 #include <sstream>
 
+static int gOffset = 0;
+std::vector<int> fOffsets; // starts at -2, every time you see somethign with mem, dec.
+
+
 SemanticAnalyzer::SemanticAnalyzer(ASTNode* root, SymbolTable* symTable) :
 m_root(root),
 m_symTable(symTable),
@@ -792,14 +796,79 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
     }
 
     calcExpType(node);
-    calculateEnterScope(node);
+    if (m_symTable->depth() == 2)
+    {
+        node->setMemRefType(MemReferenceType::Global);
+    } 
+    else
+    {
+        if (node->getNodeType() == NodeType::VarDeclNode)
+        {
+            auto varDecl = cast<VarDeclNode*>(node);
+            if (varDecl->isStatic())
+            {
+                node->setMemRefType(MemReferenceType::Static);
+            }
+            else if (varDecl->isParam())
+            {
+                node->setMemRefType(MemReferenceType::Parameter);
+            }
+            else
+            {
+                node->setMemRefType(MemReferenceType::Local);
+            }
+        }
+    }
+    bool didEnterScope = calculateEnterScope(node);
+    // if entered scope
+    if (didEnterScope)
+    {
+        // push back a -2, because every scope has to have room for return frame ptr and return addr
+        fOffsets.push_back(-2);
+    }
+    else
+    {
+        if (node->getMemRefType() == MemReferenceType::Global) // its a global variable
+        {
+            gOffset -= node->getMemSize();
+        }
+        else
+        {
+            node->setMemLoc(fOffsets.back());
+            fOffsets.back() -= node->getMemSize();
+        }
+    }
+
+
+    // do some memory stuff here.
 
     for (int i=0; i < node->getNumChildren(); i++)
     {
         traverseAndSetTypes(node->getChild(i));
     }
 
-    calculateLeaveScope(node, false);
+    bool didLeaveScope = calculateLeaveScope(node, false);
+    if (didLeaveScope)
+    {
+        int innerScopeOffset = fOffsets.back();
+        node->setMemSize(innerScopeOffset); // sets size for node
+        fOffsets.pop_back();
+        if (node->getMemRefType() == MemReferenceType::Global) // its global
+        {
+            node->setMemLoc(gOffset);
+            gOffset -= node->getMemSize();
+        }
+        else
+        {
+            int outerScopeOffset = fOffsets.back();
+            node->setMemLoc(outerScopeOffset);
+
+            if (innerScopeOffset < outerScopeOffset)
+            {
+                fOffsets.back() = innerScopeOffset;
+            } 
+        }
+    }
 
     traverseAndSetTypes(node->getSibling(0));
 }
@@ -823,6 +892,8 @@ DataType SemanticAnalyzer::calcExpType(ASTNode* node)
         if (declNode && declNode->getNodeType() == NodeType::VarDeclNode)
         {
             expNode->setExpType(declNode->getDataType());
+            expNode->setMemSize(declNode->getMemSize());
+            expNode->setMemRefType(declNode->getMemRefType());
         }
     } else if (expNode->getNodeType() == NodeType::CallNode)
     {
@@ -902,7 +973,7 @@ DeclNode* SemanticAnalyzer::lookupSymTable(std::string name, int lineNum, bool u
     return node;
 }
 
-void SemanticAnalyzer::calculateLeaveScope(ASTNode* node, bool isWarn)
+bool SemanticAnalyzer::calculateLeaveScope(ASTNode* node, bool isWarn)
 {
     auto parentType = NodeType::CompoundStmtNode;
     if (node->getParent() != nullptr)
@@ -933,10 +1004,12 @@ void SemanticAnalyzer::calculateLeaveScope(ASTNode* node, bool isWarn)
             }
         }
         leaveScope(isWarn);
+        return true;
     }
+    return false;
 }
 
-void SemanticAnalyzer::calculateEnterScope(ASTNode* node)
+bool SemanticAnalyzer::calculateEnterScope(ASTNode* node)
 {
     if (node->getNodeType() == NodeType::CompoundStmtNode)
     {
@@ -951,13 +1024,13 @@ void SemanticAnalyzer::calculateEnterScope(ASTNode* node)
         {
             case NodeType::FunDeclNode:
             case NodeType::ForNode:
-                return;
+                return false;
         }
 
         std::stringstream ss;
         ss << "Compount Stmt at line: " << node ->getLineNum();
         m_symTable->enter(ss.str());
-        return;
+        return true;
     }
 
     else if (node->getNodeType() == NodeType::ForNode)
@@ -965,6 +1038,7 @@ void SemanticAnalyzer::calculateEnterScope(ASTNode* node)
         std::stringstream ss;
         ss << "For loop at line: " << node->getLineNum();
         m_symTable->enter(ss.str());
+        return true;
     }
 
     else if (node->getNodeType() == NodeType::FunDeclNode)
@@ -972,7 +1046,10 @@ void SemanticAnalyzer::calculateEnterScope(ASTNode* node)
         std::stringstream ss;
         ss << "Func decl at line: " << node->getLineNum();
         m_symTable->enter(ss.str());
+        return true;
     }
+
+    return false;
 }
 
 void SemanticAnalyzer::leaveScope(bool isWarn)

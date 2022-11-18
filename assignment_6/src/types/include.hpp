@@ -6,3 +6,4 @@
 #include "hpp/tokenData.hpp"
 #include "hpp/unaryOpType.hpp"
 #include "hpp/nodeType.hpp"
+#include "hpp/memReferenceType.hpp"

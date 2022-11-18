@@ -40,8 +40,8 @@ private:
     void recursiveAddToSym(ASTNode* node);
 
     void errorOnWrongRangeType(ASTNode* node);
-    void calculateLeaveScope(ASTNode* node, bool isWarn=true);
-    void calculateEnterScope(ASTNode* node);
+    bool calculateLeaveScope(ASTNode* node, bool isWarn=true);
+    bool calculateEnterScope(ASTNode* node);
     DataType calcExpType(ASTNode* node);
     bool insertToSymTable(std::string, DeclNode* );
     DeclNode* lookupSymTable(std::string name, int lineNum, bool use=true, bool warnUninit=true);

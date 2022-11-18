@@ -10,6 +10,7 @@ ASTNode::ASTNode(int lineNum)
     m_lineNum = lineNum;
     m_sibling = nullptr;
     m_hasBeenAnalyzed = false;
+    m_memSize = 0;
 }
 
 ASTNode::~ASTNode()
@@ -34,7 +35,7 @@ unsigned int ASTNode::getNumSiblings()
 }
 
 
-void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl, bool printType)
+void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl, bool printType, bool printMem)
 {
     for (int i=0; i < indentLevel; i++)
     {
@@ -49,22 +50,76 @@ void ASTNode::print(unsigned int indentLevel, int siblingLvl, int childLvl, bool
         std::cout << "Child: " << childLvl << "  ";
     }
     std::cout << this->toString(printType);
-    std::cout << " [line: " << m_lineNum << "]\n";
-    
+    if (printMem && m_memSize != 0)
+    {
+        std::cout << " " << getMemTag();
+    }
+    std::cout << " " << getLineTag() << "\n";
+
     // print children
     for (unsigned int i=0; i < m_children.size(); i++)
     {
         if (m_children[i] != nullptr)
         {
-            m_children[i]->print(indentLevel + 1, 0, i, printType);
+            m_children[i]->print(indentLevel + 1, 0, i, printType, printMem);
         }
     }
 
     // print siblings
     if (m_sibling != nullptr)
     {
-        m_sibling->print(indentLevel, siblingLvl + 1, -1, printType);
+        m_sibling->print(indentLevel, siblingLvl + 1, -1, printType, printMem);
     }
+}
+
+void ASTNode::setMemSize(int memSize)
+{
+    m_memSize = memSize;
+}
+
+void ASTNode::setMemLoc(int memLoc)
+{
+    m_memLoc = memLoc;
+}
+
+std::string ASTNode::getLineTag()
+{
+    std::stringstream ss;
+    ss << "[line: " << m_lineNum << "]";
+    return ss.str();
+}
+
+std::string ASTNode::getMemTag()
+{
+    if (m_memSize == 0)
+    {
+        return "";
+    }
+
+    std::stringstream ss;
+    ss << "[mem: ";
+    switch (m_memRefType)
+    {
+    case MemReferenceType::Global:
+        ss << "Global";
+        break;
+    case MemReferenceType::Local:
+        ss << "Local";
+        break;
+    case MemReferenceType::Parameter:
+        ss << "Parameter";
+        break;
+    case MemReferenceType::Static:
+        ss << "LocalStatic";
+        break;
+    case MemReferenceType::None:
+        ss << "None";
+        break;
+    }
+
+    ss << " loc: " << m_memLoc << " size: " << m_memSize << "]";
+
+    return ss.str();
 }
 
 ASTNode* ASTNode::getAncestor(NodeType type)

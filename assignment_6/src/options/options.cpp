@@ -20,6 +20,7 @@ Options::Options(int argc, char **argv)
     m_isPFlag = false;
     m_isDFlag = false;
     m_ishFlag = false;
+    m_isMFlag = false;
 
     // not used now, but could potentially be used in later assignments.
     bool errFlag = false;
@@ -27,7 +28,7 @@ Options::Options(int argc, char **argv)
     while (true) {
         // hunt for a string of options
         int c;
-        while ((c = ourGetopt(argc, argv, (char *)"dpDPh")) != EOF)
+        while ((c = ourGetopt(argc, argv, (char *)"dpDPhM")) != EOF)
         {
             switch (c) {
             case 'd':
@@ -45,6 +46,8 @@ Options::Options(int argc, char **argv)
             case 'D':
                 m_isDFlag = true;
                 break;
+            case 'M':
+                m_isMFlag = true;
             }
         }
 

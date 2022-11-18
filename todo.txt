@@ -1,4 +1,0 @@
-some mysteries:
-    1. why is arrayops saying Array is unindexed array on line 22 but not 21.
-    2. what is the deal with main being defined. what is the exact logic? seems like 
-        strange and emptyline contradict. I have working solution though.

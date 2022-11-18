@@ -196,11 +196,14 @@ varDeclId       : ID
                     {
                         DataType dataType = DataType(DataTypeEnum::Void);
                         $$ = new VarDeclNode($1->lineNum, $1->str, dataType);
+                        $$->setMemSize(1);                        $$->setMemSize(1);
+
                     }
                 | ID LBRACK NUMCONST RBRACK
                     {
                         DataType dataType = DataType(DataTypeEnum::Void, true);
                         $$ = new VarDeclNode($1->lineNum, $1->str, dataType);
+                        $$->setMemSize($3->num + 1);
                     }
                 | ID LBRACK error
                     {
@@ -1025,6 +1028,7 @@ int main(int argc, char** argv)
 
     if (options.getFileName() != "")
     {
+        std::cout << "====================================\nFILE: " << options.getFileName().substr(options.getFileName().find_last_of("/\\") + 1) << "\n";
         auto file = fopen(options.getFileName().c_str(), "r");
         if (file == nullptr)
         {
@@ -1051,7 +1055,7 @@ int main(int argc, char** argv)
     // if AST print flag (-p) is on and tree is not null
     if (options.ispFlag() && root != nullptr)
     {
-        root->print();
+        root->print(0, 0, -1, false, options.isMFlag());
     }
 
     SemanticAnalyzer semantics = SemanticAnalyzer(root, &symTable);
@@ -1062,7 +1066,7 @@ int main(int argc, char** argv)
     // if AST print annotated flag is set and tree not null
     if (options.isPFlag() && root != nullptr && Error::getErrorCount() == 0)
     {
-        root->print(0, 0, -1, true); // PRINT WITH TYPE INFO THOUGH
+        root->print(0, 0, -1, true, options.isMFlag()); // PRINT WITH TYPE INFO THOUGH
         // print root with type info stuff
     }
 
