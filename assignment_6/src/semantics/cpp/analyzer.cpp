@@ -6,7 +6,7 @@
 
 #include <sstream>
 
-static int gOffset = 0;
+int gOffset = 0;
 std::vector<int> fOffsets; // starts at -2, every time you see somethign with mem, dec.
 
 
@@ -830,7 +830,11 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
     {
         if (node->getMemRefType() == MemReferenceType::Global) // its a global variable
         {
-            gOffset -= node->getMemSize();
+            if (node->getNodeType() == NodeType::VarDeclNode ||
+                node->getNodeType() == NodeType::ConstNode)
+            {
+                gOffset -= node->getMemSize();
+            }
         }
         else
         {
@@ -856,7 +860,6 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         if (node->getMemRefType() == MemReferenceType::Global) // its global
         {
             node->setMemLoc(gOffset);
-            gOffset -= node->getMemSize();
         }
         else
         {

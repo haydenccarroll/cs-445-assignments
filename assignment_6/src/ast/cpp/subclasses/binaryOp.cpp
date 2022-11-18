@@ -60,7 +60,7 @@ std::string BinaryOpNode::toString(bool printType)
     ss << binaryOpTypeToStr(m_binaryOpType);
     if (printType)
     {
-        ss << " " << m_dataType.getBasicType().toString();
+        ss << " " << m_dataType.toString();
     }
 
     return ss.str();

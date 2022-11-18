@@ -19,6 +19,7 @@ extern int yylex();
 
 extern FILE* yyin;
 extern int yydebug;
+extern int gOffset;
 
 ASTNode* root = nullptr;
 
@@ -1005,6 +1006,8 @@ constant        : NUMCONST
                 | STRINGCONST
                     {
                         $$ = new ConstNode($1->lineNum, $1->str);
+                        $$->setMemSize($1->str.length() + 1);
+                        $$->setMemRefType(MemReferenceType::Global);
                     }
                 ;
 %%
@@ -1072,7 +1075,10 @@ int main(int argc, char** argv)
 
     std::cout << "Number of warnings: " << Error::getWarningCount() << std::endl;
     std::cout << "Number of errors: " << Error::getErrorCount() << std::endl;
-
+    if (Error::getErrorCount() == 0 && options.isMFlag())
+    {
+        std::cout << "Offset for end of global space: " << gOffset << std::endl;
+    }
     delete root;
     return EXIT_SUCCESS;
 }
