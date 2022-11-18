@@ -913,11 +913,6 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         {
             int outerScopeOffset = fOffsets.back();
             node->setMemLoc(outerScopeOffset);
-
-            if (innerScopeOffset < outerScopeOffset)
-            {
-                fOffsets.back() = innerScopeOffset;
-            } 
         }
     }
 
