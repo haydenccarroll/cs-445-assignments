@@ -1,15 +1,4 @@
 THE WRONG LIST:
-
-    seems like subscopes still contribute to the outer most scope offset. 
-    for reference, see exampleScope.diff ln 6
-
-    it seems as if for loop variables arent getting used in the size calculation.
-    maybe because they arent a decl? not quite sure. actually pretty sure its because they dont have size.
-    See break3.diff ln5 for reference.
-
-    
-
-
     
     we arent printing static when we should.
 

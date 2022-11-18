@@ -825,7 +825,22 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
     }
 
     // enter scope
-    calculateEnterScope(node);
+    int didEnterScope = calculateEnterScope(node);
+    if (didEnterScope)
+    {
+        if (node->getNodeType() == NodeType::FunDeclNode)
+        {
+            fOffsets.push_back(-2);
+        }
+        else if (fOffsets.size() > 0)
+        {
+            fOffsets.push_back(fOffsets.back());
+        }
+        else
+        {
+            Error::critical(node->getLineNum(), "fOffsets is empty when it shouldnt be.");
+        }
+    }
 
     if (node->getMemRefType() == MemReferenceType::Global) // its a global variable
     {
@@ -885,7 +900,6 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
     {
         node->setMemLoc(0);
         node->setMemSize(calcFuncSize(node));
-        fOffsets.pop_back();
     }
 
     else if (node->getNodeType() == NodeType::CompoundStmtNode || 
@@ -899,6 +913,10 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
 
 
     bool didLeaveScope = calculateLeaveScope(node, false);
+    if (didLeaveScope)
+    {
+        fOffsets.pop_back();
+    }
 
     traverseAndSetTypes(node->getSibling(0));
 }
