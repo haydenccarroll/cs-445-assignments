@@ -856,7 +856,7 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
                 gOffset -= node->getMemSize();
             }
         }
-        else
+        else // it is a local variable
         {
             if (node->getNodeType() == NodeType::VarDeclNode)
             {

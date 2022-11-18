@@ -197,7 +197,7 @@ varDeclId       : ID
                     {
                         DataType dataType = DataType(DataTypeEnum::Void);
                         $$ = new VarDeclNode($1->lineNum, $1->str, dataType);
-                        $$->setMemSize(1);                        $$->setMemSize(1);
+                        $$->setMemSize(1);
 
                     }
                 | ID LBRACK NUMCONST RBRACK
@@ -345,6 +345,7 @@ parmId          : ID
                     {
                         DataType dataType = DataType(DataTypeEnum::Void);
                         auto param = new VarDeclNode($1->lineNum, $1->str, dataType, false, true);
+                        param->setMemSize(1);
                         param->setInitialized(true);
                         $$ = param;
                     }
@@ -352,6 +353,7 @@ parmId          : ID
                     {
                         DataType dataType = DataType(DataTypeEnum::Void, true);
                         auto param = new VarDeclNode($1->lineNum, $1->str, dataType, false, true);
+                        param->setMemSize(1);
                         param->setInitialized(true);
                         $$ = param;
                     }
