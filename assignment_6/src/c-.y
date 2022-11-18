@@ -546,6 +546,7 @@ iterStmtOpen    : WHILE simpleExp DO openStmt
                         DataType dataType = DataType(DataTypeEnum::Int);
                         auto var = new VarDeclNode($2->lineNum, $2->str, dataType);
                         var->setInitialized(true);
+                        var->setMemSize(1);
                         var->setTypeSpec(DataTypeEnum::Int);
                         $$->addChild(var);
                         $$->addChild($4);
@@ -564,6 +565,7 @@ iterStmtClosed  : WHILE simpleExp DO closedStmt
                         $$ = new ForNode($1->lineNum);
                         DataType dataType = DataType(DataTypeEnum::Int);
                         auto var = new VarDeclNode($2->lineNum, $2->str, dataType);
+                        var->setMemSize(1);
                         var->setInitialized(true);
                         var->setTypeSpec(DataTypeEnum::Int);
 

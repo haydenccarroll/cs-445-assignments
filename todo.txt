@@ -1,9 +1,5 @@
 THE WRONG LIST:
 
-    we are calculating the space wrong for compound statements and the like.
-    even if there are no new decls, a reference to a var will still add the space. it just wont add the space twice.
-    see walsh.diff for details. specifically ln89
-
     seems like subscopes still contribute to the outer most scope offset. 
     for reference, see exampleScope.diff ln 6
 

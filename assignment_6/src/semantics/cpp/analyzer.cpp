@@ -785,6 +785,7 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
 {
     if (node == nullptr) { return; }
 
+    // insert to sym table and push to foffset if in a new function
     if (node->getNodeType() == NodeType::VarDeclNode)
     {
         auto varDecl = cast<VarDeclNode*>(node);
@@ -797,6 +798,8 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
      } 
 
     calcExpType(node);
+
+    // set memref type
     if (m_symTable->depth() == 2)
     {
         node->setMemRefType(MemReferenceType::Global);
@@ -821,65 +824,56 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         }
     }
 
-    if (node->getMemRefType() == MemReferenceType::None)
+    // enter scope
+    calculateEnterScope(node);
+
+    if (node->getMemRefType() == MemReferenceType::Global) // its a global variable
+    {
+        if (node->getNodeType() == NodeType::VarDeclNode ||
+            node->getNodeType() == NodeType::ConstNode)
+        {
+            auto varDecl = tryCast<VarDeclNode*>(node);
+            auto constNode = tryCast<ConstNode*>(node);
+            if ((varDecl != nullptr && varDecl->getDataType().isArray()) || 
+                (constNode != nullptr && constNode->getExpType().isArray()))
+            {
+                node->setMemLoc(gOffset - 1);
+            }
+            else
+            {
+                node->setMemLoc(gOffset);
+            }
+            gOffset -= node->getMemSize();
+        }
+    }
+    else if (node->getMemRefType() == MemReferenceType::Local)
+    {
+        if (node->getNodeType() == NodeType::VarDeclNode)
+        {
+            auto varDecl = cast<VarDeclNode*>(node);
+            if (varDecl->getDataType().isArray())
+            {
+                node->setMemLoc(fOffsets.back() - 1);
+            }
+            else
+            {
+                node->setMemLoc(fOffsets.back());
+            }
+            fOffsets.back() -= node->getMemSize();
+        }
+    }
+    else if (node->getMemRefType() == MemReferenceType::Parameter)
+    {
+        if (node->getNodeType() == NodeType::VarDeclNode)
+        {
+            node->setMemLoc(fOffsets.back());
+            fOffsets.back() -= node->getMemSize();
+        }
+        node->setMemSize(1);
+    }
+    else if (node->getMemRefType() == MemReferenceType::None)
     {
         node->setMemLoc(0);
-    }
-
-    bool didEnterScope = calculateEnterScope(node);
-    // if entered scope
-    if (didEnterScope)
-    {
-        // push back a -2, because every scope has to have room for return frame ptr and return addr
-        // fOffsets.push_back(-2);
-    }
-    else
-    {
-        if (node->getMemRefType() == MemReferenceType::Global) // its a global variable
-        {
-            if (node->getNodeType() == NodeType::VarDeclNode ||
-                node->getNodeType() == NodeType::ConstNode)
-            {
-                auto varDecl = tryCast<VarDeclNode*>(node);
-                auto constNode = tryCast<ConstNode*>(node);
-                if (varDecl != nullptr)
-                {
-                    if (varDecl->getDataType().isArray())
-                    {
-                        node->setMemLoc(gOffset - 1);
-                    }
-                }
-                else if (constNode != nullptr)
-                {
-                    if (constNode->getExpType().isArray())
-                    {
-                        node->setMemLoc(gOffset - 1);
-                    }
-                }
-                else
-                {
-                    node->setMemLoc(gOffset);
-                }
-                gOffset -= node->getMemSize();
-            }
-        }
-        else // it is a local variable
-        {
-            if (node->getNodeType() == NodeType::VarDeclNode)
-            {
-                auto varDecl = cast<VarDeclNode*>(node);
-                if (varDecl->getDataType().isArray() &&
-                    !varDecl->isParam())
-                {
-                    node->setMemLoc(fOffsets.back() - 1);
-                }
-                else
-                {
-                    node->setMemLoc(fOffsets.back());
-                }
-                fOffsets.back() -= node->getMemSize();
-            }
-        }
     }
 
     for (int i=0; i < node->getNumChildren(); i++)
@@ -887,39 +881,24 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         traverseAndSetTypes(node->getChild(i));
     }
 
-    if (node->getNodeType() == NodeType::CompoundStmtNode)
+    if (node->getNodeType() == NodeType::FunDeclNode)
     {
-        if (fOffsets.size() >= 1)
+        node->setMemLoc(0);
+        node->setMemSize(calcFuncSize(node));
+        fOffsets.pop_back();
+    }
+
+    else if (node->getNodeType() == NodeType::CompoundStmtNode || 
+            node->getNodeType() == NodeType::ForNode)
+    {
+        if (fOffsets.size() > 0)
         {
             node->setMemSize(fOffsets.back());
         }
     }
 
-    bool didLeaveScope = calculateLeaveScope(node, false);
-    if (didLeaveScope)
-    {
-        int innerScopeOffset = fOffsets.back();
-        node->setMemSize(innerScopeOffset); // sets size for node
-        if (node->getMemRefType() == MemReferenceType::Global) // its global
-        {
-            if (node->getNodeType() == NodeType::FunDeclNode)
-            {
-                node->setMemLoc(0);
-                node->setMemSize(calcFuncSize(node));
-                fOffsets.pop_back();
 
-            }
-            else
-            {
-                node->setMemLoc(gOffset);
-            }
-        }
-        else if (node->getMemRefType() != MemReferenceType::None)
-        {
-            int outerScopeOffset = fOffsets.back();
-            node->setMemLoc(outerScopeOffset);
-        }
-    }
+    bool didLeaveScope = calculateLeaveScope(node, false);
 
     traverseAndSetTypes(node->getSibling(0));
 }
