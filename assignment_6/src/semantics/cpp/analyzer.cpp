@@ -819,6 +819,12 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
             }
         }
     }
+
+    if (node->getMemRefType() == MemReferenceType::None)
+    {
+        node->setMemLoc(0);
+    }
+
     bool didEnterScope = calculateEnterScope(node);
     // if entered scope
     if (didEnterScope)
@@ -909,7 +915,7 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
                 node->setMemLoc(gOffset);
             }
         }
-        else
+        else if (node->getMemRefType() != MemReferenceType::None)
         {
             int outerScopeOffset = fOffsets.back();
             node->setMemLoc(outerScopeOffset);

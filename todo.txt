@@ -1,5 +1,14 @@
 THE WRONG LIST:
-    parameters do not have a size. i dont believe any parameters do. relation to 2nd point.
-    we dont handle parameter arrays good, because they dont have a specified size. they should default to size 1.
     it seems as if for loop variables dont have a size when used inside the loop. same story probably.
+    
     we arent printing static when we should.
+
+    we arent checking to see if a variable is static. 
+    
+    seems like some global variables are out of order. maybe string constants go first in memory?
+        or maybe stuff that has = or :, the right side should get processed first.
+        ex: a2a.diff
+    
+    when calculating the size of a function, we need to also check parameters siblings.
+    its possible in thecase of int a, b, char c, that the b will not get seen.
+
