@@ -855,6 +855,14 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         traverseAndSetTypes(node->getChild(i));
     }
 
+    if (node->getNodeType() == NodeType::CompoundStmtNode)
+    {
+        if (fOffsets.size() >= 1)
+        {
+            node->setMemSize(fOffsets.back());
+        }
+    }
+
     bool didLeaveScope = calculateLeaveScope(node, false);
     if (didLeaveScope)
     {
