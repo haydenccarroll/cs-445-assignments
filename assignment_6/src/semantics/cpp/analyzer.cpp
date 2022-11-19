@@ -785,6 +785,13 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
 {
     if (node == nullptr) { return; }
 
+    // analyze var initiailization first
+    if (node->getNodeType() == NodeType::VarDeclNode)
+    {
+        auto child = node->getChild(0);
+        traverseAndSetTypes(child);
+    }
+
     // insert to sym table and push to foffset if in a new function
     if (node->getNodeType() == NodeType::VarDeclNode)
     {
@@ -891,9 +898,13 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         node->setMemLoc(0);
     }
 
-    for (int i=0; i < node->getNumChildren(); i++)
+    // dont want to process vardecl node children (we already have, its initializzation)
+    if (node->getNodeType() != NodeType::VarDeclNode)
     {
-        traverseAndSetTypes(node->getChild(i));
+        for (int i=0; i < node->getNumChildren(); i++)
+        {
+            traverseAndSetTypes(node->getChild(i));
+        }
     }
 
     if (node->getNodeType() == NodeType::FunDeclNode)
