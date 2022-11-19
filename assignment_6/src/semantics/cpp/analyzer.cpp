@@ -842,8 +842,7 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
         }
     }
 
-    if (node->getMemRefType() == MemReferenceType::Global || 
-        node->getMemRefType() == MemReferenceType::Static) // its a global variable
+    if (node->getMemRefType() == MemReferenceType::Global || node->getMemRefType() == MemReferenceType::Static) // its a global variable
     {
         if (node->getNodeType() == NodeType::VarDeclNode ||
             node->getNodeType() == NodeType::ConstNode)
@@ -916,6 +915,10 @@ void SemanticAnalyzer::traverseAndSetTypes(ASTNode* node)
     if (didLeaveScope)
     {
         fOffsets.pop_back();
+        if (node->getNodeType() == NodeType::ForNode)
+        {
+            node->setMemSize(fOffsets.back() - 1);
+        }
     }
 
     traverseAndSetTypes(node->getSibling(0));
