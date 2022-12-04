@@ -1035,7 +1035,6 @@ int main(int argc, char** argv)
 
     if (options.getFileName() != "")
     {
-        std::cout << "====================================\nFILE: " << options.getFileName().substr(options.getFileName().find_last_of("/\\") + 1) << "\n";
         auto file = fopen(options.getFileName().c_str(), "r");
         if (file == nullptr)
         {
@@ -1071,18 +1070,19 @@ int main(int argc, char** argv)
     // do semantic analysis
 
     // if AST print annotated flag is set and tree not null
-    if (options.isPFlag() && root != nullptr && Error::getErrorCount() == 0)
+    if ((options.isPFlag() || options.isMFlag()) && root != nullptr && Error::getErrorCount() == 0)
     {
         root->print(0, 0, -1, true, options.isMFlag()); // PRINT WITH TYPE INFO THOUGH
         // print root with type info stuff
     }
 
-    std::cout << "Number of warnings: " << Error::getWarningCount() << std::endl;
-    std::cout << "Number of errors: " << Error::getErrorCount() << std::endl;
     if (Error::getErrorCount() == 0 && options.isMFlag())
     {
         std::cout << "Offset for end of global space: " << gOffset << std::endl;
     }
+    std::cout << "Number of warnings: " << Error::getWarningCount() << std::endl;
+    std::cout << "Number of errors: " << Error::getErrorCount() << std::endl;
+
     delete root;
     return EXIT_SUCCESS;
 }

@@ -1270,4 +1270,3 @@ int SemanticAnalyzer::calcFuncSize(ASTNode* node)
 
     return runSum;
 }
-
