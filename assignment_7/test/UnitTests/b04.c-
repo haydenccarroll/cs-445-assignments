@@ -1,0 +1,6 @@
+// C-F22
+main()
+{
+     output(50/13);
+     outnl();
+}

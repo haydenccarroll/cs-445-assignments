@@ -1,0 +1,7 @@
+// C-F22
+main(){
+    char yy:'a';
+    outputc(yy);
+    {
+    }
+}

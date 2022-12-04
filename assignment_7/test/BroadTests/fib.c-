@@ -1,0 +1,17 @@
+// C-S20
+// recursive fibonacci function
+int fib(int n)
+{
+        output(n);
+        outnl();
+        if n<3 then return 1;
+        else return fib(n-1) + fib(n-2);
+}
+
+main()
+{
+        output(fib(input()));
+        outnl();
+}
+
+        

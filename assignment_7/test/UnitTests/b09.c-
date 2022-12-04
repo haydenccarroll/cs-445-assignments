@@ -1,0 +1,6 @@
+// C-F22
+main()
+{
+     outputb(true  and  true);
+     outnl();
+}

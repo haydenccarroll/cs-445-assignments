@@ -1,0 +1,6 @@
+// C-F22
+main()
+{
+    bool ba:true, bb: true  and  not  false, bc: 5>4;
+    outputb(ba);
+}

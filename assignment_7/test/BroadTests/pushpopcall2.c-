@@ -1,0 +1,12 @@
+int dog(int x, y) {return x*y;}
+
+int g;
+main() {
+     output(dog(111, 222));
+     {
+        int x, y, z;
+        x=333; y=444; z=555;
+        output(dog(x, y));
+     }
+     output(dog(333+33, 444*44));
+}

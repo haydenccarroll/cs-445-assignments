@@ -1,0 +1,11 @@
+// C-F22
+int cat()
+{
+    return 93;
+}
+
+main()
+{
+    output(cat());
+    outnl();
+}

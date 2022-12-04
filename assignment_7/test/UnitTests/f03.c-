@@ -1,0 +1,12 @@
+// C-F22
+cat()
+{
+    output(42);
+    return;
+}
+
+main()
+{
+    cat();
+    output(43);
+}

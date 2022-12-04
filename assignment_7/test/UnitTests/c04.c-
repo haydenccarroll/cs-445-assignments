@@ -1,0 +1,11 @@
+// C-F22
+int x;
+int y;
+
+main()
+{
+    x = 73;
+    y = 211;
+    output(x+y);
+    outnl();
+}

@@ -1,9 +1,1 @@
 THE WRONG LIST:
-    
-    we arent printing static when we should.
-
-    we arent checking to see if a variable is static. 
-    
-    seems like some global variables are out of order. maybe string constants go first in memory?
-        or maybe stuff that has = or :, the right side should get processed first.
-        ex: a2a.diff

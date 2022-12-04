@@ -1,0 +1,7 @@
+// C-F22
+int ga:111;
+main(){
+    output(ga);
+    {
+    }
+}

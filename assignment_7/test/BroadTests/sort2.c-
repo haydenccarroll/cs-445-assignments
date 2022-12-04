@@ -1,0 +1,37 @@
+//   A program to perform selection sort of an array
+swap(int a[], i, j)
+{
+    int t;
+
+    t = a[i];
+    a[i] = a[j];
+    a[j] = t;
+}
+
+sort(int a[])
+{ 
+for i=0 to *a do {
+    int minloc;
+
+    minloc = i;
+    for j=i+1 to *a do if a[j]<a[minloc] then minloc = j;     
+    swap(a, i, minloc);
+    }
+}
+
+print(int x[])
+{
+for i=0 to *x do output(x[i]);
+outnl();
+}
+
+
+main ()
+{ int x[20];
+
+//  for i=0 to *x do x[i] = ?100;
+for i=0 to *x do x[i] = input();
+print(x);
+sort(x);
+print(x);
+}
