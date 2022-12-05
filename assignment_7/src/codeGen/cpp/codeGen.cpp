@@ -111,6 +111,7 @@ void CodeGen::generateIO()
 )""";
     // generate io stuff by using heckendorns code
     emitRawStr(comment);
+    emitNewLoc(38);
 }
 
 void CodeGen::traverseGenerate(ASTNode* node)

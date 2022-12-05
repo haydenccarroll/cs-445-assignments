@@ -70,6 +70,7 @@
         "variant": "cpp",
         "const.hpp": "c",
         "call.hpp": "c",
-        "node.hpp": "c"
+        "node.hpp": "c",
+        "codecvt": "cpp"
     }
 }
