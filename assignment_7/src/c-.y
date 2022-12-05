@@ -4,6 +4,7 @@
 #include "error/include.hpp"
 #include "symTable/include.hpp"
 #include "semantics/include.hpp"
+#include "codeGen/include.hpp"
 #include "types/include.hpp" // must be included before tab.h
 #include "ast/include.hpp" // must be included before tab.h
 #include "yyerror/include.hpp"
@@ -12,6 +13,7 @@
 #include <string>
 #include <stdexcept>
 #include <stdlib.h>
+#include <filesystem>
 
 #include "c-.tab.h"
 
@@ -1082,6 +1084,14 @@ int main(int argc, char** argv)
     }
     std::cout << "Number of warnings: " << Error::getWarningCount() << std::endl;
     std::cout << "Number of errors: " << Error::getErrorCount() << std::endl;
+
+
+    std::filesystem::path tmFilePath = options.getFileName();
+    tmFilePath = tmFilePath.replace_extension("tm");
+    tmFilePath = "../tmp/" + tmFilePath.filename().generic_string();
+    std::cout << "TM FILE PATH: " << tmFilePath << std::endl;
+    CodeGen codeGen(root, tmFilePath);
+    codeGen.generate();
 
     delete root;
     return EXIT_SUCCESS;

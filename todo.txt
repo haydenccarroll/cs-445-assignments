@@ -1,1 +1,4 @@
 THE WRONG LIST:
+
+loop through the tree (functions first)
+add comments + instructions along the way with heckendorns code
