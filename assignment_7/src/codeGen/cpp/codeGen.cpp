@@ -125,7 +125,9 @@ void CodeGen::genEndStuff()
     // init globals and statics here
     emitComment("END INIT GLOBALS AND STATICS");
     emitRM("LDA", 3, 1, 7, "Return address in ac");
-    emitRM("JMP", 7, -9, 7, "Jump to main"); // -9 isnt always constant. idk what it is.
+
+    int offsetFromMain = m_funcsToLocs.at("main") - emitWhereAmI() - 1;
+    emitRM("JMP", 7, offsetFromMain, 7, "Jump to main");
     emitRO("HALT", 0, 0, 0, "DONE!");
     emitComment("END INIT");
 }
@@ -146,6 +148,9 @@ void CodeGen::traverseGenerate(ASTNode* node)
         break;
     case NodeType::CompoundStmtNode:
         genCompoundStmtStart(cast<CompoundStmtNode*>(node));
+        break;
+    case NodeType::ReturnNode:
+        genReturn(cast<ReturnNode*>(node));
         break;
     }
 
@@ -173,6 +178,8 @@ void CodeGen::genFuncStart(FunDeclNode* node)
     {
         return;
     }
+
+    m_funcsToLocs[node->getName()] = emitWhereAmI();
 
     // boilerplate for every function beginning
     std::stringstream ss;
@@ -242,9 +249,14 @@ void CodeGen::genCompoundStmtEnd(CompoundStmtNode* node)
 
     emitComment("TOFF set: -2");
     emitComment("END COMPOUND");
+}
 
-    
-
+void CodeGen::genReturn(ReturnNode* node)
+{
+    emitComment("RETURN");
+    emitRM("LD", 3, -1, 1, "Load return address");
+    emitRM("LD", 1, 0, 1, "Adjust fp");
+    emitRM("JMP", 7, 0, 3, "Return"); // -9 isnt always constant. idk what it is.
 
 }
 

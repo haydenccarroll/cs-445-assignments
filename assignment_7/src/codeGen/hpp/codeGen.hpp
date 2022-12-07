@@ -4,6 +4,8 @@
 #include "emitCode.hpp"
 
 #include <string>
+#include <map>
+
 class CodeGen
 {
 public:
@@ -23,10 +25,12 @@ public:
 
     void genFor(ForNode* node);
     void genID(IdNode* node);
+    void genReturn(ReturnNode* node);
 
     void genEndStuff();
 
 private:
     std::string m_fileName;
     ASTNode* m_tree;
+    std::map<std::string,int> m_funcsToLocs;
 };
