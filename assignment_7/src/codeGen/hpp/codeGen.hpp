@@ -13,11 +13,18 @@ public:
     void generateIO();
     void traverseGenerate(ASTNode* node);
 
-    void genFunc(FunDeclNode* node);
+    void genFuncStart(FunDeclNode* node);
+    void genFuncEnd(FunDeclNode* node);
+
     void genVarDecl(VarDeclNode* node);
-    void genCompoundStmt(CompoundStmtNode* node);
+
+    void genCompoundStmtStart(CompoundStmtNode* node);
+    void genCompoundStmtEnd(CompoundStmtNode* node);
+
     void genFor(ForNode* node);
     void genID(IdNode* node);
+
+    void genEndStuff();
 
 private:
     std::string m_fileName;

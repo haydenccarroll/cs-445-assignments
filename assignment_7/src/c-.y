@@ -1088,8 +1088,7 @@ int main(int argc, char** argv)
 
     std::filesystem::path tmFilePath = options.getFileName();
     tmFilePath = tmFilePath.replace_extension("tm");
-    tmFilePath = "../tmp/" + tmFilePath.filename().generic_string();
-    std::cout << "TM FILE PATH: " << tmFilePath << std::endl;
+    tmFilePath = tmFilePath.filename().generic_string();
     CodeGen codeGen(root, tmFilePath);
     codeGen.generate();
 

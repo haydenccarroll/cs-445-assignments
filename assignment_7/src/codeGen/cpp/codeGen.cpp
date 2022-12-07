@@ -36,6 +36,8 @@ void CodeGen::generate()
 
     traverseGenerate(m_tree);
 
+    genEndStuff();
+
 
 
 }
@@ -111,7 +113,21 @@ void CodeGen::generateIO()
 )""";
     // generate io stuff by using heckendorns code
     emitRawStr(comment);
-    emitNewLoc(38);
+    emitNewLoc(39);
+}
+
+void CodeGen::genEndStuff()
+{
+    emitComment("INIT");
+    emitRM("LDA", 1, 0, 0, "set first frame at end of globals"); // should use goffset
+    emitRM("ST", 1, 0, 1, "store old fp (point to self)");
+    emitComment("INIT GLOBALS AND STATICS");
+    // init globals and statics here
+    emitComment("END INIT GLOBALS AND STATICS");
+    emitRM("LDA", 3, 1, 7, "Return address in ac");
+    emitRM("JMP", 7, -9, 7, "Jump to main"); // -9 isnt always constant. idk what it is.
+    emitRO("HALT", 0, 0, 0, "DONE!");
+    emitComment("END INIT");
 }
 
 void CodeGen::traverseGenerate(ASTNode* node)
@@ -126,9 +142,10 @@ void CodeGen::traverseGenerate(ASTNode* node)
     switch(node->getNodeType())
     {
     case NodeType::FunDeclNode:
-        genFunc(cast<FunDeclNode*>(node));
+        genFuncStart(cast<FunDeclNode*>(node));
         break;
-    default:
+    case NodeType::CompoundStmtNode:
+        genCompoundStmtStart(cast<CompoundStmtNode*>(node));
         break;
     }
 
@@ -140,27 +157,60 @@ void CodeGen::traverseGenerate(ASTNode* node)
     switch (node->getNodeType())
     {
     case NodeType::FunDeclNode:
-        ss << "END FUNCTION " << cast<FunDeclNode*>(node)->getName();
-        emitComment(ss.str());
+        genFuncEnd(cast<FunDeclNode*>(node));
+        break;
+    case NodeType::CompoundStmtNode:
+        genCompoundStmtEnd(cast<CompoundStmtNode*>(node));
         break;
     }
 
     traverseGenerate(node->getSibling(0));
 }
 
-void CodeGen::genFunc(FunDeclNode* node)
+void CodeGen::genFuncStart(FunDeclNode* node)
 {
     if (node == nullptr)
     {
         return;
     }
+
+    // boilerplate for every function beginning
     std::stringstream ss;
     emitComment("");
     emitComment("** ** ** ** ** ** ** ** ** ** ** **");
     ss << "FUNCTION " << node->getName();
     emitComment(ss.str());
-    ss.clear();
+    ss.str("");
+    ss << "TOFF set: " << -2;
+    emitComment(ss.str());
+    ss.str("");
+    emitRM("ST", 3, -1, 1, "Store return address");
+}
 
+void CodeGen::genFuncEnd(FunDeclNode* node)
+{
+    if (node == nullptr)
+    {
+        return;
+    }
+
+    // boilerplate for every function end
+    emitComment("Add standard closing in case there is no return statement");
+    emitRM("LDC", 2, 0, 6, "Set return value to 0");
+    emitRM("LD", 3, -1, 1, "Load return address");
+    emitRM("LD", 1, 0, 1, "Adjust fp");
+    emitRM("JMP", 7, 0, 3, "Return");
+    std::stringstream ss;
+    ss << "END FUNCTION " << node->getName();
+    emitComment(ss.str());
+
+    if (node->getName() == "main")
+    {
+        int currLoc = emitWhereAmI();
+        emitNewLoc(0);
+        emitRM("JMP", 7, currLoc - 1, 7, "Jump to init [backpatch]");
+        emitNewLoc(currLoc);
+    }
 }
 
 void CodeGen::genVarDecl(VarDeclNode* node)
@@ -172,8 +222,29 @@ void CodeGen::genID(IdNode* node)
 
 }
 
-void CodeGen::genCompoundStmt(CompoundStmtNode* node)
+void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
 {
+    if (node == nullptr)
+    {
+        return;
+    }
+    emitComment("COMPOUND");
+    emitComment("TOFF set: -2");
+    emitComment("Compound Body");
+}
+
+void CodeGen::genCompoundStmtEnd(CompoundStmtNode* node)
+{
+    if (node == nullptr)
+    {
+        return;
+    }
+
+    emitComment("TOFF set: -2");
+    emitComment("END COMPOUND");
+
+    
+
 
 }
 
