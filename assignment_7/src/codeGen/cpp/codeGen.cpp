@@ -397,8 +397,10 @@ void CodeGen::genUnary(UnaryOpNode* node)
         genChsign(node);
         break;
     case UnaryOpType::Dec:
+        genDec(node);
         break;
     case UnaryOpType::Inc:
+        genInc(node);
         break;
     case UnaryOpType::Not:
         genNot(node);
@@ -409,6 +411,102 @@ void CodeGen::genUnary(UnaryOpNode* node)
     case UnaryOpType::SizeOf:
         break;
     }
+}
+
+void CodeGen::genInc(UnaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != UnaryOpType::Inc)
+    {
+        return;
+    }
+
+    bool isGlobal = false;
+    bool isArray = false;
+    int thirdParm;
+    int secondParm = 0;
+    auto idNode = cast<IdNode*>(node->getChild(0));
+    switch (idNode->getMemRefType())
+    {
+    case MemReferenceType::Global:
+    case MemReferenceType::Static:
+        isGlobal = true;
+    }
+    if (isGlobal)
+    {
+        thirdParm= 0;
+    }
+    else if (idNode->getExpType().isArray())
+    {
+        thirdParm = 5;
+    }
+    else
+    {
+        thirdParm = 1;
+        secondParm = -2;
+    }
+
+    idNode->setHasBeenCodegenned(true);
+
+    std::stringstream ss;
+    ss << "load lhs variable " << idNode->getIdName();
+    emitRM("LD", 3, secondParm, thirdParm, ss.str(), false);
+    ss.str("");
+
+    ss << "increment value of " << idNode->getIdName();
+    emitRM("LDA", 3, 1, 3, ss.str(), false);
+    ss.str("");
+
+    ss << "Store variable " << idNode->getIdName();
+    emitRM("ST", 3, secondParm, thirdParm, ss.str(), false);
+    ss.str("");
+}
+
+void CodeGen::genDec(UnaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != UnaryOpType::Dec)
+    {
+        return;
+    }
+
+    bool isGlobal = false;
+    bool isArray = false;
+    int thirdParm;
+    int secondParm = 0;
+    auto idNode = cast<IdNode*>(node->getChild(0));
+    switch (idNode->getMemRefType())
+    {
+    case MemReferenceType::Global:
+    case MemReferenceType::Static:
+        isGlobal = true;
+    }
+    if (isGlobal)
+    {
+        thirdParm= 0;
+    }
+    else if (idNode->getExpType().isArray())
+    {
+        thirdParm = 5;
+    }
+    else
+    {
+        thirdParm = 1;
+        secondParm = -2;
+    }
+
+    idNode->setHasBeenCodegenned(true);
+
+    std::stringstream ss;
+    ss << "load lhs variable " << idNode->getIdName();
+    emitRM("LD", 3, secondParm, thirdParm, ss.str(), false);
+    ss.str("");
+
+    ss << "decrement value of " << idNode->getIdName();
+    emitRM("LDA", 3, -1, 3, ss.str(), false);
+    ss.str("");
+
+    ss << "Store variable " << idNode->getIdName();
+    emitRM("ST", 3, secondParm, thirdParm, ss.str(), false);
+    ss.str("");
 }
 
 void CodeGen::genNot(UnaryOpNode* node)

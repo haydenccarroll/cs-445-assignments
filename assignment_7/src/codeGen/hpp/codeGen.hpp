@@ -51,6 +51,8 @@ public:
     void genTNEQ(BinaryOpNode* node);
 
     void genUnary(UnaryOpNode* node);
+    void genInc(UnaryOpNode* node);
+    void genDec(UnaryOpNode* node);
     void genNot(UnaryOpNode* node);
     void genRand(UnaryOpNode* node);
     void genChsign(UnaryOpNode* node);
