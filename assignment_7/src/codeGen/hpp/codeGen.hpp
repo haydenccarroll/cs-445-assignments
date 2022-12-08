@@ -40,6 +40,16 @@ public:
     void genSub(BinaryOpNode* node);
     void genMul(BinaryOpNode* node);
     void genDiv(BinaryOpNode* node);
+    void genMod(BinaryOpNode* node);
+    void genTEQ(BinaryOpNode* node);
+    void genTGT(BinaryOpNode* node);
+    void genTLT(BinaryOpNode* node);
+    void genTNEQ(BinaryOpNode* node);
+
+    void genUnary(UnaryOpNode* node);
+    void genNot(UnaryOpNode* node);
+    void genRand(UnaryOpNode* node);
+
 
 
     void genEndStuff();

@@ -174,6 +174,9 @@ void CodeGen::traverseGenerate(ASTNode* node)
     case NodeType::BinaryOpNode:
         genBinary(cast<BinaryOpNode*>(node));
         break;
+    case NodeType::UnaryOpNode:
+        genUnary(cast<UnaryOpNode*>(node));
+        break;
     case NodeType::IdNode:
         genID(cast<IdNode*>(node));
         break;
@@ -378,6 +381,57 @@ void CodeGen::genVarDecl(VarDeclNode* node)
     // dont do anything, let other functions handle this.
 }
 
+void CodeGen::genUnary(UnaryOpNode* node)
+{
+    if (node == nullptr)
+    {
+        return;
+    }
+
+    switch (node->getOperatorType())
+    {
+    case UnaryOpType::Chsign:
+        break;
+    case UnaryOpType::Dec:
+        break;
+    case UnaryOpType::Inc:
+        break;
+    case UnaryOpType::Not:
+        genNot(node);
+        break;
+    case UnaryOpType::Random:
+        genRand(node);
+        break;
+    case UnaryOpType::SizeOf:
+        break;
+    }
+}
+
+void CodeGen::genNot(UnaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != UnaryOpType::Not)
+    {
+        return;
+    }
+
+    traverseGenerate(node->getChild(0)); // generate RHS
+
+    emitRM("LDC", 4, 1, 6, "Load 1");
+    emitRO("XOR", 3, 3, 4, "Op XOR to get logical not");
+}
+
+void CodeGen::genRand(UnaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != UnaryOpType::Random)
+    {
+        return;
+    }
+
+    traverseGenerate(node->getChild(0)); // generate RHS
+
+    emitRO("RND", 3, 3, 6, "Op ?");
+}
+
 void CodeGen::genBinary(BinaryOpNode* node)
 {
     if (node == nullptr)
@@ -407,6 +461,21 @@ void CodeGen::genBinary(BinaryOpNode* node)
         break;
     case BinaryOpType::Div:
         genDiv(node);
+        break;
+    case BinaryOpType::Mod:
+        genMod(node);
+        break;
+    case BinaryOpType::EQ:
+        genTEQ(node);
+        break;
+    case BinaryOpType::GT:
+        genTGT(node);
+        break;
+    case BinaryOpType::LT:
+        genTLT(node);
+        break;
+    case BinaryOpType::NEQ:
+        genTNEQ(node);
         break;
     }
 }
@@ -492,6 +561,61 @@ void CodeGen::genAnd(BinaryOpNode* node)
 
     genGenericBinOp(node);
     emitRO("AND", 3, 4, 3, "Op AND");
+}
+
+void CodeGen::genTEQ(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::EQ)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("TEQ", 3, 4, 3, "Op ==");
+}
+
+void CodeGen::genTNEQ(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::NEQ)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("TNEQ", 3, 4, 3, "Op !=");
+}
+
+void CodeGen::genTGT(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::GT)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("TGT", 3, 4, 3, "Op >");
+}
+
+void CodeGen::genTLT(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::LT)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("TLT", 3, 4, 3, "Op <");
+}
+
+void CodeGen::genMod(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::Mod)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("MOD", 3, 4, 3, "Op %");
 }
 
 void CodeGen::genMul(BinaryOpNode* node)
