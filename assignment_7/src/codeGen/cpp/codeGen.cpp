@@ -288,6 +288,7 @@ void CodeGen::genCall(CallNode* node)
         return;
     }
     std::stringstream ss;
+    int oldToff = m_toff;
     
     ss << "CALL " << node->getFunName();
     emitComment(ss.str());
@@ -321,7 +322,7 @@ void CodeGen::genCall(CallNode* node)
     emitComment(ss.str());
     ss.str("");
 
-    emitRM("LDA", 1, m_toff - 3, 1, "Ghost frame becomes new active frame");
+    emitRM("LDA", 1, oldToff, 1, "Ghost frame becomes new active frame");
     emitRM("LDA", 3, 1, 7, "Return address in ac");
 
     ss << "CALL " << node->getFunName();
