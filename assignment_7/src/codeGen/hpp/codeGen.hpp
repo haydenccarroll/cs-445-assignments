@@ -27,9 +27,12 @@ public:
     void genVarDecl(VarDeclNode* node);
 
     void genConst(ConstNode* node);
-    
     void genCall(CallNode* node);
     void loadParam(ExpNode* node);
+
+    void genBinary(BinaryOpNode* node);
+    void genAss(BinaryOpNode* node);
+
 
     void genEndStuff();
 

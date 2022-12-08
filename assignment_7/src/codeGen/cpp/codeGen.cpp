@@ -171,6 +171,12 @@ void CodeGen::traverseGenerate(ASTNode* node)
     case NodeType::ConstNode:
         genConst(cast<ConstNode*>(node));
         break;
+    case NodeType::BinaryOpNode:
+        genBinary(cast<BinaryOpNode*>(node));
+        break;
+    case NodeType::IdNode:
+        genID(cast<IdNode*>(node));
+        break;
     }
 
     for (unsigned int i=0; i < node->getNumChildren(); i++)
@@ -239,7 +245,26 @@ void CodeGen::genFuncEnd(FunDeclNode* node)
 
 void CodeGen::genID(IdNode* node)
 {
+    if (node == nullptr)
+    {
+        return;
+    }
 
+    bool isLocal = true;
+    switch (node->getMemRefType())
+    {
+    case MemReferenceType::Global:
+    case MemReferenceType::Static:
+        isLocal = false;
+    }
+
+    if (!node->getExpType().isArray())
+    {
+        std::stringstream ss;
+        ss << "Load variable " << node->getIdName();
+        emitRM("LD", 3, node->getMemLoc(), (int) isLocal, ss.str(), false);
+        ss.str("");
+    }
 }
 
 void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
@@ -353,6 +378,65 @@ void CodeGen::genVarDecl(VarDeclNode* node)
     // dont do anything, let other functions handle this.
 }
 
+void CodeGen::genBinary(BinaryOpNode* node)
+{
+    if (node == nullptr)
+    {
+        return;
+    }
+
+    switch (node->getOperatorType())
+    {
+    case BinaryOpType::Ass:
+        genAss(node);
+        break;
+    }
+}
+
+void CodeGen::genAss(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::Ass)
+    {
+        return;
+    }
+
+    traverseGenerate(node->getChild(1)); // calculate RHS first.
+
+    auto idNode = tryCast<IdNode*>(node->getChild(0));
+    if (idNode)
+    {
+        // 0 if global/static
+        // 1 if lcocal
+        // 5 if array?
+        bool isGlobal = false;
+        bool isArray = false;
+        switch (idNode->getMemRefType())
+        {
+        case MemReferenceType::Global:
+        case MemReferenceType::Static:
+            isGlobal = true;
+        }
+
+        int thirdSTParam;
+        if (isGlobal)
+        {
+            thirdSTParam = 0;
+        }
+        else if (idNode->getExpType().isArray())
+        {
+            thirdSTParam = 5;
+        }
+        else
+        {
+            thirdSTParam = 1;
+        }
+
+        std::stringstream ss;
+        idNode->setHasBeenCodegenned(true); // dont process LHS any more
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+    }
+}
 // void CodeGen::loadParam(ExpNode* node)
 // {
 //     if (node == nullptr)
