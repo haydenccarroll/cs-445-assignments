@@ -19,6 +19,7 @@ public:
     ASTNode* getParent() { return m_parent; }
     ASTNode* getAncestor(NodeType type);
     bool getHasBeenAnalyzed() { return m_hasBeenAnalyzed; }
+    bool getHasBeenCodeGenned() { return m_isCodegenned; }
     unsigned int getNumChildren() { return m_children.size(); }
     unsigned int getNumSiblings();
     int getLineNum() { return m_lineNum; };
@@ -30,6 +31,7 @@ public:
     void addChild(ASTNode* child);
     void addSibling(ASTNode* sibling);
     void setHasBeenAnalyzed(bool isAnalyzed) { m_hasBeenAnalyzed = isAnalyzed; }
+    void setHasBeenCodegenned(bool isCodeGenned) { m_isCodegenned = isCodeGenned; }
     void setMemSize(int memSize);
     void setMemLoc(int memLoc);
     void setMemRefType(MemReferenceType memRefType) { m_memRefType = memRefType; }
@@ -57,6 +59,7 @@ protected:
     ASTNode* m_parent;
 
     bool m_hasBeenAnalyzed;
+    bool m_isCodegenned;
     int m_lineNum;
     int m_memSize;
     int m_memLoc;

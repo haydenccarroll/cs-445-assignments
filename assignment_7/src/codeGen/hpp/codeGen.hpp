@@ -27,10 +27,22 @@ public:
     void genID(IdNode* node);
     void genReturn(ReturnNode* node);
 
+    void genConst(ConstNode* node);
+    
+    void genCall(CallNode* node);
+    void loadParam(ExpNode* node);
+
     void genEndStuff();
+
+    void toffSet(int toff);
+    void toffDec();
+    void toffInc();
+
+    bool isNodeTopMostExp(ASTNode* node);
 
 private:
     std::string m_fileName;
     ASTNode* m_tree;
     std::map<std::string,int> m_funcsToLocs;
+    int m_toff = 0;
 };

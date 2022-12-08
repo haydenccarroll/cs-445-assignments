@@ -2,6 +2,7 @@
 #define EMIT_CODE_H__
 
 #include <iostream>
+#include <string>
 
 //
 //  REGISTER DEFINES for optional use in calling the 
@@ -39,8 +40,9 @@ void emitGoto(int d, long long int s, char *c, char *cc);
 void emitGotoAbs(int a, char *c);
 void emitGotoAbs(int a, char *c, char *cc);
 
-void emitRM(char *op, long long int r, long long int d, long long int s, char *c);
-void emitRM(char *op, long long int r, long long int d, long long int s, char *c, char *cc);
+void emitRM(char *op, long long int r, long long int d, long long int s, const char *c);
+void emitRM(char *op, long long int r, long long int d, long long int s, std::string, bool spaceAfter=true);
+void emitRM(char *op, long long int r, long long int d, long long int s, const char *c, char *cc);
 void emitRMAbs(char *op, long long int r, long long int a, char *c);
 void emitRMAbs(char *op, long long int r, long long int a, char *c, char *cc);
 

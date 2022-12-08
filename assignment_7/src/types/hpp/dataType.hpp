@@ -29,6 +29,11 @@ public:
 
         return m_nextType->getBasicType();
     }
+
+    DataTypeEnum getEnumType()
+    {
+        return getBasicType().m_enumType;
+    }
     bool operator==(const DataType &right) const;
     bool operator!=(const DataType &right) const;
 

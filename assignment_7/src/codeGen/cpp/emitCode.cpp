@@ -85,14 +85,28 @@ void emitRO(char *op,long long int r,long long int s,long long int t, char *c)
 // s = the base register
 // c = a comment
 // 
-void emitRM(char *op, long long int r, long long int d, long long int s, char *c, char *cc)
+void emitRM(char *op, long long int r, long long int d, long long int s, const char *c, char *cc)
 {
     fprintf(code, "%3d:  %5s  %lld,%lld(%lld)\t%s %s\n", emitLoc, op, r, d, s, c, cc);
     fflush(code);
     emitLoc++;
 }
 
-void emitRM(char *op,long long int r,long long int d,long long int s, char *c)
+void emitRM(char *op, long long int r, long long int d, long long int s, std::string string, bool spaceAfter)
+{
+    if (spaceAfter)
+    {
+        emitRM(op, r, d, s, string.c_str());
+    }
+    else
+    {
+        fprintf(code, "%3d:  %5s  %lld,%lld(%lld)\t%s\n", emitLoc, op, r, d, s, string.c_str());
+        fflush(code);
+        emitLoc++;
+    }
+}
+
+void emitRM(char *op,long long int r,long long int d,long long int s, const char *c)
 {
     emitRM(op, r, d, s, c, (char *)"");
 }

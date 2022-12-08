@@ -2,3 +2,6 @@ THE WRONG LIST:
 
 loop through the tree (functions first)
 add comments + instructions along the way with heckendorns code
+
+
+for arguments in calls, simply just process them

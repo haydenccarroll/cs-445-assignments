@@ -114,6 +114,14 @@ void CodeGen::generateIO()
     // generate io stuff by using heckendorns code
     emitRawStr(comment);
     emitNewLoc(39);
+
+    m_funcsToLocs["input"] = 1;
+    m_funcsToLocs["output"] = 6;
+    m_funcsToLocs["inputb"] = 12;
+    m_funcsToLocs["outputb"] = 17;
+    m_funcsToLocs["inputc"] = 23;
+    m_funcsToLocs["outputc"] = 28;
+    m_funcsToLocs["outnl"] = 34;
 }
 
 void CodeGen::genEndStuff()
@@ -134,11 +142,16 @@ void CodeGen::genEndStuff()
 
 void CodeGen::traverseGenerate(ASTNode* node)
 {
-    if (node == nullptr)
+    if (node == nullptr || node->getHasBeenCodeGenned())
     {
         return;
     }
-
+    
+    node->setHasBeenCodegenned(true);
+    if (isNodeTopMostExp(node))
+    {
+        emitComment("EXPRESSION");
+    }
     std::stringstream ss;
 
     switch(node->getNodeType())
@@ -151,6 +164,12 @@ void CodeGen::traverseGenerate(ASTNode* node)
         break;
     case NodeType::ReturnNode:
         genReturn(cast<ReturnNode*>(node));
+        break;
+    case NodeType::CallNode:
+        genCall(cast<CallNode*>(node));
+        break;
+    case NodeType::ConstNode:
+        genConst(cast<ConstNode*>(node));
         break;
     }
 
@@ -188,9 +207,7 @@ void CodeGen::genFuncStart(FunDeclNode* node)
     ss << "FUNCTION " << node->getName();
     emitComment(ss.str());
     ss.str("");
-    ss << "TOFF set: " << -2;
-    emitComment(ss.str());
-    ss.str("");
+    toffSet(-2);
     emitRM("ST", 3, -1, 1, "Store return address");
 }
 
@@ -236,7 +253,7 @@ void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
         return;
     }
     emitComment("COMPOUND");
-    emitComment("TOFF set: -2");
+    toffSet(-2);
     emitComment("Compound Body");
 }
 
@@ -247,17 +264,163 @@ void CodeGen::genCompoundStmtEnd(CompoundStmtNode* node)
         return;
     }
 
-    emitComment("TOFF set: -2");
+    toffSet(-2);
     emitComment("END COMPOUND");
 }
 
 void CodeGen::genReturn(ReturnNode* node)
 {
+    if (node == nullptr)
+    {
+        return;
+    }
+
     emitComment("RETURN");
     emitRM("LD", 3, -1, 1, "Load return address");
     emitRM("LD", 1, 0, 1, "Adjust fp");
     emitRM("JMP", 7, 0, 3, "Return"); // -9 isnt always constant. idk what it is.
+}
 
+void CodeGen::genCall(CallNode* node)
+{
+    if (node == nullptr)
+    {
+        return;
+    }
+    std::stringstream ss;
+    
+    ss << "CALL " << node->getFunName();
+    emitComment(ss.str());
+    ss.str("");
+
+    ss << "Store fp in ghost frame for " << node->getFunName();
+    emitRM("ST", 1, -2, 1, ss.str(), false);
+    ss.str("");
+
+    toffDec();
+    toffDec();
+
+
+    for (int i=0; i < node->getNumChildren(); i++)
+    {
+        ss << "Param " << i+1;
+        emitComment(ss.str());
+        ss.str("");
+
+        // loadParam(cast<ExpNode*>(node->getChild(i)));
+
+        traverseGenerate(node->getChild(i));
+
+        //TODO: PROCESS PARAMETER HERE
+
+        emitRM("ST", 3, m_toff, 1, "Push parameter");
+        toffDec();
+    }
+
+    ss << "Param end " << node->getFunName();
+    emitComment(ss.str());
+    ss.str("");
+
+    emitRM("LDA", 1, m_toff - 3, 1, "Ghost frame becomes new active frame");
+    emitRM("LDA", 3, 1, 7, "Return address in ac");
+
+    ss << "CALL " << node->getFunName();
+    int offsetFromFunc = m_funcsToLocs.at(node->getFunName()) - emitWhereAmI() - 1;
+    emitRM("JMP", 7, offsetFromFunc, 7, ss.str(), false);
+    ss.str("");
+
+    emitRM("LDA", 3, 0, 2, "Save the result in ac");
+
+    ss << "Call end " << node->getFunName();
+    emitComment(ss.str());
+    ss.str("");
+
+    toffSet(-2);
+}
+
+// void CodeGen::loadParam(ExpNode* node)
+// {
+//     if (node == nullptr)
+//     {
+//         return;
+//     }
+
+//     bool isVar = (node->getNodeType() == NodeType::IdNode);
+//     bool isArr = false;
+//     IdNode* idNode = tryCast<IdNode*>(node);
+//     if (node->getNodeType() == NodeType::BinaryOpNode)
+//     {
+//         auto binNode = cast<BinaryOpNode*>(node);
+//         switch (binNode->getOperatorType())
+//         {
+//         case BinaryOpType::MulAss:
+//         case BinaryOpType::DivAss:
+//         case BinaryOpType::SubAss:
+//         case BinaryOpType::AddAss:
+//         case BinaryOpType::Ass:
+//             isVar = true;
+//             idNode = cast<IdNode*>(binNode->getChild(0));
+//             break;
+//         case BinaryOpType::Index:
+//             isArr = true;
+//             break;
+//         }
+//     }
+
+//     if (isVar)
+//     {
+
+//         bool isLocal = true;
+
+//         switch (idNode->getMemRefType())
+//         {
+//         case MemReferenceType::Global:
+//         case MemReferenceType::Static:
+//             isLocal = false;
+//             break;
+//         }
+
+//         std::stringstream ss;
+//         ss << "Load variable " << idNode->getIdName();
+//         emitRM("LD", 3, idNode->getMemLoc(), isLocal, ss.str());
+//         ss.str("");
+//     }
+//     else if (isArr)
+//     {
+//         // do stuff if its an array
+//     }
+//     else
+//     {
+//         int value = 0;
+//         switch (node->getExpType().getEnumType())
+//         {
+//         case DataTypeEnum::Bool:
+//             emitRM("LD", 3, value, 6, "Load Boolean constant");
+//             break;
+//         case DataTypeEnum::Char:
+//             emitRM("LD", 3, value, 6, "Load char constant");
+//             break;
+//         case DataTypeEnum::Int:
+//             emitRM("LD", 3, value, 6, "Load integer constant");
+//             break;
+//         }
+//     }
+// }
+
+void CodeGen::genConst(ConstNode* node)
+{
+    switch (node->getExpType().getEnumType())
+    {
+    case DataTypeEnum::Bool:
+        emitRM("LDC", 3, int(node->getBoolVal()), 6, "Load Boolean constant");
+        break;
+    case DataTypeEnum::Char:
+        emitRM("LDC", 3, int(node->getCharVal()), 6, "Load char constant");
+        break;
+    case DataTypeEnum::Int:
+        emitRM("LDC", 3, int(node->getIntVal()), 6, "Load integer constant");
+        break;
+    }
 }
 
 void CodeGen::genFor(ForNode* node)
@@ -265,3 +428,45 @@ void CodeGen::genFor(ForNode* node)
 
 }
 
+void CodeGen::toffSet(int toff)
+{
+    m_toff = toff;
+    std::stringstream ss;
+    ss << "TOFF set: " << m_toff;
+    emitComment(ss.str());
+}
+
+void CodeGen::toffDec()
+{
+    m_toff--;
+    std::stringstream ss;
+    ss << "TOFF dec: " << m_toff;
+    emitComment(ss.str());
+}
+
+void CodeGen::toffInc()
+{
+    m_toff++;
+    std::stringstream ss;
+    ss << "TOFF inc: " << m_toff;
+    emitComment(ss.str());
+}
+
+bool CodeGen::isNodeTopMostExp(ASTNode* node)
+{
+    auto expNode = tryCast<ExpNode*>(node);
+    if (expNode == nullptr)
+    {
+        return false;
+    }
+
+    while (node->getParent() != nullptr)
+    {
+        if (tryCast<ExpNode*>(node->getParent()) != nullptr)
+        {
+            return false;
+        }
+        node = node->getParent();
+    }
+    return true;
+}
