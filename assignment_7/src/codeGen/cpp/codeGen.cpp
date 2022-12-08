@@ -207,7 +207,7 @@ void CodeGen::genFuncStart(FunDeclNode* node)
     ss << "FUNCTION " << node->getName();
     emitComment(ss.str());
     ss.str("");
-    toffSet(-2);
+    toffPush(-2);
     emitRM("ST", 3, -1, 1, "Store return address");
 }
 
@@ -237,10 +237,6 @@ void CodeGen::genFuncEnd(FunDeclNode* node)
     }
 }
 
-void CodeGen::genVarDecl(VarDeclNode* node)
-{
-}
-
 void CodeGen::genID(IdNode* node)
 {
 
@@ -253,7 +249,15 @@ void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
         return;
     }
     emitComment("COMPOUND");
-    toffSet(-2);
+    
+    auto child = tryCast<VarDeclNode*>(node->getChild(0));
+    int size = 0;
+    while (child != nullptr)
+    {
+        size += child->getMemSize();
+        child = tryCast<VarDeclNode*>(child->getSibling(0));
+    }
+    toffPush(m_toffs.back() - size);
     emitComment("Compound Body");
 }
 
@@ -264,7 +268,7 @@ void CodeGen::genCompoundStmtEnd(CompoundStmtNode* node)
         return;
     }
 
-    toffSet(-2);
+    toffPop();
     emitComment("END COMPOUND");
 }
 
@@ -288,14 +292,14 @@ void CodeGen::genCall(CallNode* node)
         return;
     }
     std::stringstream ss;
-    int oldToff = m_toff;
-    
+    int oldToff = m_toffs.back(); // needed because print order is messed up
+    toffPush(m_toffs.back(), false);
     ss << "CALL " << node->getFunName();
     emitComment(ss.str());
     ss.str("");
 
     ss << "Store fp in ghost frame for " << node->getFunName();
-    emitRM("ST", 1, -2, 1, ss.str(), false);
+    emitRM("ST", 1, m_toffs.back(), 1, ss.str(), false);
     ss.str("");
 
     toffDec();
@@ -304,17 +308,17 @@ void CodeGen::genCall(CallNode* node)
 
     for (int i=0; i < node->getNumChildren(); i++)
     {
+        if (node->getChild(i) == nullptr) // skip null childs
+        {
+            continue;
+        }
         ss << "Param " << i+1;
         emitComment(ss.str());
         ss.str("");
 
-        // loadParam(cast<ExpNode*>(node->getChild(i)));
-
         traverseGenerate(node->getChild(i));
 
-        //TODO: PROCESS PARAMETER HERE
-
-        emitRM("ST", 3, m_toff, 1, "Push parameter");
+        emitRM("ST", 3, m_toffs.back(), 1, "Push parameter");
         toffDec();
     }
 
@@ -336,7 +340,17 @@ void CodeGen::genCall(CallNode* node)
     emitComment(ss.str());
     ss.str("");
 
-    toffSet(-2);
+    toffPop();
+}
+
+void CodeGen::genVarDecl(VarDeclNode* node)
+{
+    if (node == nullptr)
+    {
+        return;
+    }
+
+    // dont do anything, let other functions handle this.
 }
 
 // void CodeGen::loadParam(ExpNode* node)
@@ -429,28 +443,48 @@ void CodeGen::genFor(ForNode* node)
 
 }
 
-void CodeGen::toffSet(int toff)
+void CodeGen::toffPush(int toff, bool print)
 {
-    m_toff = toff;
-    std::stringstream ss;
-    ss << "TOFF set: " << m_toff;
-    emitComment(ss.str());
+    m_toffs.push_back(toff);
+    if (print)
+    {
+        std::stringstream ss;
+        ss << "TOFF set: " << toff;
+        emitComment(ss.str());
+    }
 }
 
-void CodeGen::toffDec()
+void CodeGen::toffPop(bool print)
 {
-    m_toff--;
-    std::stringstream ss;
-    ss << "TOFF dec: " << m_toff;
-    emitComment(ss.str());
+    m_toffs.pop_back();
+    if (print)
+    {
+        std::stringstream ss;
+        ss << "TOFF set: " << m_toffs.back();
+        emitComment(ss.str());
+    }
 }
 
-void CodeGen::toffInc()
+void CodeGen::toffDec(bool print)
 {
-    m_toff++;
-    std::stringstream ss;
-    ss << "TOFF inc: " << m_toff;
-    emitComment(ss.str());
+    m_toffs.back()--;
+    if (print)
+    {
+        std::stringstream ss;
+        ss << "TOFF dec: " << m_toffs.back();
+        emitComment(ss.str());
+    }
+}
+
+void CodeGen::toffInc(bool print)
+{
+    m_toffs.back()++;
+    if (print)
+    {
+        std::stringstream ss;
+        ss << "TOFF inc: " << m_toffs.back();
+        emitComment(ss.str());
+    }
 }
 
 bool CodeGen::isNodeTopMostExp(ASTNode* node)
