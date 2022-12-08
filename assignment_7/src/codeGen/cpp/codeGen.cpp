@@ -282,7 +282,10 @@ void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
     int size = 0;
     while (child != nullptr)
     {
-        size += child->getMemSize();
+        if (child->getMemRefType() != MemReferenceType::Static)
+        {
+            size += child->getMemSize();
+        }
         child = tryCast<VarDeclNode*>(child->getSibling(0));
     }
     toffPush(m_toffs.back() - size);
