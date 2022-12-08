@@ -1,4 +1,1 @@
 THE WRONG LIST:
-
-arrays when being indexed (never implemented [ binop)
-arrays when being indexed on the LHS of an equal string

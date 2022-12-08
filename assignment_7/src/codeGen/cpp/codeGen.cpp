@@ -124,13 +124,49 @@ void CodeGen::generateIO()
     m_funcsToLocs["outnl"] = 34;
 }
 
+void CodeGen::genGlobalStatics(ASTNode* node)
+{
+    if (node == nullptr)
+    {
+        return;
+    }
+
+    bool isGlobal = false;
+    if ((node->getMemRefType() == MemReferenceType::Global ||
+        node->getMemRefType() == MemReferenceType::Static))
+    {
+        isGlobal = true;
+    }
+
+    if (node->getNodeType() == NodeType::VarDeclNode && isGlobal)
+    {
+        auto decl = cast<VarDeclNode*>(node);
+        if (decl->getDataType().isArray())
+        {
+            std::stringstream ss;
+            ss << "load size of array " << decl->getName();
+            emitRM("LDC", 3, decl->getMemSize()-1, 6, ss.str(), false);
+            ss.str("");
+
+            bool isLocal = decl->getMemRefType() == MemReferenceType::Local;
+            ss << "save size of array " << decl->getName();
+            emitRM("ST", 3, 0, 0, ss.str(), false);
+            ss.str("");
+        }
+
+    }
+
+
+    genGlobalStatics(node->getSibling(0));
+}
+
 void CodeGen::genEndStuff()
 {
     emitComment("INIT");
     emitRM("LDA", 1, m_finalGOffset, 0, "set first frame at end of globals"); // should use goffset
     emitRM("ST", 1, 0, 1, "store old fp (point to self)");
     emitComment("INIT GLOBALS AND STATICS");
-    // init globals and statics here
+    genGlobalStatics(m_tree);
     emitComment("END INIT GLOBALS AND STATICS");
     emitRM("LDA", 3, 1, 7, "Return address in ac");
 
