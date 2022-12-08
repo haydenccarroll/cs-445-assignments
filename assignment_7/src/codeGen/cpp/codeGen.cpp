@@ -443,45 +443,58 @@ void CodeGen::genInc(UnaryOpNode* node)
     bool isArray = false;
     int thirdParm;
     int secondParm = 0;
+    node->getChild(0)->setHasBeenCodegenned(true);
     auto idNode = tryCast<IdNode*>(node->getChild(0));
-    if (idNode == nullptr)
+    if (idNode != nullptr)
     {
-        return;
-    }
-    switch (idNode->getMemRefType())
-    {
-    case MemReferenceType::Global:
-    case MemReferenceType::Static:
-        isGlobal = true;
-    }
-    if (isGlobal)
-    {
-        thirdParm= 0;
-    }
-    else if (idNode->getExpType().isArray())
-    {
-        thirdParm = 5;
-    }
-    else
-    {
-        thirdParm = 1;
-        secondParm = -2;
-    }
+        switch (idNode->getMemRefType())
+        {
+        case MemReferenceType::Global:
+        case MemReferenceType::Static:
+            isGlobal = true;
+        }
+        if (isGlobal)
+        {
+            thirdParm= 0;
+        }
+        else if (idNode->getExpType().isArray())
+        {
+            thirdParm = 5;
+        }
+        else
+        {
+            thirdParm = 1;
+            secondParm = -2;
+        }
 
-    idNode->setHasBeenCodegenned(true);
+        std::stringstream ss;
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 3, secondParm, thirdParm, ss.str(), false);
+        ss.str("");
 
-    std::stringstream ss;
-    ss << "load lhs variable " << idNode->getIdName();
-    emitRM("LD", 3, secondParm, thirdParm, ss.str(), false);
-    ss.str("");
+        ss << "increment value of " << idNode->getIdName();
+        emitRM("LDA", 3, 1, 3, ss.str(), false);
+        ss.str("");
 
-    ss << "increment value of " << idNode->getIdName();
-    emitRM("LDA", 3, 1, 3, ss.str(), false);
-    ss.str("");
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, secondParm, thirdParm, ss.str(), false);
+        ss.str("");
+    }
+    else // must be array index
+    {
+        genLHSIndex(cast<BinaryOpNode*>(node->getChild(0)), nullptr, 3);
+        std::stringstream ss;
 
-    ss << "Store variable " << idNode->getIdName();
-    emitRM("ST", 3, secondParm, thirdParm, ss.str(), false);
-    ss.str("");
+        auto idNode = cast<IdNode*>(node->getChild(0)->getChild(0));
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 3, 0, 5, ss.str(), false);
+        ss.str("");
+        ss << "increment value of " << idNode->getIdName();
+        emitRM("LDA", 3, 1, 3, ss.str(), false);
+        ss.str("");
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, 0, 5, ss.str(), false);
+    }
 }
 
 void CodeGen::genDec(UnaryOpNode* node)
@@ -495,45 +508,58 @@ void CodeGen::genDec(UnaryOpNode* node)
     bool isArray = false;
     int thirdParm;
     int secondParm = 0;
+    node->getChild(0)->setHasBeenCodegenned(true);
     auto idNode = tryCast<IdNode*>(node->getChild(0));
-    if (idNode == nullptr)
+    if (idNode != nullptr)
     {
-        return;
-    }
-    switch (idNode->getMemRefType())
-    {
-    case MemReferenceType::Global:
-    case MemReferenceType::Static:
-        isGlobal = true;
-    }
-    if (isGlobal)
-    {
-        thirdParm= 0;
-    }
-    else if (idNode->getExpType().isArray())
-    {
-        thirdParm = 5;
-    }
-    else
-    {
-        thirdParm = 1;
-        secondParm = -2;
-    }
+        switch (idNode->getMemRefType())
+        {
+        case MemReferenceType::Global:
+        case MemReferenceType::Static:
+            isGlobal = true;
+        }
+        if (isGlobal)
+        {
+            thirdParm= 0;
+        }
+        else if (idNode->getExpType().isArray())
+        {
+            thirdParm = 5;
+        }
+        else
+        {
+            thirdParm = 1;
+            secondParm = -2;
+        }
 
-    idNode->setHasBeenCodegenned(true);
+        std::stringstream ss;
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 3, secondParm, thirdParm, ss.str(), false);
+        ss.str("");
 
-    std::stringstream ss;
-    ss << "load lhs variable " << idNode->getIdName();
-    emitRM("LD", 3, secondParm, thirdParm, ss.str(), false);
-    ss.str("");
+        ss << "decrement value of " << idNode->getIdName();
+        emitRM("LDA", 3, -1, 3, ss.str(), false);
+        ss.str("");
 
-    ss << "decrement value of " << idNode->getIdName();
-    emitRM("LDA", 3, -1, 3, ss.str(), false);
-    ss.str("");
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, secondParm, thirdParm, ss.str(), false);
+        ss.str("");
+    }
+    else // must be array index
+    {
+        genLHSIndex(cast<BinaryOpNode*>(node->getChild(0)), nullptr, 3);
+        std::stringstream ss;
 
-    ss << "Store variable " << idNode->getIdName();
-    emitRM("ST", 3, secondParm, thirdParm, ss.str(), false);
-    ss.str("");
+        auto idNode = cast<IdNode*>(node->getChild(0)->getChild(0));
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 3, 0, 5, ss.str(), false);
+        ss.str("");
+        ss << "decrement value of " << idNode->getIdName();
+        emitRM("LDA", 3, -1, 3, ss.str(), false);
+        ss.str("");
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, 0, 5, ss.str(), false);
+    }
 }
 
 void CodeGen::genNot(UnaryOpNode* node)
@@ -630,6 +656,9 @@ void CodeGen::genBinary(BinaryOpNode* node)
     case BinaryOpType::NEQ:
         genTNEQ(node);
         break;
+    case BinaryOpType::Index:
+        genIndex(node);
+        break;
     }
 }
 
@@ -640,11 +669,13 @@ void CodeGen::genAss(BinaryOpNode* node)
         return;
     }
 
-    traverseGenerate(node->getChild(1)); // calculate RHS first.
+    node->getChild(0)->setHasBeenCodegenned(true);
 
     auto idNode = tryCast<IdNode*>(node->getChild(0));
     if (idNode)
     {
+        traverseGenerate(node->getChild(1)); // calculate RHS first.
+
         // 0 if global/static
         // 1 if lcocal
         // 5 if array?
@@ -672,9 +703,18 @@ void CodeGen::genAss(BinaryOpNode* node)
         }
 
         std::stringstream ss;
-        idNode->setHasBeenCodegenned(true); // dont process LHS any more
         ss << "Store variable " << idNode->getIdName();
         emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+    }
+    else // it must be array index
+    {
+        auto indexNode = cast<BinaryOpNode*>(node->getChild(0));
+        genLHSIndex(indexNode, node->getChild(1));
+
+        std::stringstream ss;
+        auto idNode = cast<IdNode*>(indexNode->getChild(0));
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, 0, 5, ss.str(), false);
     }
 }
 
@@ -1023,6 +1063,65 @@ void CodeGen::genSub(BinaryOpNode* node)
     emitRO("SUB", 3, 4, 3, "Op -");
 }
 
+void CodeGen::genLHSIndex(BinaryOpNode* node, ASTNode* rhs, int subThirdParam)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::Index)
+    {
+        return;
+    }
+
+    auto idNode = cast<IdNode*>(node->getChild(0));
+    int isLocal = 1;
+    switch (idNode->getMemRefType())
+    {
+    case MemReferenceType::Global:
+    case MemReferenceType::Static:
+        isLocal = 0;
+    }
+    traverseGenerate(node->getChild(1)); // generate array index here
+    if (rhs != nullptr)
+    {
+        emitRM("ST", 3, m_toffs.back(), 1, "Push index");
+        toffDec();
+        traverseGenerate(rhs);
+        toffInc();
+        emitRM("LD", 4, m_toffs.back(), 1, "Pop index");
+    }
+    std::stringstream ss;
+    ss << "Load address of base of array " << idNode->getIdName();
+    emitRM("LDA", 5, idNode->getMemLoc(), isLocal, ss.str(), false);
+    emitRO("SUB", 5, 5, subThirdParam, "Compute offset of value");
+}
+
+void CodeGen::genIndex(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::Index)
+    {
+        return;
+    }
+
+    std::stringstream ss;
+    auto idNode = cast<IdNode*>(node->getChild(0));
+    ss << "Load address of base of array " << idNode->getIdName();
+
+    // first param is 3, unless its on LHS
+    int isLocal = 1;
+    switch (idNode->getMemRefType())
+    {
+    case MemReferenceType::Global:
+    case MemReferenceType::Static:
+        isLocal = 0;
+    }
+    emitRM("LDA", 3, idNode->getMemLoc(), isLocal, ss.str(), false);
+    emitRM("ST", 3, m_toffs.back(), 1, "Push left side");
+    toffDec();
+    traverseGenerate(node->getChild(1)); // calculate array index here
+    toffInc();
+    emitRM("LD", 4, m_toffs.back(), 1, "Pop left into ac1");
+    emitRO("SUB", 3, 4, 3, "compute location from index");
+    emitRM("LD", 3, 0, 3, "Load array element");
+}
+
 void CodeGen::genConst(ConstNode* node)
 {
     switch (node->getExpType().getEnumType())
@@ -1106,3 +1205,4 @@ bool CodeGen::isNodeTopMostExp(ASTNode* node)
     }
     return true;
 }
+

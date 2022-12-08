@@ -49,6 +49,8 @@ public:
     void genTGT(BinaryOpNode* node);
     void genTLT(BinaryOpNode* node);
     void genTNEQ(BinaryOpNode* node);
+    void genIndex(BinaryOpNode* node);
+    void genLHSIndex(BinaryOpNode* node, ASTNode* rhs=nullptr, int subThirdParam=4);
 
     void genUnary(UnaryOpNode* node);
     void genInc(UnaryOpNode* node);
@@ -67,6 +69,7 @@ public:
     void toffInc(bool print=true);
 
     bool isNodeTopMostExp(ASTNode* node);
+    bool isNodeOnLHS(ASTNode* node);
 
 private:
     std::string m_fileName;
