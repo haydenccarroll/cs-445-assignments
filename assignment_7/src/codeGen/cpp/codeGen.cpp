@@ -150,7 +150,7 @@ void CodeGen::genGlobalStatics(ASTNode* node)
 
             bool isLocal = decl->getMemRefType() == MemReferenceType::Local;
             ss << "save size of array " << decl->getName();
-            emitRM("ST", 3, 0, 0, ss.str(), false);
+            emitRM("ST", 3, decl->getMemLoc()+1, 0, ss.str(), false);
             ss.str("");
         }
 
