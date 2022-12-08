@@ -127,7 +127,7 @@ void CodeGen::generateIO()
 void CodeGen::genEndStuff()
 {
     emitComment("INIT");
-    emitRM("LDA", 1, 0, 0, "set first frame at end of globals"); // should use goffset
+    emitRM("LDA", 1, m_finalGOffset, 0, "set first frame at end of globals"); // should use goffset
     emitRM("ST", 1, 0, 1, "store old fp (point to self)");
     emitComment("INIT GLOBALS AND STATICS");
     // init globals and statics here

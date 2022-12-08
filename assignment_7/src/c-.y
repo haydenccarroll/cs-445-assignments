@@ -1090,6 +1090,7 @@ int main(int argc, char** argv)
     tmFilePath = tmFilePath.replace_extension("tm");
     tmFilePath = tmFilePath.filename().generic_string();
     CodeGen codeGen(root, tmFilePath);
+    codeGen.setFinalGOffset(gOffset);
     codeGen.generate();
 
     delete root;

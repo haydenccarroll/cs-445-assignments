@@ -15,6 +15,8 @@ public:
     void generateIO();
     void traverseGenerate(ASTNode* node);
 
+    void setFinalGOffset(int gOffset) { m_finalGOffset = gOffset; }
+
     void genFuncStart(FunDeclNode* node);
     void genFuncEnd(FunDeclNode* node);
 
@@ -48,4 +50,5 @@ private:
     ASTNode* m_tree;
     std::map<std::string,int> m_funcsToLocs;
     std::vector<int> m_toffs;
+    int m_finalGOffset;
 };
