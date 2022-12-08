@@ -277,7 +277,7 @@ void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
         return;
     }
     emitComment("COMPOUND");
-    
+    int oldToff = m_toffs.back();
     auto child = tryCast<VarDeclNode*>(node->getChild(0));
     int size = 0;
     while (child != nullptr)
@@ -286,9 +286,28 @@ void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
         {
             size += child->getMemSize();
         }
+
         child = tryCast<VarDeclNode*>(child->getSibling(0));
     }
     toffPush(m_toffs.back() - size);
+    child = tryCast<VarDeclNode*>(node->getChild(0));
+    while (child != nullptr)
+    {
+        if (child->getDataType().isArray())
+        {
+            std::stringstream ss;
+            ss << "load size of array " << child->getName();
+            emitRM("LDC", 3, child->getMemSize()-1, 6, ss.str(), false);
+            ss.str("");
+
+            bool isLocal = child->getMemRefType() == MemReferenceType::Local;
+            ss << "save size of array " << child->getName();
+            emitRM("ST", 3, oldToff, isLocal, ss.str(), false);
+            ss.str("");
+        }
+
+        child = tryCast<VarDeclNode*>(child->getSibling(0));
+    }
     emitComment("Compound Body");
 }
 
@@ -424,7 +443,11 @@ void CodeGen::genInc(UnaryOpNode* node)
     bool isArray = false;
     int thirdParm;
     int secondParm = 0;
-    auto idNode = cast<IdNode*>(node->getChild(0));
+    auto idNode = tryCast<IdNode*>(node->getChild(0));
+    if (idNode == nullptr)
+    {
+        return;
+    }
     switch (idNode->getMemRefType())
     {
     case MemReferenceType::Global:
@@ -472,7 +495,11 @@ void CodeGen::genDec(UnaryOpNode* node)
     bool isArray = false;
     int thirdParm;
     int secondParm = 0;
-    auto idNode = cast<IdNode*>(node->getChild(0));
+    auto idNode = tryCast<IdNode*>(node->getChild(0));
+    if (idNode == nullptr)
+    {
+        return;
+    }
     switch (idNode->getMemRefType())
     {
     case MemReferenceType::Global:
