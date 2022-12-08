@@ -34,6 +34,10 @@ public:
     void genBinary(BinaryOpNode* node);
     void genGenericBinOp(BinaryOpNode* node);
     void genAss(BinaryOpNode* node);
+    void genAddAss(BinaryOpNode* node);
+    void genSubAss(BinaryOpNode* node);
+    void genDivAss(BinaryOpNode* node);
+    void genMulAss(BinaryOpNode* node);
     void genOr(BinaryOpNode* node);
     void genAnd(BinaryOpNode* node);
     void genAdd(BinaryOpNode* node);

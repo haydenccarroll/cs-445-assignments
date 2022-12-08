@@ -457,6 +457,18 @@ void CodeGen::genBinary(BinaryOpNode* node)
     case BinaryOpType::Ass:
         genAss(node);
         break;
+    case BinaryOpType::AddAss:
+        genAddAss(node);
+        break;
+    case BinaryOpType::DivAss:
+        genDivAss(node);
+        break;
+    case BinaryOpType::MulAss:
+        genMulAss(node);
+        break;
+    case BinaryOpType::SubAss:
+        genSubAss(node);
+        break;
     case BinaryOpType::Or:
         genOr(node);
         break;
@@ -533,6 +545,214 @@ void CodeGen::genAss(BinaryOpNode* node)
 
         std::stringstream ss;
         idNode->setHasBeenCodegenned(true); // dont process LHS any more
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+    }
+}
+
+void CodeGen::genAddAss(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::AddAss)
+    {
+        return;
+    }
+
+    traverseGenerate(node->getChild(1)); // calculate RHS first.
+
+    auto idNode = tryCast<IdNode*>(node->getChild(0));
+    if (idNode)
+    {
+        // 0 if global/static
+        // 1 if lcocal
+        // 5 if array?
+        bool isGlobal = false;
+        bool isArray = false;
+        switch (idNode->getMemRefType())
+        {
+        case MemReferenceType::Global:
+        case MemReferenceType::Static:
+            isGlobal = true;
+        }
+
+        int thirdSTParam;
+        if (isGlobal)
+        {
+            thirdSTParam = 0;
+        }
+        else if (idNode->getExpType().isArray())
+        {
+            thirdSTParam = 5;
+        }
+        else
+        {
+            thirdSTParam = 1;
+        }
+
+        std::stringstream ss;
+        idNode->setHasBeenCodegenned(true); // dont process LHS any more
+
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 4, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+        ss.str("");
+
+        emitRO("ADD", 3, 4, 3, "op +=");
+
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+    }
+}
+
+void CodeGen::genSubAss(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::SubAss)
+    {
+        return;
+    }
+
+    traverseGenerate(node->getChild(1)); // calculate RHS first.
+
+    auto idNode = tryCast<IdNode*>(node->getChild(0));
+    if (idNode)
+    {
+        // 0 if global/static
+        // 1 if lcocal
+        // 5 if array?
+        bool isGlobal = false;
+        bool isArray = false;
+        switch (idNode->getMemRefType())
+        {
+        case MemReferenceType::Global:
+        case MemReferenceType::Static:
+            isGlobal = true;
+        }
+
+        int thirdSTParam;
+        if (isGlobal)
+        {
+            thirdSTParam = 0;
+        }
+        else if (idNode->getExpType().isArray())
+        {
+            thirdSTParam = 5;
+        }
+        else
+        {
+            thirdSTParam = 1;
+        }
+
+        std::stringstream ss;
+        idNode->setHasBeenCodegenned(true); // dont process LHS any more
+
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 4, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+        ss.str("");
+
+        emitRO("SUB", 3, 4, 3, "op -=");
+
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+    }
+}
+
+void CodeGen::genMulAss(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::MulAss)
+    {
+        return;
+    }
+
+    traverseGenerate(node->getChild(1)); // calculate RHS first.
+
+    auto idNode = tryCast<IdNode*>(node->getChild(0));
+    if (idNode)
+    {
+        // 0 if global/static
+        // 1 if lcocal
+        // 5 if array?
+        bool isGlobal = false;
+        bool isArray = false;
+        switch (idNode->getMemRefType())
+        {
+        case MemReferenceType::Global:
+        case MemReferenceType::Static:
+            isGlobal = true;
+        }
+
+        int thirdSTParam;
+        if (isGlobal)
+        {
+            thirdSTParam = 0;
+        }
+        else if (idNode->getExpType().isArray())
+        {
+            thirdSTParam = 5;
+        }
+        else
+        {
+            thirdSTParam = 1;
+        }
+
+        std::stringstream ss;
+        idNode->setHasBeenCodegenned(true); // dont process LHS any more
+
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 4, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+        ss.str("");
+
+        emitRO("MUL", 3, 4, 3, "op *=");
+
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+    }
+}
+
+void CodeGen::genDivAss(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::DivAss)
+    {
+        return;
+    }
+
+    traverseGenerate(node->getChild(1)); // calculate RHS first.
+
+    auto idNode = tryCast<IdNode*>(node->getChild(0));
+    if (idNode)
+    {
+        // 0 if global/static
+        // 1 if lcocal
+        // 5 if array?
+        bool isGlobal = false;
+        bool isArray = false;
+        switch (idNode->getMemRefType())
+        {
+        case MemReferenceType::Global:
+        case MemReferenceType::Static:
+            isGlobal = true;
+        }
+
+        int thirdSTParam;
+        if (isGlobal)
+        {
+            thirdSTParam = 0;
+        }
+        else if (idNode->getExpType().isArray())
+        {
+            thirdSTParam = 5;
+        }
+        else
+        {
+            thirdSTParam = 1;
+        }
+
+        std::stringstream ss;
+        idNode->setHasBeenCodegenned(true); // dont process LHS any more
+
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 4, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+        ss.str("");
+
+        emitRO("DIV", 3, 4, 3, "op /=");
+
         ss << "Store variable " << idNode->getIdName();
         emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
     }
