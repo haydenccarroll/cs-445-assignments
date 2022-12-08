@@ -32,8 +32,14 @@ public:
     void genCall(CallNode* node);
 
     void genBinary(BinaryOpNode* node);
+    void genGenericBinOp(BinaryOpNode* node);
     void genAss(BinaryOpNode* node);
     void genOr(BinaryOpNode* node);
+    void genAnd(BinaryOpNode* node);
+    void genAdd(BinaryOpNode* node);
+    void genSub(BinaryOpNode* node);
+    void genMul(BinaryOpNode* node);
+    void genDiv(BinaryOpNode* node);
 
 
     void genEndStuff();

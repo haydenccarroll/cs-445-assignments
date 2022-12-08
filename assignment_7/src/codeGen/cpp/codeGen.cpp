@@ -393,6 +393,21 @@ void CodeGen::genBinary(BinaryOpNode* node)
     case BinaryOpType::Or:
         genOr(node);
         break;
+    case BinaryOpType::And:
+        genAnd(node);
+        break;
+    case BinaryOpType::Add:
+        genAdd(node);
+        break;
+    case BinaryOpType::Sub:
+        genSub(node);
+        break;
+    case BinaryOpType::Mul:
+        genMul(node);
+        break;
+    case BinaryOpType::Div:
+        genDiv(node);
+        break;
     }
 }
 
@@ -441,9 +456,9 @@ void CodeGen::genAss(BinaryOpNode* node)
     }
 }
 
-void CodeGen::genOr(BinaryOpNode* node)
+void CodeGen::genGenericBinOp(BinaryOpNode* node)
 {
-    if (node == nullptr || node->getOperatorType() != BinaryOpType::Or)
+    if (node == nullptr)
     {
         return;
     }
@@ -455,8 +470,72 @@ void CodeGen::genOr(BinaryOpNode* node)
     traverseGenerate(node->getChild(1)); // traverse RHS
     toffInc();
     emitRM("LD", 4, m_toffs.back(), 1, "Pop left into ac1");
+}
 
+void CodeGen::genOr(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::Or)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
     emitRO("OR", 3, 4, 3, "Op OR");
+}
+
+void CodeGen::genAnd(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::And)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("AND", 3, 4, 3, "Op AND");
+}
+
+void CodeGen::genMul(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::Mul)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("MUL", 3, 4, 3, "Op *");
+}
+
+void CodeGen::genDiv(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::Div)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("DIV", 3, 4, 3, "Op /");
+}
+
+void CodeGen::genAdd(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::Add)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("ADD", 3, 4, 3, "Op +");
+}
+
+void CodeGen::genSub(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::Sub)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("SUB", 3, 4, 3, "Op -");
 }
 
 void CodeGen::genConst(ConstNode* node)
