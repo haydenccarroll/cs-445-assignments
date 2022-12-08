@@ -390,6 +390,9 @@ void CodeGen::genBinary(BinaryOpNode* node)
     case BinaryOpType::Ass:
         genAss(node);
         break;
+    case BinaryOpType::Or:
+        genOr(node);
+        break;
     }
 }
 
@@ -437,74 +440,24 @@ void CodeGen::genAss(BinaryOpNode* node)
         emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
     }
 }
-// void CodeGen::loadParam(ExpNode* node)
-// {
-//     if (node == nullptr)
-//     {
-//         return;
-//     }
 
-//     bool isVar = (node->getNodeType() == NodeType::IdNode);
-//     bool isArr = false;
-//     IdNode* idNode = tryCast<IdNode*>(node);
-//     if (node->getNodeType() == NodeType::BinaryOpNode)
-//     {
-//         auto binNode = cast<BinaryOpNode*>(node);
-//         switch (binNode->getOperatorType())
-//         {
-//         case BinaryOpType::MulAss:
-//         case BinaryOpType::DivAss:
-//         case BinaryOpType::SubAss:
-//         case BinaryOpType::AddAss:
-//         case BinaryOpType::Ass:
-//             isVar = true;
-//             idNode = cast<IdNode*>(binNode->getChild(0));
-//             break;
-//         case BinaryOpType::Index:
-//             isArr = true;
-//             break;
-//         }
-//     }
+void CodeGen::genOr(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::Or)
+    {
+        return;
+    }
 
-//     if (isVar)
-//     {
+    // generic BinOp stuff
+    traverseGenerate(node->getChild(0)); // traverse LHS
+    emitRM("ST", 3, m_toffs.back(), 1, "Push left side");
+    toffDec();
+    traverseGenerate(node->getChild(1)); // traverse RHS
+    toffInc();
+    emitRM("LD", 4, m_toffs.back(), 1, "Pop left into ac1");
 
-//         bool isLocal = true;
-
-//         switch (idNode->getMemRefType())
-//         {
-//         case MemReferenceType::Global:
-//         case MemReferenceType::Static:
-//             isLocal = false;
-//             break;
-//         }
-
-//         std::stringstream ss;
-//         ss << "Load variable " << idNode->getIdName();
-//         emitRM("LD", 3, idNode->getMemLoc(), isLocal, ss.str());
-//         ss.str("");
-//     }
-//     else if (isArr)
-//     {
-//         // do stuff if its an array
-//     }
-//     else
-//     {
-//         int value = 0;
-//         switch (node->getExpType().getEnumType())
-//         {
-//         case DataTypeEnum::Bool:
-//             emitRM("LD", 3, value, 6, "Load Boolean constant");
-//             break;
-//         case DataTypeEnum::Char:
-//             emitRM("LD", 3, value, 6, "Load char constant");
-//             break;
-//         case DataTypeEnum::Int:
-//             emitRM("LD", 3, value, 6, "Load integer constant");
-//             break;
-//         }
-//     }
-// }
+    emitRO("OR", 3, 4, 3, "Op OR");
+}
 
 void CodeGen::genConst(ConstNode* node)
 {
