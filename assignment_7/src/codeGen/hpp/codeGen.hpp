@@ -49,6 +49,7 @@ public:
     void genUnary(UnaryOpNode* node);
     void genNot(UnaryOpNode* node);
     void genRand(UnaryOpNode* node);
+    void genChsign(UnaryOpNode* node);
 
 
 

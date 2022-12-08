@@ -391,6 +391,7 @@ void CodeGen::genUnary(UnaryOpNode* node)
     switch (node->getOperatorType())
     {
     case UnaryOpType::Chsign:
+        genChsign(node);
         break;
     case UnaryOpType::Dec:
         break;
@@ -430,6 +431,18 @@ void CodeGen::genRand(UnaryOpNode* node)
     traverseGenerate(node->getChild(0)); // generate RHS
 
     emitRO("RND", 3, 3, 6, "Op ?");
+}
+
+void CodeGen::genChsign(UnaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != UnaryOpType::Chsign)
+    {
+        return;
+    }
+
+    traverseGenerate(node->getChild(0)); // generate RHS
+
+    emitRO("NEG", 3, 3, 3, "Op unary -");
 }
 
 void CodeGen::genBinary(BinaryOpNode* node)
