@@ -176,7 +176,7 @@ void CodeGen::genEndStuff()
     emitComment("END INIT");
 }
 
-void CodeGen::traverseGenerate(ASTNode* node)
+void CodeGen::traverseGenerate(ASTNode* node, bool traverseSiblings)
 {
     if (node == nullptr || node->getHasBeenCodeGenned())
     {
@@ -232,8 +232,11 @@ void CodeGen::traverseGenerate(ASTNode* node)
         genCompoundStmtEnd(cast<CompoundStmtNode*>(node));
         break;
     }
-
-    traverseGenerate(node->getSibling(0));
+    
+    if (traverseSiblings)
+    {
+        traverseGenerate(node->getSibling(0));
+    }
 }
 
 void CodeGen::genFuncStart(FunDeclNode* node)
@@ -407,20 +410,21 @@ void CodeGen::genCall(CallNode* node)
     toffDec();
 
 
-    for (int i=0; i < node->getNumChildren(); i++)
+    auto param = node->getChild(0);
+    int count = 1;
+    while (param != nullptr)
     {
-        if (node->getChild(i) == nullptr) // skip null childs
-        {
-            continue;
-        }
-        ss << "Param " << i+1;
+        ss << "Param " << count;
         emitComment(ss.str());
         ss.str("");
 
-        traverseGenerate(node->getChild(i));
+        traverseGenerate(param, false);
 
         emitRM("ST", 3, m_toffs.back(), 1, "Push parameter");
         toffDec();
+
+        param = param->getSibling(0);
+        count++;
     }
 
     ss << "Param end " << node->getFunName();

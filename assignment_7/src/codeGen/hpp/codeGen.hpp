@@ -13,7 +13,7 @@ public:
     ~CodeGen();
     void generate();
     void generateIO();
-    void traverseGenerate(ASTNode* node);
+    void traverseGenerate(ASTNode* node, bool traverseSiblings=true);
 
     void setFinalGOffset(int gOffset) { m_finalGOffset = gOffset; }
 
