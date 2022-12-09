@@ -2,3 +2,8 @@ THE WRONG LIST:
 
 do array copying
 expression comment isnt always right.
+
+have some memory issue with for loops.
+
+not sure why s05.c- has a different order of static/global assign. seems backwars for that one file.
+i dont velieve it should matter, but idk.

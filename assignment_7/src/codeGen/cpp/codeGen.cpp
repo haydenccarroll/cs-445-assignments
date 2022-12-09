@@ -124,21 +124,21 @@ void CodeGen::generateIO()
     m_funcsToLocs["outnl"] = 34;
 }
 
-void CodeGen::genGlobalStatics(ASTNode* node)
+void CodeGen::genGlobalStatics()
+{
+    genGlobals(m_tree);
+    genStatics(m_tree);
+}
+
+void CodeGen::genStatics(ASTNode* node)
 {
     if (node == nullptr)
     {
         return;
     }
 
-    bool isGlobal = false;
-    if ((node->getMemRefType() == MemReferenceType::Global ||
-        node->getMemRefType() == MemReferenceType::Static))
-    {
-        isGlobal = true;
-    }
-
-    if (node->getNodeType() == NodeType::VarDeclNode && isGlobal)
+    if (node->getNodeType() == NodeType::VarDeclNode &&
+        node->getMemRefType() == MemReferenceType::Static)
     {
         auto decl = cast<VarDeclNode*>(node);
         if (decl->getDataType().isArray())
@@ -154,26 +154,53 @@ void CodeGen::genGlobalStatics(ASTNode* node)
             ss.str("");
         } else if (decl->getChild(0) != nullptr) // is initialization
         {
-            int isLocal = 1;
-            switch (decl->getMemRefType())
-            {
-            case MemReferenceType::Global:
-            case MemReferenceType::Static:
-                isLocal = 0;
-            }
             std::stringstream ss;
             ss << "Store variable " << decl->getName();
             traverseGenerate(decl->getChild(0));
-            emitRM("ST", 3, decl->getMemLoc(), isLocal, ss.str(), false);
+            emitRM("ST", 3, decl->getMemLoc(), 0, ss.str(), false);
         }
 
     }
 
     for (int i=0; i < node->getNumChildren(); i++)
     {
-        genGlobalStatics(node->getChild(i));
+        genStatics(node->getChild(i));
     }
-    genGlobalStatics(node->getSibling(0));
+    genStatics(node->getSibling(0));
+}
+
+void CodeGen::genGlobals(ASTNode* node)
+{
+    if (node == nullptr)
+    {
+        return;
+    }
+
+    if (node->getNodeType() == NodeType::VarDeclNode &&
+        node->getMemRefType() == MemReferenceType::Global)
+    {
+        auto decl = cast<VarDeclNode*>(node);
+        if (decl->getDataType().isArray())
+        {
+            std::stringstream ss;
+            ss << "load size of array " << decl->getName();
+            emitRM("LDC", 3, decl->getMemSize()-1, 6, ss.str(), false);
+            ss.str("");
+
+            bool isLocal = decl->getMemRefType() == MemReferenceType::Local;
+            ss << "save size of array " << decl->getName();
+            emitRM("ST", 3, decl->getMemLoc()+1, 0, ss.str(), false);
+            ss.str("");
+        } else if (decl->getChild(0) != nullptr) // is initialization
+        {
+            std::stringstream ss;
+            ss << "Store variable " << decl->getName();
+            traverseGenerate(decl->getChild(0));
+            emitRM("ST", 3, decl->getMemLoc(), 0, ss.str(), false);
+        }
+
+    }
+    genGlobals(node->getSibling(0));
 }
 
 void CodeGen::genEndStuff()
@@ -187,7 +214,7 @@ void CodeGen::genEndStuff()
     emitRM("LDA", 1, m_finalGOffset, 0, "set first frame at end of globals"); // should use goffset
     emitRM("ST", 1, 0, 1, "store old fp (point to self)");
     emitComment("INIT GLOBALS AND STATICS");
-    genGlobalStatics(m_tree);
+    genGlobalStatics();
     emitComment("END INIT GLOBALS AND STATICS");
     emitRM("LDA", 3, 1, 7, "Return address in ac");
 
@@ -245,6 +272,9 @@ void CodeGen::traverseGenerate(ASTNode* node, bool traverseSiblings)
         break;
     case NodeType::BreakNode:
         genBreak(cast<BreakNode*>(node));
+        break;
+    case NodeType::ForNode:
+        genFor(cast<ForNode*>(node));
         break;
     }
 
@@ -1452,7 +1482,53 @@ void CodeGen::genBreak(BreakNode* node)
 
 void CodeGen::genFor(ForNode* node)
 {
+    auto iterDecl = cast<VarDeclNode*>(node->getChild(0));
+    auto range = cast<RangeNode*>(node->getChild(1));
+    int iterLoc = m_toffs.back();
+    int stopLoc = iterLoc - 1;
+    int stepLoc = iterLoc - 2;
+    toffPush(m_toffs.back() - 3); // 3 is probably typical, but if it has the BY maybe 4
+    emitComment("FOR");
+    traverseGenerate(range->getChild(0)); // generate lower bound
+    emitRM("ST", 3, iterLoc, 1, "save starting value in index variable");
+    traverseGenerate(range->getChild(1)); // generate upper bound
+    emitRM("ST", 3, stopLoc, 1, "save stop value"); // 2nd param isnt right
+    if (range->getChild(2)) // has the by part of range
+    {
+        traverseGenerate(range->getChild(2));
+    }
+    else
+    {
+        emitRM("LDC", 3, 1, 6, "default increment by 1");
+    }
+    emitRM("ST", 3, stepLoc, 1, "save step value"); // 2nd param isnt right
+    int saveStepLoc = emitWhereAmI(); // used for jumping to top of loop
+    emitRM("LD", 4, iterLoc, 1, "loop index"); // 2nd param isnt right
+    emitRM("LD", 5, stopLoc, 1, "stop value"); // 2nd param isnt right
+    emitRM("LD", 3, stepLoc, 1, "step value"); // 2nd param isnt right
+    emitRO("SLT", 3, 4, 5, "Op <");
+    emitRM("JNZ", 3, 1, 7, "Jump to loop body");
 
+
+    int startPos = emitWhereAmI();
+    emitNewLoc(startPos+1); // save room for backpatch
+
+    traverseGenerate(node->getChild(2)); // gen loop body
+
+    emitComment("Bottom of loop increment and jump");
+    emitRM("LD", 3, iterLoc, 1, "Load index"); // 2nd param isnt right
+    emitRM("LD", 5, stepLoc, 1, "Load step"); // 2nd param isnt right
+    emitRO("ADD", 3, 3, 5, "increment");
+    emitRM("ST", 3, iterLoc, 1, "store back to index"); // 2nd param isnt right
+    emitRM("JMP", 7, saveStepLoc - emitWhereAmI() - 1, 7, "go to beginning of loop"); // 2nd param isnt right
+    
+    int endPos = emitWhereAmI();
+    emitNewLoc(startPos);
+    emitRM("JMP", 7, endPos - startPos - 1, 7, "Jump past loop [backpatch]"); // 2nd param isnt right
+    emitNewLoc(endPos);
+
+    toffPop(false);
+    emitComment("END LOOP");
 }
 
 void CodeGen::toffPush(int toff, bool print)

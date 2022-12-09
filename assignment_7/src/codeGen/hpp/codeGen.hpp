@@ -66,7 +66,9 @@ public:
     void genChsign(UnaryOpNode* node);
 
 
-    void genGlobalStatics(ASTNode* node);
+    void genGlobalStatics();
+    void genStatics(ASTNode* node);
+    void genGlobals(ASTNode* node);
     void genEndStuff();
 
     void toffPush(int toff, bool print=true);
