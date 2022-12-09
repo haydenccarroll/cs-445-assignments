@@ -699,6 +699,12 @@ void CodeGen::genBinary(BinaryOpNode* node)
     case BinaryOpType::NEQ:
         genTNEQ(node);
         break;
+    case BinaryOpType::LEQ:
+        genTLE(node);
+        break;
+    case BinaryOpType::GEQ:
+        genTGE(node);
+        break;
     case BinaryOpType::Index:
         genIndex(node);
         break;
