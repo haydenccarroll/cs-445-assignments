@@ -216,6 +216,9 @@ void CodeGen::traverseGenerate(ASTNode* node, bool traverseSiblings)
     case NodeType::IdNode:
         genID(cast<IdNode*>(node));
         break;
+    case NodeType::IfNode:
+        genIf(cast<IfNode*>(node));
+        break;
     }
 
     for (unsigned int i=0; i < node->getNumChildren(); i++)
@@ -1290,6 +1293,48 @@ void CodeGen::genConst(ConstNode* node)
         emitRM("LDC", 3, int(node->getIntVal()), 6, "Load integer constant");
         break;
     }
+}
+
+void CodeGen::genIf(IfNode* node)
+{
+    if (node == nullptr || node->getNodeType() != NodeType::IfNode)
+    {
+        return;
+    }
+
+    emitComment("IF");
+
+    traverseGenerate(node->getChild(0));
+
+    // leave space for the jump at the end.
+    int oldInstruct = emitWhereAmI();
+    emitNewLoc(oldInstruct+1);
+
+    emitComment("THEN");
+    traverseGenerate(node->getChild(1));
+
+    int newInstruct = emitWhereAmI();
+    emitNewLoc(oldInstruct);
+    emitRM("JZR", 3, newInstruct - oldInstruct - 1, 7, "Jump around the THEN if false [backpatch]");
+    emitNewLoc(newInstruct);
+
+    if (node->getChild(2) != nullptr)
+    {
+        oldInstruct = emitWhereAmI();
+        emitNewLoc(oldInstruct+1);
+
+        emitComment("ELSE");
+        traverseGenerate(node->getChild(2));
+
+        int newInstruct = emitWhereAmI();
+        emitNewLoc(oldInstruct);
+        emitRM("JZR", 7, newInstruct - oldInstruct - 1, 7, "Jump around the ELSE [backpatch]");
+        emitNewLoc(newInstruct);
+    }
+
+
+
+    emitComment("END IF");
 }
 
 void CodeGen::genFor(ForNode* node)
