@@ -520,7 +520,7 @@ void CodeGen::genInc(UnaryOpNode* node)
         ss.str("");
 
         ss << "Store variable " << idNode->getIdName();
-        emitRM("ST", 3, secondParm, thirdParm, ss.str(), false);
+        emitRM("ST", 3, idNode->getMemLoc(), thirdParm, ss.str(), false);
         ss.str("");
     }
     else // must be array index
@@ -585,7 +585,7 @@ void CodeGen::genDec(UnaryOpNode* node)
         ss.str("");
 
         ss << "Store variable " << idNode->getIdName();
-        emitRM("ST", 3, secondParm, thirdParm, ss.str(), false);
+        emitRM("ST", 3, idNode->getMemLoc(), thirdParm, ss.str(), false);
         ss.str("");
     }
     else // must be array index
