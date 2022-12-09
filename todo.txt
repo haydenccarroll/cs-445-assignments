@@ -1,7 +1,4 @@
 THE WRONG LIST:
 
-do * (sizeof operator)
-
 do array copying
-
 expression comment isnt always right.

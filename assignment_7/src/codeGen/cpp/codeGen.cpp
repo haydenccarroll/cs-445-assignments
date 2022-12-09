@@ -535,8 +535,20 @@ void CodeGen::genUnary(UnaryOpNode* node)
         genRand(node);
         break;
     case UnaryOpType::SizeOf:
+        genSizeOf(node);
         break;
     }
+}
+
+void CodeGen::genSizeOf(UnaryOpNode* node)
+{
+    if (node == nullptr || node->getNodeType() != NodeType::UnaryOpNode)
+    {
+        return;
+    }
+
+    traverseGenerate(node->getChild(0));
+    emitRM("LD", 3, 1, 3, "Load array size");
 }
 
 void CodeGen::genInc(UnaryOpNode* node)

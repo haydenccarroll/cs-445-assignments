@@ -58,6 +58,7 @@ public:
     void genLHSIndex(BinaryOpNode* node, ASTNode* rhs=nullptr, int subThirdParam=4);
 
     void genUnary(UnaryOpNode* node);
+    void genSizeOf(UnaryOpNode* node);
     void genInc(UnaryOpNode* node);
     void genDec(UnaryOpNode* node);
     void genNot(UnaryOpNode* node);
