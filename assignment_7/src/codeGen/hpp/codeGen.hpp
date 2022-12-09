@@ -31,6 +31,7 @@ public:
     void genConst(ConstNode* node);
     void genCall(CallNode* node);
     void genIf(IfNode* node);
+    void genWhile(WhileNode* node);
 
     void genBinary(BinaryOpNode* node);
     void genGenericBinOp(BinaryOpNode* node);

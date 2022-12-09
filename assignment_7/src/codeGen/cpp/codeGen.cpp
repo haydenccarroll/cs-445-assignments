@@ -219,6 +219,9 @@ void CodeGen::traverseGenerate(ASTNode* node, bool traverseSiblings)
     case NodeType::IfNode:
         genIf(cast<IfNode*>(node));
         break;
+    case NodeType::WhileNode:
+        genWhile(cast<WhileNode*>(node));
+        break;
     }
 
     for (unsigned int i=0; i < node->getNumChildren(); i++)
@@ -1342,6 +1345,42 @@ void CodeGen::genIf(IfNode* node)
 
 
     emitComment("END IF");
+}
+
+void CodeGen::genWhile(WhileNode* node)
+{
+    if (node == nullptr || node->getNodeType() != NodeType::WhileNode)
+    {
+        return;
+    }
+
+    emitComment("WHILE");
+    int whileStartLoc = emitWhereAmI(); // useful for jumping back to loop
+
+    // generate while condition stuff
+    traverseGenerate(node->getChild(0));
+    emitRM("JNZ", 3, 1, 7, "Jump to while part");
+    
+    int doStartLoc = emitWhereAmI(); // useful for skipping loop entirely
+    emitNewLoc(doStartLoc + 1);
+
+    // give space for 1 instruction
+    emitComment("DO");
+
+    // generate do condition
+    traverseGenerate(node->getChild(1));
+    emitRM("JMP", 7, whileStartLoc - emitWhereAmI() - 1, 7, "go to beginning of loop");
+    int endWhileLoc = emitWhereAmI();
+    
+    emitNewLoc(doStartLoc);
+    emitRM("JMP", 7, endWhileLoc - doStartLoc - 1, 7, "Jump past loop [backpatch]");
+    emitNewLoc(endWhileLoc);
+
+    // insert go to beginning of loop instruction
+    // insert end loop instruction
+    emitComment("END WHILE");
+
+
 }
 
 void CodeGen::genFor(ForNode* node)
