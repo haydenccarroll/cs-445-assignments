@@ -338,7 +338,7 @@ void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
 
             bool isLocal = child->getMemRefType() == MemReferenceType::Local;
             ss << "save size of array " << child->getName();
-            emitRM("ST", 3, oldToff, isLocal, ss.str(), false);
+            emitRM("ST", 3, child->getMemLoc() + 1, isLocal, ss.str(), false);
             ss.str("");
         }
 
@@ -505,7 +505,7 @@ void CodeGen::genInc(UnaryOpNode* node)
 
         std::stringstream ss;
         ss << "load lhs variable " << idNode->getIdName();
-        emitRM("LD", 3, secondParm, thirdParm, ss.str(), false);
+        emitRM("LD", 3, idNode->getMemLoc(), thirdParm, ss.str(), false);
         ss.str("");
 
         ss << "increment value of " << idNode->getIdName();
@@ -570,7 +570,7 @@ void CodeGen::genDec(UnaryOpNode* node)
 
         std::stringstream ss;
         ss << "load lhs variable " << idNode->getIdName();
-        emitRM("LD", 3, secondParm, thirdParm, ss.str(), false);
+        emitRM("LD", 3, idNode->getMemLoc(), thirdParm, ss.str(), false);
         ss.str("");
 
         ss << "decrement value of " << idNode->getIdName();
