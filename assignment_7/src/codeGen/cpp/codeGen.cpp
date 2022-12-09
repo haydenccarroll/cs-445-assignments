@@ -252,7 +252,7 @@ void CodeGen::genFuncStart(FunDeclNode* node)
     ss << "FUNCTION " << node->getName();
     emitComment(ss.str());
     ss.str("");
-    toffPush(-2);
+    toffPush(node->getMemSize());
     emitRM("ST", 3, -1, 1, "Store return address");
 }
 
