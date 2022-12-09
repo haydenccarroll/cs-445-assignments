@@ -222,6 +222,9 @@ void CodeGen::traverseGenerate(ASTNode* node, bool traverseSiblings)
     case NodeType::WhileNode:
         genWhile(cast<WhileNode*>(node));
         break;
+    case NodeType::BreakNode:
+        genBreak(cast<BreakNode*>(node));
+        break;
     }
 
     for (unsigned int i=0; i < node->getNumChildren(); i++)
@@ -1360,8 +1363,10 @@ void CodeGen::genWhile(WhileNode* node)
     // generate while condition stuff
     traverseGenerate(node->getChild(0));
     emitRM("JNZ", 3, 1, 7, "Jump to while part");
-    
+
     int doStartLoc = emitWhereAmI(); // useful for skipping loop entirely
+    m_loopLocs.push_back(doStartLoc);
+    
     emitNewLoc(doStartLoc + 1);
 
     // give space for 1 instruction
@@ -1378,9 +1383,19 @@ void CodeGen::genWhile(WhileNode* node)
 
     // insert go to beginning of loop instruction
     // insert end loop instruction
+    m_loopLocs.pop_back();
     emitComment("END WHILE");
+}
 
-
+void CodeGen::genBreak(BreakNode* node)
+{
+    if (node == nullptr || node->getNodeType() != NodeType::BreakNode ||
+        m_loopLocs.size() == 0)
+    {
+        return;
+    }
+    emitComment("BREAK");
+    emitRM("JMP", 7, m_loopLocs.back() - emitWhereAmI() - 1, 7, "break");
 }
 
 void CodeGen::genFor(ForNode* node)

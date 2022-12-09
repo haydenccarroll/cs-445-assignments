@@ -32,6 +32,7 @@ public:
     void genCall(CallNode* node);
     void genIf(IfNode* node);
     void genWhile(WhileNode* node);
+    void genBreak(BreakNode* node);
 
     void genBinary(BinaryOpNode* node);
     void genGenericBinOp(BinaryOpNode* node);
@@ -80,5 +81,6 @@ private:
     ASTNode* m_tree;
     std::map<std::string,int> m_funcsToLocs;
     std::vector<int> m_toffs;
+    std::vector<int> m_loopLocs;
     int m_finalGOffset;
 };
