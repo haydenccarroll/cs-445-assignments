@@ -320,7 +320,14 @@ void CodeGen::genID(IdNode* node)
     {
         std::stringstream ss;
         ss << "Load address of base of array " << node->getIdName();
-        emitRM("LDA", 3, node->getMemLoc(), 1, ss.str(), false);
+        if (node->getMemRefType() == MemReferenceType::Parameter)
+        {
+            emitRM("LD", 3, node->getMemLoc(), isLocal, ss.str(), false);
+        }
+        else
+        {
+            emitRM("LDA", 3, node->getMemLoc(), isLocal, ss.str(), false);
+        }
         ss.str("");
     }
 }
