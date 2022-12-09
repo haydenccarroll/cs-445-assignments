@@ -1,8 +1,6 @@
 THE WRONG LIST:
 
 do * (sizeof operator)
-no initializations work int x:6; 
-    need to create function to load varDecls, throw logic in here.
 
 do array copying
 

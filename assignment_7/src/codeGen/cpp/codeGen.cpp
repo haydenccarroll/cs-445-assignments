@@ -152,11 +152,27 @@ void CodeGen::genGlobalStatics(ASTNode* node)
             ss << "save size of array " << decl->getName();
             emitRM("ST", 3, decl->getMemLoc()+1, 0, ss.str(), false);
             ss.str("");
+        } else if (decl->getChild(0) != nullptr) // is initialization
+        {
+            int isLocal = 1;
+            switch (decl->getMemRefType())
+            {
+            case MemReferenceType::Global:
+            case MemReferenceType::Static:
+                isLocal = 0;
+            }
+            std::stringstream ss;
+            ss << "Store variable " << decl->getName();
+            traverseGenerate(decl->getChild(0));
+            emitRM("ST", 3, decl->getMemLoc(), isLocal, ss.str(), false);
         }
 
     }
 
-
+    for (int i=0; i < node->getNumChildren(); i++)
+    {
+        genGlobalStatics(node->getChild(i));
+    }
     genGlobalStatics(node->getSibling(0));
 }
 
@@ -227,9 +243,12 @@ void CodeGen::traverseGenerate(ASTNode* node, bool traverseSiblings)
         break;
     }
 
-    for (unsigned int i=0; i < node->getNumChildren(); i++)
+    if (node->getNodeType() != NodeType::VarDeclNode)
     {
-        traverseGenerate(node->getChild(i));
+        for (unsigned int i=0; i < node->getNumChildren(); i++)
+        {
+            traverseGenerate(node->getChild(i));
+        }
     }
 
     switch (node->getNodeType())
@@ -339,7 +358,6 @@ void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
         return;
     }
     emitComment("COMPOUND");
-    int oldToff = m_toffs.back();
     auto child = tryCast<VarDeclNode*>(node->getChild(0));
     int size = 0;
     while (child != nullptr)
@@ -355,17 +373,35 @@ void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
     child = tryCast<VarDeclNode*>(node->getChild(0));
     while (child != nullptr)
     {
-        if (child->getDataType().isArray())
+        int isLocal = 1;
+        switch (child->getMemRefType())
         {
-            std::stringstream ss;
-            ss << "load size of array " << child->getName();
-            emitRM("LDC", 3, child->getMemSize()-1, 6, ss.str(), false);
-            ss.str("");
+        case MemReferenceType::Global:
+        case MemReferenceType::Static:
+            isLocal = 0;
+        }
+        if (isLocal == 1)
+        {
+            child->setHasBeenCodegenned(true);
+            if (child->getDataType().isArray())
+            {
+                std::stringstream ss;
+                ss << "load size of array " << child->getName();
+                emitRM("LDC", 3, child->getMemSize()-1, 6, ss.str(), false);
+                ss.str("");
 
-            bool isLocal = child->getMemRefType() == MemReferenceType::Local;
-            ss << "save size of array " << child->getName();
-            emitRM("ST", 3, child->getMemLoc() + 1, isLocal, ss.str(), false);
-            ss.str("");
+                bool isLocal = child->getMemRefType() == MemReferenceType::Local;
+                ss << "save size of array " << child->getName();
+                emitRM("ST", 3, child->getMemLoc() + 1, isLocal, ss.str(), false);
+                ss.str("");
+            } else if (child->getChild(0) != nullptr) // there is an initialization
+            {
+
+                std::stringstream ss;
+                ss << "Store variable " << child->getName();
+                traverseGenerate(child->getChild(0));
+                emitRM("ST", 3, child->getMemLoc(), isLocal, ss.str(), false);
+            }
         }
 
         child = tryCast<VarDeclNode*>(child->getSibling(0));
