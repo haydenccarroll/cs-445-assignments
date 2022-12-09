@@ -373,9 +373,17 @@ void CodeGen::genReturn(ReturnNode* node)
     }
 
     emitComment("RETURN");
+
+    auto returnVal = node->getChild(0);
+    if (returnVal != nullptr)
+    {
+        traverseGenerate(returnVal);
+        emitRM("LDA", 2, 0, 3, "Copy result to return register");
+    }
+
     emitRM("LD", 3, -1, 1, "Load return address");
     emitRM("LD", 1, 0, 1, "Adjust fp");
-    emitRM("JMP", 7, 0, 3, "Return"); // -9 isnt always constant. idk what it is.
+    emitRM("JMP", 7, 0, 3, "Return");
 }
 
 void CodeGen::genCall(CallNode* node)
@@ -1337,14 +1345,10 @@ bool CodeGen::isNodeTopMostExp(ASTNode* node)
         return false;
     }
 
-    while (node->getParent() != nullptr)
+    if (node->getParent()->getNodeType() == NodeType::CompoundStmtNode)
     {
-        if (tryCast<ExpNode*>(node->getParent()) != nullptr)
-        {
-            return false;
-        }
-        node = node->getParent();
+        return true;
     }
-    return true;
+    return false;
 }
 
