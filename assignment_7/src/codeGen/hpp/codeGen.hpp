@@ -49,6 +49,8 @@ public:
     void genTGT(BinaryOpNode* node);
     void genTLT(BinaryOpNode* node);
     void genTNEQ(BinaryOpNode* node);
+    void genTGE(BinaryOpNode* node);
+    void genTLE(BinaryOpNode* node);
     void genIndex(BinaryOpNode* node);
     void genLHSIndex(BinaryOpNode* node, ASTNode* rhs=nullptr, int subThirdParam=4);
 

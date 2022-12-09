@@ -304,6 +304,13 @@ void CodeGen::genID(IdNode* node)
         emitRM("LD", 3, node->getMemLoc(), (int) isLocal, ss.str(), false);
         ss.str("");
     }
+    else
+    {
+        std::stringstream ss;
+        ss << "Load address of base of array " << node->getIdName();
+        emitRM("LDA", 3, node->getMemLoc(), 1, ss.str(), false);
+        ss.str("");
+    }
 }
 
 void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
@@ -1019,7 +1026,29 @@ void CodeGen::genTNEQ(BinaryOpNode* node)
     }
 
     genGenericBinOp(node);
-    emitRO("TNEQ", 3, 4, 3, "Op !=");
+    emitRO("TNE", 3, 4, 3, "Op !=");
+}
+
+void CodeGen::genTGE(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::GEQ)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("TGE", 3, 4, 3, "Op >=");
+}
+
+void CodeGen::genTLE(BinaryOpNode* node)
+{
+    if (node == nullptr || node->getOperatorType() != BinaryOpType::LEQ)
+    {
+        return;
+    }
+
+    genGenericBinOp(node);
+    emitRO("TLE", 3, 4, 3, "Op <=");
 }
 
 void CodeGen::genTGT(BinaryOpNode* node)
@@ -1125,7 +1154,14 @@ void CodeGen::genLHSIndex(BinaryOpNode* node, ASTNode* rhs, int subThirdParam)
     }
     std::stringstream ss;
     ss << "Load address of base of array " << idNode->getIdName();
-    emitRM("LDA", 5, idNode->getMemLoc(), isLocal, ss.str(), false);
+    if (idNode->getMemRefType() == MemReferenceType::Parameter)
+    {
+        emitRM("LD", 5, idNode->getMemLoc(), isLocal, ss.str(), false);
+    }
+    else
+    {
+        emitRM("LDA", 5, idNode->getMemLoc(), isLocal, ss.str(), false);
+    }
     emitRO("SUB", 5, 5, subThirdParam, "Compute offset of value");
 }
 
@@ -1138,6 +1174,7 @@ void CodeGen::genIndex(BinaryOpNode* node)
 
     std::stringstream ss;
     auto idNode = cast<IdNode*>(node->getChild(0));
+    idNode->setHasBeenCodegenned(true);
     ss << "Load address of base of array " << idNode->getIdName();
 
     // first param is 3, unless its on LHS
@@ -1148,7 +1185,14 @@ void CodeGen::genIndex(BinaryOpNode* node)
     case MemReferenceType::Static:
         isLocal = 0;
     }
-    emitRM("LDA", 3, idNode->getMemLoc(), isLocal, ss.str(), false);
+    if (idNode->getMemRefType() == MemReferenceType::Parameter)
+    {
+        emitRM("LD", 3, idNode->getMemLoc(), isLocal, ss.str(), false);
+    }
+    else
+    {
+        emitRM("LDA", 3, idNode->getMemLoc(), isLocal, ss.str(), false);
+    }
     emitRM("ST", 3, m_toffs.back(), 1, "Push left side");
     toffDec();
     traverseGenerate(node->getChild(1)); // calculate array index here
