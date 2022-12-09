@@ -768,11 +768,13 @@ void CodeGen::genAddAss(BinaryOpNode* node)
         return;
     }
 
-    traverseGenerate(node->getChild(1)); // calculate RHS first.
+    node->getChild(0)->setHasBeenCodegenned(true);
 
     auto idNode = tryCast<IdNode*>(node->getChild(0));
     if (idNode)
     {
+        traverseGenerate(node->getChild(1)); // calculate RHS first.
+
         // 0 if global/static
         // 1 if lcocal
         // 5 if array?
@@ -800,8 +802,6 @@ void CodeGen::genAddAss(BinaryOpNode* node)
         }
 
         std::stringstream ss;
-        idNode->setHasBeenCodegenned(true); // dont process LHS any more
-
         ss << "load lhs variable " << idNode->getIdName();
         emitRM("LD", 4, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
         ss.str("");
@@ -810,6 +810,20 @@ void CodeGen::genAddAss(BinaryOpNode* node)
 
         ss << "Store variable " << idNode->getIdName();
         emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+    }
+    else
+    {
+        auto indexNode = cast<BinaryOpNode*>(node->getChild(0));
+        genLHSIndex(indexNode, node->getChild(1));
+
+        std::stringstream ss;
+        auto idNode = cast<IdNode*>(indexNode->getChild(0));
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 4, 0, 5, ss.str(), false);
+        ss.str("");
+        emitRO("ADD", 3, 4, 3, "op +=");
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, 0, 5, ss.str(), false);
     }
 }
 
@@ -820,11 +834,13 @@ void CodeGen::genSubAss(BinaryOpNode* node)
         return;
     }
 
-    traverseGenerate(node->getChild(1)); // calculate RHS first.
+    node->getChild(0)->setHasBeenCodegenned(true);
 
     auto idNode = tryCast<IdNode*>(node->getChild(0));
     if (idNode)
     {
+        traverseGenerate(node->getChild(1)); // calculate RHS first.
+
         // 0 if global/static
         // 1 if lcocal
         // 5 if array?
@@ -852,8 +868,6 @@ void CodeGen::genSubAss(BinaryOpNode* node)
         }
 
         std::stringstream ss;
-        idNode->setHasBeenCodegenned(true); // dont process LHS any more
-
         ss << "load lhs variable " << idNode->getIdName();
         emitRM("LD", 4, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
         ss.str("");
@@ -862,6 +876,20 @@ void CodeGen::genSubAss(BinaryOpNode* node)
 
         ss << "Store variable " << idNode->getIdName();
         emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+    }
+    else
+    {
+        auto indexNode = cast<BinaryOpNode*>(node->getChild(0));
+        genLHSIndex(indexNode, node->getChild(1));
+
+        std::stringstream ss;
+        auto idNode = cast<IdNode*>(indexNode->getChild(0));
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 4, 0, 5, ss.str(), false);
+        ss.str("");
+        emitRO("SUB", 3, 4, 3, "op -=");
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, 0, 5, ss.str(), false);
     }
 }
 
@@ -872,11 +900,13 @@ void CodeGen::genMulAss(BinaryOpNode* node)
         return;
     }
 
-    traverseGenerate(node->getChild(1)); // calculate RHS first.
+    node->getChild(0)->setHasBeenCodegenned(true);
 
     auto idNode = tryCast<IdNode*>(node->getChild(0));
     if (idNode)
     {
+        traverseGenerate(node->getChild(1)); // calculate RHS first.
+
         // 0 if global/static
         // 1 if lcocal
         // 5 if array?
@@ -904,8 +934,6 @@ void CodeGen::genMulAss(BinaryOpNode* node)
         }
 
         std::stringstream ss;
-        idNode->setHasBeenCodegenned(true); // dont process LHS any more
-
         ss << "load lhs variable " << idNode->getIdName();
         emitRM("LD", 4, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
         ss.str("");
@@ -914,6 +942,20 @@ void CodeGen::genMulAss(BinaryOpNode* node)
 
         ss << "Store variable " << idNode->getIdName();
         emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+    }
+    else
+    {
+        auto indexNode = cast<BinaryOpNode*>(node->getChild(0));
+        genLHSIndex(indexNode, node->getChild(1));
+
+        std::stringstream ss;
+        auto idNode = cast<IdNode*>(indexNode->getChild(0));
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 4, 0, 5, ss.str(), false);
+        ss.str("");
+        emitRO("MUL", 3, 4, 3, "op *=");
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, 0, 5, ss.str(), false);
     }
 }
 
@@ -924,11 +966,13 @@ void CodeGen::genDivAss(BinaryOpNode* node)
         return;
     }
 
-    traverseGenerate(node->getChild(1)); // calculate RHS first.
+    node->getChild(0)->setHasBeenCodegenned(true);
 
     auto idNode = tryCast<IdNode*>(node->getChild(0));
     if (idNode)
     {
+        traverseGenerate(node->getChild(1)); // calculate RHS first.
+
         // 0 if global/static
         // 1 if lcocal
         // 5 if array?
@@ -956,8 +1000,6 @@ void CodeGen::genDivAss(BinaryOpNode* node)
         }
 
         std::stringstream ss;
-        idNode->setHasBeenCodegenned(true); // dont process LHS any more
-
         ss << "load lhs variable " << idNode->getIdName();
         emitRM("LD", 4, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
         ss.str("");
@@ -966,6 +1008,20 @@ void CodeGen::genDivAss(BinaryOpNode* node)
 
         ss << "Store variable " << idNode->getIdName();
         emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+    }
+    else
+    {
+        auto indexNode = cast<BinaryOpNode*>(node->getChild(0));
+        genLHSIndex(indexNode, node->getChild(1));
+
+        std::stringstream ss;
+        auto idNode = cast<IdNode*>(indexNode->getChild(0));
+        ss << "load lhs variable " << idNode->getIdName();
+        emitRM("LD", 4, 0, 5, ss.str(), false);
+        ss.str("");
+        emitRO("DIV", 3, 4, 3, "op /=");
+        ss << "Store variable " << idNode->getIdName();
+        emitRM("ST", 3, 0, 5, ss.str(), false);
     }
 }
 
