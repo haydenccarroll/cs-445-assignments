@@ -178,6 +178,11 @@ void CodeGen::genGlobalStatics(ASTNode* node)
 
 void CodeGen::genEndStuff()
 {
+    int currLoc = emitWhereAmI();
+    emitNewLoc(0);
+    emitRM("JMP", 7, currLoc - 1, 7, "Jump to init [backpatch]");
+    emitNewLoc(currLoc);
+
     emitComment("INIT");
     emitRM("LDA", 1, m_finalGOffset, 0, "set first frame at end of globals"); // should use goffset
     emitRM("ST", 1, 0, 1, "store old fp (point to self)");
@@ -303,14 +308,6 @@ void CodeGen::genFuncEnd(FunDeclNode* node)
     std::stringstream ss;
     ss << "END FUNCTION " << node->getName();
     emitComment(ss.str());
-
-    if (node->getName() == "main")
-    {
-        int currLoc = emitWhereAmI();
-        emitNewLoc(0);
-        emitRM("JMP", 7, currLoc - 1, 7, "Jump to init [backpatch]");
-        emitNewLoc(currLoc);
-    }
 }
 
 void CodeGen::genID(IdNode* node)
