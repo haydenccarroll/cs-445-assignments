@@ -1315,10 +1315,17 @@ void CodeGen::genIf(IfNode* node)
 
     int newInstruct = emitWhereAmI();
     emitNewLoc(oldInstruct);
-    emitRM("JZR", 3, newInstruct - oldInstruct - 1, 7, "Jump around the THEN if false [backpatch]");
+    if (node->getChild(2) != nullptr) // if there is else 
+    {
+        emitRM("JZR", 3, newInstruct - oldInstruct, 7, "Jump around the THEN if false [backpatch]");
+    }
+    else
+    {
+        emitRM("JZR", 3, newInstruct - oldInstruct - 1, 7, "Jump around the THEN if false [backpatch]");
+    }
     emitNewLoc(newInstruct);
 
-    if (node->getChild(2) != nullptr)
+    if (node->getChild(2) != nullptr) // if there is else
     {
         oldInstruct = emitWhereAmI();
         emitNewLoc(oldInstruct+1);
@@ -1328,7 +1335,7 @@ void CodeGen::genIf(IfNode* node)
 
         int newInstruct = emitWhereAmI();
         emitNewLoc(oldInstruct);
-        emitRM("JZR", 7, newInstruct - oldInstruct - 1, 7, "Jump around the ELSE [backpatch]");
+        emitRM("JMP", 7, newInstruct - oldInstruct - 1, 7, "Jump around the ELSE [backpatch]");
         emitNewLoc(newInstruct);
     }
 
