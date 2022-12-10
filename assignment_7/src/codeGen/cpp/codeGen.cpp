@@ -1201,8 +1201,23 @@ void CodeGen::genTEQ(BinaryOpNode* node)
     }
 
     genGenericBinOp(node);
+    if (cast<ExpNode*>(node->getChild(0))->getExpType().isArray())
+    {
+        emitRM("LD", 5, 1, 3, "AC2 <- |RHS|");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRM("LDA", 2, 0, 5, "R2 <- |RHS|");
+        emitRO("SWP", 5, 6, 6, "pick smallest size");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRO("CO", 4, 3, 5, "setup array compare  LHS vs RHS");
+        emitRO("TNE", 5, 4, 3, "if not equal then test (AC1, AC)");
+        emitRO("JNZ", 5, 2, 7, "jump not equal");
+        emitRM("LDA", 3, 0, 2, "AC1 <- |RHS|");
+        emitRM("LDA", 4, 0, 6, "AC <- |LHS|");
+    }
     emitRO("TEQ", 3, 4, 3, "Op ==");
 }
+
+
 
 void CodeGen::genTNEQ(BinaryOpNode* node)
 {
@@ -1212,6 +1227,19 @@ void CodeGen::genTNEQ(BinaryOpNode* node)
     }
 
     genGenericBinOp(node);
+    if (cast<ExpNode*>(node->getChild(0))->getExpType().isArray())
+    {
+        emitRM("LD", 5, 1, 3, "AC2 <- |RHS|");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRM("LDA", 2, 0, 5, "R2 <- |RHS|");
+        emitRO("SWP", 5, 6, 6, "pick smallest size");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRO("CO", 4, 3, 5, "setup array compare  LHS vs RHS");
+        emitRO("TNE", 5, 4, 3, "if not equal then test (AC1, AC)");
+        emitRO("JNZ", 5, 2, 7, "jump not equal");
+        emitRM("LDA", 3, 0, 2, "AC1 <- |RHS|");
+        emitRM("LDA", 4, 0, 6, "AC <- |LHS|");
+    }
     emitRO("TNE", 3, 4, 3, "Op !=");
 }
 
@@ -1223,6 +1251,19 @@ void CodeGen::genTGE(BinaryOpNode* node)
     }
 
     genGenericBinOp(node);
+    if (cast<ExpNode*>(node->getChild(0))->getExpType().isArray())
+    {
+        emitRM("LD", 5, 1, 3, "AC2 <- |RHS|");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRM("LDA", 2, 0, 5, "R2 <- |RHS|");
+        emitRO("SWP", 5, 6, 6, "pick smallest size");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRO("CO", 4, 3, 5, "setup array compare  LHS vs RHS");
+        emitRO("TNE", 5, 4, 3, "if not equal then test (AC1, AC)");
+        emitRO("JNZ", 5, 2, 7, "jump not equal");
+        emitRM("LDA", 3, 0, 2, "AC1 <- |RHS|");
+        emitRM("LDA", 4, 0, 6, "AC <- |LHS|");
+    }
     emitRO("TGE", 3, 4, 3, "Op >=");
 }
 
@@ -1234,6 +1275,19 @@ void CodeGen::genTLE(BinaryOpNode* node)
     }
 
     genGenericBinOp(node);
+    if (cast<ExpNode*>(node->getChild(0))->getExpType().isArray())
+    {
+        emitRM("LD", 5, 1, 3, "AC2 <- |RHS|");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRM("LDA", 2, 0, 5, "R2 <- |RHS|");
+        emitRO("SWP", 5, 6, 6, "pick smallest size");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRO("CO", 4, 3, 5, "setup array compare  LHS vs RHS");
+        emitRO("TNE", 5, 4, 3, "if not equal then test (AC1, AC)");
+        emitRO("JNZ", 5, 2, 7, "jump not equal");
+        emitRM("LDA", 3, 0, 2, "AC1 <- |RHS|");
+        emitRM("LDA", 4, 0, 6, "AC <- |LHS|");
+    }
     emitRO("TLE", 3, 4, 3, "Op <=");
 }
 
@@ -1245,6 +1299,19 @@ void CodeGen::genTGT(BinaryOpNode* node)
     }
 
     genGenericBinOp(node);
+    if (cast<ExpNode*>(node->getChild(0))->getExpType().isArray())
+    {
+        emitRM("LD", 5, 1, 3, "AC2 <- |RHS|");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRM("LDA", 2, 0, 5, "R2 <- |RHS|");
+        emitRO("SWP", 5, 6, 6, "pick smallest size");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRO("CO", 4, 3, 5, "setup array compare  LHS vs RHS");
+        emitRO("TNE", 5, 4, 3, "if not equal then test (AC1, AC)");
+        emitRO("JNZ", 5, 2, 7, "jump not equal");
+        emitRM("LDA", 3, 0, 2, "AC1 <- |RHS|");
+        emitRM("LDA", 4, 0, 6, "AC <- |LHS|");
+    }
     emitRO("TGT", 3, 4, 3, "Op >");
 }
 
@@ -1256,6 +1323,19 @@ void CodeGen::genTLT(BinaryOpNode* node)
     }
 
     genGenericBinOp(node);
+    if (cast<ExpNode*>(node->getChild(0))->getExpType().isArray())
+    {
+        emitRM("LD", 5, 1, 3, "AC2 <- |RHS|");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRM("LDA", 2, 0, 5, "R2 <- |RHS|");
+        emitRO("SWP", 5, 6, 6, "pick smallest size");
+        emitRM("LD", 6, 1, 4, "AC3 <- |LHS|");
+        emitRO("CO", 4, 3, 5, "setup array compare  LHS vs RHS");
+        emitRO("TNE", 5, 4, 3, "if not equal then test (AC1, AC)");
+        emitRO("JNZ", 5, 2, 7, "jump not equal");
+        emitRM("LDA", 3, 0, 2, "AC1 <- |RHS|");
+        emitRM("LDA", 4, 0, 6, "AC <- |LHS|");
+    }
     emitRO("TLT", 3, 4, 3, "Op <");
 }
 
