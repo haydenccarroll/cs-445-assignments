@@ -152,6 +152,11 @@ void CodeGen::genStatics(ASTNode* node)
             ss << "save size of array " << decl->getName();
             emitRM("ST", 3, decl->getMemLoc()+1, 0, ss.str(), false);
             ss.str("");
+            if (decl->getChild(0) != nullptr)
+            {
+                traverseGenerate(decl->getChild(0));
+                genArrayCopy(decl, decl->getChild(0));
+            }
         } else if (decl->getChild(0) != nullptr) // is initialization
         {
             std::stringstream ss;
@@ -191,6 +196,12 @@ void CodeGen::genGlobals(ASTNode* node)
             ss << "save size of array " << decl->getName();
             emitRM("ST", 3, decl->getMemLoc()+1, 0, ss.str(), false);
             ss.str("");
+
+            if (decl->getChild(0) != nullptr)
+            {
+                traverseGenerate(decl->getChild(0));
+                genArrayCopy(decl, decl->getChild(0));
+            }
         } else if (decl->getChild(0) != nullptr) // is initialization
         {
             std::stringstream ss;
@@ -202,6 +213,20 @@ void CodeGen::genGlobals(ASTNode* node)
     }
     genGlobals(node->getSibling(0));
 }
+
+void CodeGen::genArrayCopy(ASTNode* lhs, ASTNode* rhs)
+{
+    if (lhs == nullptr || rhs == nullptr)
+    {
+        return;
+    }
+    emitRM("LDA", 4, lhs->getMemLoc(), 1, "address of lhs");
+    emitRM("LD", 5, 1, 3, "size of rhs");
+    emitRM("LD", 6, 1, 4, "size of lhs");
+    emitRO("SWP", 5, 6, 6, "pick smallest size");
+    emitRO("MOV", 4, 3, 5, "array op =");
+}
+
 
 void CodeGen::genEndStuff()
 {
@@ -421,6 +446,11 @@ void CodeGen::genCompoundStmtStart(CompoundStmtNode* node)
                 ss << "save size of array " << child->getName();
                 emitRM("ST", 3, child->getMemLoc() + 1, isLocal, ss.str(), false);
                 ss.str("");
+                if (child->getChild(0) != nullptr)
+                {
+                    traverseGenerate(child->getChild(0));
+                    genArrayCopy(child, child->getChild(0));
+                }
             } else if (child->getChild(0) != nullptr) // there is an initialization
             {
 
@@ -828,35 +858,26 @@ void CodeGen::genAss(BinaryOpNode* node)
     {
         traverseGenerate(node->getChild(1)); // calculate RHS first.
 
+        if (idNode->getExpType().isArray())
+        {
+            genArrayCopy(idNode, node->getChild(1));
+            return;
+        }
+
         // 0 if global/static
         // 1 if lcocal
-        // 5 if array?
-        bool isGlobal = false;
+        bool isLocal = 1;
         bool isArray = false;
         switch (idNode->getMemRefType())
         {
         case MemReferenceType::Global:
         case MemReferenceType::Static:
-            isGlobal = true;
-        }
-
-        int thirdSTParam;
-        if (isGlobal)
-        {
-            thirdSTParam = 0;
-        }
-        else if (idNode->getExpType().isArray())
-        {
-            thirdSTParam = 5;
-        }
-        else
-        {
-            thirdSTParam = 1;
+            isLocal = 0;
         }
 
         std::stringstream ss;
         ss << "Store variable " << idNode->getIdName();
-        emitRM("ST", 3, idNode->getMemLoc(), thirdSTParam, ss.str(), false);
+        emitRM("ST", 3, idNode->getMemLoc(), isLocal, ss.str(), false);
     }
     else // it must be array index
     {
@@ -1369,6 +1390,13 @@ void CodeGen::genIndex(BinaryOpNode* node)
 
 void CodeGen::genConst(ConstNode* node)
 {
+    if (node->getExpType().isArray())
+    {
+        emitStrLit(m_litOff, (char*) node->getStringVal().c_str());
+        m_litOff += node->getStringVal().length() + 1;
+        emitRM("LDA", 3, node->getMemLoc(), 0, "Load address of char array");
+        return;
+    }
     switch (node->getExpType().getEnumType())
     {
     case DataTypeEnum::Bool:

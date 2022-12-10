@@ -186,7 +186,7 @@ void emitGotoAbs(int a, char *c)
 
 int emitStrLit(int goffset, char *s)
 {
-    fprintf(code, "%3d:  %5s  \"%s\"\n", -goffset, (char *)"LIT", s);
+    fprintf(code, "%3d:  %5s  \"%s\"\n", goffset, (char *)"LIT", s);
     return goffset;
 }
 

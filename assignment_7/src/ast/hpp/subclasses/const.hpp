@@ -24,6 +24,7 @@ public:
     int getIntVal() { return m_intValue; }
     char getCharVal() { return m_charValue; }
     bool getBoolVal() { return m_boolValue; }
+    std::string getStringVal() { return m_stringValue; }
 
     std::string toString(bool printType=false) override;
 private:

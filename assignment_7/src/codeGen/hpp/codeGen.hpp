@@ -34,6 +34,8 @@ public:
     void genWhile(WhileNode* node);
     void genBreak(BreakNode* node);
 
+    void genArrayCopy(ASTNode* lhs, ASTNode* rhs);
+
     void genBinary(BinaryOpNode* node);
     void genGenericBinOp(BinaryOpNode* node);
     void genAss(BinaryOpNode* node);
@@ -86,4 +88,5 @@ private:
     std::vector<int> m_toffs;
     std::vector<int> m_loopLocs;
     int m_finalGOffset;
+    int m_litOff=1;
 };

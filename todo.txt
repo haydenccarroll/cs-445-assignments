@@ -1,6 +1,5 @@
 THE WRONG LIST:
 
-do array copying
 expression comment isnt always right.
 
 have some memory issue with for loops.
