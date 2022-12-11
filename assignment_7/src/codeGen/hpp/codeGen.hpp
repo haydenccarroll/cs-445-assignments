@@ -81,8 +81,11 @@ public:
     bool isNodeTopMostExp(ASTNode* node);
     bool isNodeOnLHS(ASTNode* node);
 
+    std::string getFilenameBase(std::string base);
+
 private:
-    std::string m_fileName;
+    std::string m_oldFileName;
+    std::string m_newFileName;
     ASTNode* m_tree;
     std::map<std::string,int> m_funcsToLocs;
     std::vector<int> m_toffs;

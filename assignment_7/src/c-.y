@@ -13,7 +13,6 @@
 #include <string>
 #include <stdexcept>
 #include <stdlib.h>
-#include <filesystem>
 
 #include "c-.tab.h"
 
@@ -1085,11 +1084,7 @@ int main(int argc, char** argv)
     std::cout << "Number of warnings: " << Error::getWarningCount() << std::endl;
     std::cout << "Number of errors: " << Error::getErrorCount() << std::endl;
 
-
-    std::filesystem::path tmFilePath = options.getFileName();
-    tmFilePath = tmFilePath.replace_extension("tm");
-    tmFilePath = tmFilePath.filename().generic_string();
-    CodeGen codeGen(root, tmFilePath);
+    CodeGen codeGen(root, options.getFileName());
     codeGen.setFinalGOffset(gOffset);
     codeGen.generate();
 

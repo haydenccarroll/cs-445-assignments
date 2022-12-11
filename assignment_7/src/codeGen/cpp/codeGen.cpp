@@ -1,15 +1,15 @@
 #include "../hpp/codeGen.hpp"
 #include "../../error/include.hpp"
 
-#include <filesystem>
 FILE* code = nullptr;
 
 CodeGen::CodeGen(ASTNode* tree, std::string fileName)
 {
     m_tree = tree;
-    m_fileName = fileName;
+    m_oldFileName = fileName;
+    m_newFileName = getFilenameBase(m_oldFileName) + ".tm";
 
-    auto file = fopen(m_fileName.c_str(), "w");
+    auto file = fopen(m_newFileName.c_str(), "w");
     if (file == nullptr)
     {
         Error::critical(0, "Could not open file for codegen.");
@@ -23,13 +23,21 @@ CodeGen::~CodeGen()
     fclose(code);
 }
 
+std::string CodeGen::getFilenameBase(std::string base)
+{
+    base.erase(base.size() - 3);
+    while (base.find("/") != std::string::npos)
+    {
+        base.erase(base.begin());
+    }
+    return base;
+}
+
 void CodeGen::generate()
 {
-    std::filesystem::path oldFileName = m_fileName;
-    oldFileName = oldFileName.replace_extension("c-");
-    std::stringstream ss;
-    ss << "File compiled:  " << oldFileName.filename().generic_string();
 
+    std::stringstream ss;
+    ss << "File compiled:  " << m_oldFileName;
     emitComment("C- compiler version F22");
     emitComment(ss.str());
     generateIO();
